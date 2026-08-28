@@ -62,8 +62,8 @@ Implementation priority therefore remains: stable end-to-end generation flow fir
 
 ## Source locations
 
-- Android project (working project): `MobileDevFinalProj`
-- Legacy web/backend source (reference and future server work): sibling folder `..\Project\firstsite`
+- Android project (working project): `MobileDevFinalProj/JournifyAndroid`
+- Reused Django backend (now copied into the working project): `JournifyAndroid/backend`
 - Original presentation: `C:\Users\phana\OneDrive\Desktop\CT POC.pdf`
 
 ## Product understood from the presentation and source
@@ -248,8 +248,9 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M2 — Define Android domain/API boundaries and create the native Journify shell/theme/navigation.**
 - [x] **M3 — Build trip setup form and validation.**
 - [x] **M4 — Build itinerary result timeline with demo data.**
-- [ ] **M5 — Add Django mobile generation/catalog API adapter and connect Android.**
-- [ ] **M6 — Add Room persistence plus loading/empty/error/offline states.**
+- [x] **M5 — Add Django mobile generation/catalog API adapter and connect Android.**
+- [x] **M6 — Add Room persistence plus loading/empty/error/offline states.**
+- [x] **M6.5 — Add partial place selection, rich place details/review links, and itinerary replacement.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -262,7 +263,20 @@ Milestones 3 and 4 are complete. `PlannerActivity` collects days, POIs/day, budg
 
 Verification: `assembleDebug` and `testDebugUnitTest` both completed successfully after M3–M4. Debug APK: `app/build/outputs/apk/debug/app-debug.apk`.
 
-Next: M5. Add the stateless Django mobile generation/catalog endpoint and a remote Android repository. The legacy backend currently sits outside this project's writable workspace, so keep the Android client on the demo adapter until the backend can be edited or copied into the working project.
+M5 and M6 are now complete. The copied Django backend exposes stateless mobile catalog and generation endpoints. Android uses the remote repository first and a deterministic offline demo repository if the server cannot be reached. Saved itineraries persist in Room and are available under the Trips tab. The map screen renders real stop coordinates with Leaflet/OpenStreetMap and requests a road route from OSRM.
+
+### Selection, review links and editing milestone — 29 August 2026
+
+- Trip setup now continues to a native place-selection screen instead of immediately generating.
+- Users may choose any subset of the required POIs and eateries; selected IDs are sent to Django and `_auto_fill_selections` fills the remaining capacity according to trip length and mood.
+- Users can switch between POI/eatery lists without losing selections, or skip selection and let Journify choose everything.
+- The catalog API now returns rating, price, coordinates, opening hours, tags/meal slots, POI highlight, image URL, and the original CSV media link.
+- Place details display all available information and label the external action as TikTok review, Google Maps review, or a generic review link based on the actual URL.
+- Every generated POI/eatery has `Chi tiết` and `Thay đổi` actions. Replacing a stop updates its data, estimated trip cost, adjacent straight-line distance estimates, and the coordinates used by the map screen.
+- Android UI was installed and exercised on `emulator-5554`: partial POI/eatery selection generated a 3-day itinerary, the selected POI remained in the optimized schedule, review details rendered correctly, and replacing Bánh căn Lệ with Bánh bèo Thái Phiên changed the estimate from 1,237,000₫ to 1,157,000₫.
+- Django `manage.py check`, live catalog/generation HTTP tests, `assembleDebug`, and `testDebugUnitTest` completed successfully. The current APK remains at `app/build/outputs/apk/debug/app-debug.apk`.
+
+Next: M7 hardening and submission work. Add a small set of domain tests, document backend/device setup, produce a release APK, and prepare report/video folders. Cloud deployment or configurable LAN server address is still required if the APK must work on a physical phone without the development computer.
 
 ### Separation milestone
 
@@ -278,5 +292,5 @@ The parent `MobileDevFinalProj` content was cleaned on 28 August 2026. All old A
 
 - Do not edit unrelated `.idea` changes; they existed before migration work.
 - Do not delete the old source until Journify compiles; unused old classes can remain temporarily.
-- Backend source is outside the Android writable root, so targeted backend edits may require explicit permission/escalation later.
+- Backend source is now inside `JournifyAndroid/backend` and is part of the canonical project.
 - Never place a laptop localhost URL directly into a release build. Android emulator uses `10.0.2.2`; physical devices need the computer LAN IP or a deployed HTTPS server.

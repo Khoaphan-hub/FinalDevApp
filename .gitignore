@@ -8,3 +8,7 @@
 .externalNativeBuild
 .cxx
 app/build
+backend/.venv/
+**/__pycache__/
+*.py[cod]
+gradle/gradle-daemon-jvm.properties

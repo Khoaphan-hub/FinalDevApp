@@ -1,10 +1,11 @@
 package com.example.finalproject.domain.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class TripRequest {
+public final class TripRequest implements Serializable {
     private final int days;
     private final int dailyPoiLimit;
     private final long budgetVnd;

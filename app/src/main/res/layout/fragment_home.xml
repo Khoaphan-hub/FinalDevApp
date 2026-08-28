@@ -33,6 +33,20 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_marginTop="18dp"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Phong cảnh Đà Lạt"
+                android:scaleType="centerCrop"
+                android:src="@drawable/hero_dalat" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             app:cardBackgroundColor="@color/primary"

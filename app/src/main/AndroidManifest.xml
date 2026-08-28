@@ -9,6 +9,7 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -40,6 +41,26 @@
 
         <activity
             android:name=".presentation.itinerary.ItineraryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.map.MapActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.catalog.CatalogActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.catalog.PlaceDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.selection.PlaceSelectionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.selection.ReplacementActivity"
             android:exported="false" />
 
 

@@ -1,0 +1,81 @@
+package com.example.finalproject.infrastructure.remote;
+
+import android.os.Handler;
+import android.os.Looper;
+
+import com.example.finalproject.domain.callback.RepositoryCallback;
+import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.domain.repository.CatalogRepository;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public final class RemoteCatalogRepository implements CatalogRepository {
+    private final String baseUrl;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler main = new Handler(Looper.getMainLooper());
+
+    public RemoteCatalogRepository(String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    }
+
+    @Override
+    public void load(String type, String query, RepositoryCallback<List<Place>> callback) {
+        executor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                String encoded = URLEncoder.encode(query == null ? "" : query, StandardCharsets.UTF_8.name());
+                URL url = new URL(baseUrl + "api/mobile/catalog/?type=" + type + "&query=" + encoded + "&limit=80");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(6000);
+                connection.setReadTimeout(12000);
+                JSONObject root = new JSONObject(read(connection));
+                if (connection.getResponseCode() != 200 || !root.optBoolean("success")) {
+                    throw new IllegalStateException(root.optString("message", "Không tải được địa điểm."));
+                }
+                JSONArray items = root.getJSONObject("data").getJSONArray("items");
+                List<Place> places = new ArrayList<>();
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+                    places.add(new Place(item.optInt("id"), item.optString("type"),
+                        item.optString("name"), item.optString("address"), item.optDouble("rating"),
+                        Math.round(item.optDouble("price")), nullable(item, "image_url"),
+                        item.optDouble("latitude"), item.optDouble("longitude"),
+                        nullable(item, "open_hours"), nullable(item, "tags"),
+                        nullable(item, "highlight"), nullable(item, "media_url")));
+                }
+                main.post(() -> callback.onSuccess(places));
+            } catch (Exception error) {
+                main.post(() -> callback.onError(error));
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    private String read(HttpURLConnection connection) throws Exception {
+        StringBuilder result = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+            connection.getResponseCode() < 400 ? connection.getInputStream() : connection.getErrorStream(),
+            StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) result.append(line);
+        }
+        return result.toString();
+    }
+
+    private String nullable(JSONObject object, String key) {
+        return object.isNull(key) ? null : object.optString(key, null);
+    }
+}

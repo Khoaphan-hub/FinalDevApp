@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.finalproject.R;
 import com.example.finalproject.presentation.home.HomeFragment;
+import com.example.finalproject.presentation.saved.SavedTripsFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -15,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SystemBarInsets.apply(findViewById(R.id.mainRoot));
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
 
@@ -26,10 +28,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
                 topAppBar.setTitle("Journify");
             } else if (itemId == R.id.nav_trips) {
-                selectedFragment = ComingSoonFragment.newInstance(
-                    "Chuyến đi của bạn",
-                    "Các lịch trình đã lưu sẽ xuất hiện ở đây."
-                );
+                selectedFragment = new SavedTripsFragment();
                 topAppBar.setTitle("Chuyến đi");
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = ComingSoonFragment.newInstance(

@@ -1,0 +1,3914 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journify - Bắt đầu kỳ nghỉ mơ ước của bạn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=SF+Pro+Display:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ios-blue: #0071E3;
+            --ios-blue-hover: #0077ED;
+            --ios-gray: #1D1D1F;
+            --ios-light-gray: #F5F5F7;
+            --ios-dark: #000000;
+            --ios-medium-gray: #1D1D1F;
+            --ios-background: #FBFBFD;
+            --ios-card-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-light: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --accent-yellow: #F5A623;
+            --accent-orange: #FF9500;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.12);
+            --shadow-heavy: rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: var(--ios-background);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+            padding: 0.6rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0071E3 0%, #00C6FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: -0.02em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            {% comment %} flex-wrap: wrap; {% endcomment %}
+        }
+        
+        .nav-text-link {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ios-dark);
+            text-decoration: none;
+            padding: 0.5rem 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-text-link:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--ios-blue);
+        }
+
+        .profile-container {
+            position: relative;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn.login {
+            background: transparent;
+            color: #000000;
+        }
+
+        .nav-btn.login:hover {
+            background: rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.login:active {
+            transform: translateY(0);
+        }
+
+        .nav-btn.signup {
+            background: var(--ios-blue);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+        }
+
+        .nav-btn.signup:hover {
+            background: var(--ios-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 113, 227, 0.4);
+        }
+
+        .nav-btn.signup:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+        }
+
+        /* Create Itinerary Button - Apple Primary Action Style */
+        .create-itinerary-btn {
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25);
+            letter-spacing: -0.01em;
+        }
+
+        .create-itinerary-btn:hover {
+            background: var(--ios-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 113, 227, 0.35);
+        }
+
+        .create-itinerary-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25);
+        }
+
+        /* Auth Modal Styles */
+        .auth-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .auth-modal-overlay.active {
+            display: flex;
+        }
+        
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            flex-shrink: 0;
+            font-size: 1.2rem; /* Kích thước emoji */
+        }
+
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(10px);
+            }
+        }
+
+        @keyframes fadeOutOverlay {
+            from {
+                opacity: 1;
+                backdrop-filter: blur(10px);
+            }
+            to {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+        }
+
+        .auth-modal-overlay.closing {
+            animation: fadeOutOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeOutOverlay {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .auth-modal-overlay.closing {
+            animation: fadeOutOverlay 0.3s ease-out forwards;
+        }
+
+        .auth-modal {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 
+                        0 10px 25px rgba(0, 0, 0, 0.15),
+                        0 0 0 0.5px rgba(255, 255, 255, 0.2) inset;
+            position: relative;
+            animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 0.5px solid rgba(255, 255, 255, 0.18);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes modalSlideDown {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+        }
+
+        .auth-modal.closing {
+            animation: modalSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .auth-modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(0, 0, 0, 0.08);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        .auth-modal-close:hover {
+            background: rgba(0, 0, 0, 0.15);
+            transform: rotate(90deg);
+        }
+
+        .auth-modal-close:active {
+            transform: rotate(90deg);
+        }
+
+        .auth-modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--ios-dark);
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .auth-modal-subtitle {
+            font-size: 0.95rem;
+            color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ios-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .auth-form-input:focus {
+            border-color: var(--ios-blue);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+
+        .auth-submit-btn:hover {
+            background: var(--ios-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
+        }
+
+        .auth-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-divider::before {
+            left: 0;
+        }
+
+        .auth-divider::after {
+            right: 0;
+        }
+
+        .auth-switch {
+            text-align: center;
+            font-size: 0.95rem;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .auth-switch-link {
+            color: var(--ios-blue);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .auth-switch-link:hover {
+            text-decoration: underline;
+            color: var(--ios-blue-hover);
+        }
+
+        .auth-error {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            color: #d32f2f;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            animation: shakeError 0.4s ease;
+        }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .language-toggle {
+            width: 44px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-dark);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(255, 255, 255, 0.4) inset;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.85rem;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 255, 255, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(255, 255, 255, 0.5) inset;
+        }
+
+        .language-toggle:active {
+            transform: translateY(0);
+        }
+
+        /* Settings Button & Panel */
+        .settings-container {
+            position: relative;
+        }
+
+        .settings-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px) rotate(90deg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-btn:active {
+            transform: translateY(-1px) rotate(90deg);
+        }
+
+        .settings-btn.active {
+            background: rgba(255, 255, 255, 1);
+            transform: rotate(180deg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .settings-panel {
+            position: absolute;
+            top: calc(100% + 1rem);
+            right: 0;
+            width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-radius: 16px;
+            padding: 0.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1500;
+        }
+
+        .settings-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .settings-section {
+            padding: 1rem 0.75rem;
+        }
+
+        .settings-section:first-child {
+            padding-top: 1rem;
+        }
+
+        .settings-section:last-child {
+            padding-bottom: 1rem;
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .settings-divider {
+            height: 0.5px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        /* Style Toggle Switch */
+        .style-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 0.25rem;
+            border-radius: 16px;
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+
+        .style-toggle-indicator {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            height: calc(100% - 0.5rem);
+            width: calc(50% - 0.375rem);
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .style-toggle-container.glass-active .style-toggle-indicator {
+            transform: translateX(calc(100% + 0.25rem));
+        }
+
+        .style-toggle-btn {
+            flex: 1;
+            padding: 0.55rem 0.75rem;
+            border-radius: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .style-toggle-btn.active {
+            color: #000000;
+        }
+
+        .style-toggle-btn:hover {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .style-toggle-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Language Toggle Buttons */
+        .language-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 0.25rem;
+            border-radius: 16px;
+            border: 0.5px solid rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+
+        .language-toggle-indicator {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            height: calc(100% - 0.5rem);
+            width: calc(50% - 0.375rem);
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .language-toggle-container.en-active .language-toggle-indicator {
+            transform: translateX(calc(100% + 0.25rem));
+        }
+
+        .language-toggle-btn {
+            flex: 1;
+            padding: 0.55rem 0.75rem;
+            border-radius: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .language-toggle-btn.active {
+            color: #000000;
+        }
+
+        .language-toggle-btn:hover {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .language-toggle-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Profile Container & Button */
+        .profile-container {
+            position: relative;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .profile-btn.active {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .profile-icon {
+            font-size: 1.2rem;
+        }
+
+        .profile-username {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 1rem);
+            right: 0;
+            min-width: 200px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-radius: 16px;
+            padding: 0.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+        }
+
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .profile-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #000000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-item.logout {
+            color: #dc3545;
+        }
+
+        .profile-item.logout:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .profile-divider {
+            height: 0.5px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        /* Simple mode profile styles */
+        body.simple-mode .profile-btn {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body.simple-mode .profile-btn:hover {
+            background: #f8f9fa;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        body.simple-mode .profile-dropdown {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 
+                        0 8px 16px rgba(0, 0, 0, 0.15),
+                        0 0 0 0.5px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Simple mode settings panel */
+        body.simple-mode .settings-panel {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 
+                        0 8px 16px rgba(0, 0, 0, 0.15),
+                        0 0 0 0.5px rgba(0, 0, 0, 0.08);
+        }
+
+        body.simple-mode .settings-btn {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Simple Mode - Override liquid glass styles */
+        body.simple-mode .nav-bar {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode .auth-modal-overlay {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            animation: fadeInOverlaySimple 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInOverlaySimple {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        body.simple-mode .auth-modal-overlay.closing {
+            animation: fadeOutOverlaySimple 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeOutOverlaySimple {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        body.simple-mode .auth-modal {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 
+                        0 8px 20px rgba(0, 0, 0, 0.1),
+                        0 0 0 0.5px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode .auth-form-input {
+            background: white;
+        }
+
+        body.simple-mode .search-input {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode .destination-card {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            background: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode .destination-badge {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode .coming-soon-badge {
+            background: rgba(29, 29, 31, 0.95);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode #chat-fab {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode #chat-fab.fab-open {
+            background: var(--ios-blue);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode #chat-popup {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 
+                        0 10px 25px rgba(0, 0, 0, 0.15),
+                        0 0 0 0.5px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.simple-mode .chat-header {
+            background: rgba(248, 249, 250, 0.95);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode #chat-messages {
+            background-image: url('{% static "home/images/1.png" %}');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        body.simple-mode #chat-messages::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.5);
+            z-index: 0;
+        }
+
+        body.simple-mode .chat-input-container {
+            background: rgba(248, 249, 250, 0.95);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode #chat-input {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode .message-content {
+            background: white;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        body.simple-mode .message.user .message-content {
+            background: var(--ios-blue);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3), 0 1px 3px rgba(0, 113, 227, 0.2);
+        }
+
+        body.simple-mode .suggestion-chip {
+            background: var(--ios-blue);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode .chat-header {
+            background: rgba(248, 249, 250, 0.95);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.simple-mode .language-toggle {
+            background: rgba(0, 0, 0, 0.08);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+        }
+
+        /* Hero Section - Fullscreen */
+        .hero-section {
+            margin-top: 0;
+            padding: 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            height: 100vh;
+            min-height: 100vh;
+            will-change: auto;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+
+        /* Gradient overlay for text contrast - Apple style scrim */
+        .hero-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.15) 0%,
+                rgba(0, 0, 0, 0.25) 40%,
+                rgba(0, 0, 0, 0.45) 100%
+            );
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-position: center;
+            background-size: cover;
+            opacity: 0;
+            filter: brightness(1.15) contrast(1.1) saturate(1.2);
+            transform: scale(1.1) translateZ(0);
+            transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            perspective: 1000px;
+            -webkit-perspective: 1000px;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-slide:nth-child(1) {
+            background-image: url("{% static 'home/images/hero/1.jpg' %}");
+        }
+
+        .hero-slide:nth-child(2) {
+            background-image: url("{% static 'home/images/hero/2.jpg' %}");
+        }
+
+        .hero-slide:nth-child(3) {
+            background-image: url("{% static 'home/images/hero/3.jpg' %}");
+        }
+
+        .hero-slide:nth-child(4) {
+            background-image: url("{% static 'home/images/hero/4.jpg' %}");
+        }
+
+        .hero-slide:nth-child(5) {
+            background-image: url("{% static 'home/images/hero/5.jpg' %}");
+        }
+
+        .hero-slide:nth-child(6) {
+            background-image: url("{% static 'home/images/hero/6.jpg' %}");
+        }
+
+        .hero-slide:nth-child(7) {
+            background-image: url("{% static 'home/images/hero/7.jpg' %}");
+        }
+
+        .hero-slide:nth-child(8) {
+            background-image: url("{% static 'home/images/hero/8.jpg' %}");
+        }
+
+        .hero-slide:nth-child(9) {
+            background-image: url("{% static 'home/images/hero/9.jpg' %}");
+        }
+
+        .hero-slide:nth-child(10) {
+            background-image: url("{% static 'home/images/hero/10.jpg' %}");
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            max-width: 1000px;
+            width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+            padding: 0 2rem;
+        }
+
+        .hero-indicators {
+            position: absolute;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 2;
+        }
+
+        .hero-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-indicator:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(1.2);
+        }
+
+        .hero-indicator.active {
+            width: 28px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, calc(-50% + 30px));
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', 'Times New Roman', serif;
+            font-size: 5.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            -webkit-text-stroke: 2px rgba(0, 0, 0, 0.35);
+            paint-order: stroke fill;
+            text-shadow: 
+                0 0 18px rgba(0, 0, 0, 0.7),
+                0 2px 4px rgba(0, 0, 0, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.5),
+                0 8px 16px rgba(0, 0, 0, 0.4);
+            transition: opacity 1.5s ease-out;
+        }
+
+        .hero-subtitle {
+            font-family: 'Montserrat', -apple-system, sans-serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.98);
+            margin-bottom: 3rem;
+            letter-spacing: 0.02em;
+            -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.3);
+            paint-order: stroke fill;
+            text-shadow: 
+                0 0 14px rgba(0, 0, 0, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                0 4px 8px rgba(0, 0, 0, 0.4),
+                0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: opacity 1.5s ease-out;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--ios-background);
+            border-radius: 0;
+            padding: 5rem 2rem 4rem;
+            min-height: 60vh;
+            animation: slideUp 0.6s ease-out 0.2s both;
+            scroll-margin-top: 80px; /* Offset cho navbar */
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--ios-dark);
+            letter-spacing: -0.02em;
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto 4rem;
+            position: relative;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.3rem 3.5rem 1.3rem 1.5rem;
+            font-size: 1.1rem;
+            border: 0.5px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--ios-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(255, 255, 255, 0.3) inset;
+        }
+
+        .search-input:focus {
+            border-color: rgba(0, 113, 227, 0.3);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 16px rgba(0, 113, 227, 0.1), 0 0 0 3px rgba(0, 113, 227, 0.08), 0 0 0 0.5px rgba(255, 255, 255, 0.4) inset;
+            transform: translateY(-1px);
+        }
+
+        .search-input::placeholder {
+            color: var(--ios-gray);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 113, 227, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+            font-size: 1.2rem;
+        }
+
+        .search-icon:hover {
+            background: rgba(0, 119, 237, 0.98);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35), 0 0 0 0.5px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        .search-icon:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* QR Import Section */
+        .qr-import-section {
+            max-width: 960px;
+            margin: 0 auto 4rem;
+            padding: 0 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .qr-import-section.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .qr-import-card {
+            padding: 2rem;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 247, 255, 0.95));
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08), 0 10px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .qr-import-text h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ios-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-import-text p {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 1rem;
+        }
+
+        .qr-import-body {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .qr-upload-area {
+            flex: 1 1 320px;
+            border: 1.5px dashed rgba(0, 0, 0, 0.15);
+            border-radius: 24px;
+            padding: 1.75rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qr-upload-area:hover,
+        .qr-upload-area.drag-active {
+            border-color: var(--ios-blue);
+            background: rgba(0, 113, 227, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 113, 227, 0.12);
+        }
+
+        .qr-upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-upload-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ios-dark);
+        }
+
+        .qr-upload-hint {
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.55);
+            margin-bottom: 1rem;
+        }
+
+        .qr-import-btn {
+            border: none;
+            background: var(--ios-blue);
+            color: white;
+            padding: 0.85rem 1.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .qr-import-btn:hover {
+            background: var(--ios-blue-hover);
+            transform: translateY(-2px);
+        }
+
+        .qr-import-status {
+            flex: 1 1 200px;
+            min-height: 48px;
+            font-size: 0.95rem;
+            color: rgba(0, 0, 0, 0.65);
+            line-height: 1.4;
+        }
+
+        .qr-import-status[data-state="loading"] {
+            color: var(--ios-blue);
+        }
+
+        .qr-import-status[data-state="success"] {
+            color: #34C759;
+        }
+
+        .qr-import-status[data-state="error"] {
+            color: #ff3b30;
+        }
+
+        /* QR Intro Text */
+        .qr-intro-text {
+            text-align: center;
+            margin: 3rem auto 2.5rem;
+            color: var(--ios-medium-gray);
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .qr-intro-text.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Destinations Section */
+        .destinations-intro {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--ios-medium-gray);
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .destinations-intro.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto 5rem;
+            padding: 0 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .destinations-grid.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .destination-card {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(255, 255, 255, 0.4) inset;
+            animation: fadeInScale 0.6s ease-out both;
+            height: 340px;
+        }
+
+        .destination-card:nth-child(1) { animation-delay: 0.1s; }
+        .destination-card:nth-child(2) { animation-delay: 0.2s; }
+        .destination-card:nth-child(3) { animation-delay: 0.3s; }
+        .destination-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .destination-card:hover {
+            transform: translateY(-10px) scale(1.01);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12), 
+                        0 10px 20px rgba(0, 0, 0, 0.08),
+                        0 0 0 0.5px rgba(255, 255, 255, 0.5) inset;
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        .destination-card.disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .destination-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(255, 255, 255, 0.4) inset;
+            background: var(--glass-bg);
+        }
+
+        .destination-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .destination-card:hover .destination-image {
+            transform: scale(1.05);
+        }
+
+        .destination-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+            padding: 2.5rem 1.5rem 1.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .destination-card:hover .destination-overlay {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+        }
+
+        .destination-name {
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.01em;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .destination-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--glass-light);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--ios-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .coming-soon-badge {
+            background: rgba(29, 29, 31, 0.9);
+            backdrop-filter: blur(20px);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            background: var(--ios-light-gray);
+            padding: 5rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .how-it-works-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: var(--ios-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .step-card {
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .step-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px var(--shadow-medium);
+        }
+
+        .step-number {
+            width: 56px;
+            height: 56px;
+            background: #000000;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .step-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--ios-dark);
+            letter-spacing: -0.01em;
+        }
+
+        .step-description {
+            color: var(--ios-medium-gray);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Why Us Section */
+        .why-us {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .why-us-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: var(--ios-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px var(--shadow-medium);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            filter: grayscale(20%);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--ios-dark);
+            letter-spacing: -0.01em;
+        }
+
+        .feature-description {
+            color: var(--ios-medium-gray);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, #1D1D1F 0%, #000000 100%);
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+            padding: 4rem 2rem 6rem;
+            margin-top: 5rem;
+            border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0071E3 0%, #00C6FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-contact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.01em;
+        }
+
+        .footer-link:hover {
+            color: rgba(255, 255, 255, 0.95);
+            transform: translateY(-1px);
+        }
+
+        .footer-divider {
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(0, 113, 227, 0.5) 50%, transparent 100%);
+            margin: 1.25rem auto;
+            border-radius: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                height: 100vh;
+                min-height: 100vh;
+            }
+            
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.6rem;
+                margin-bottom: 2rem;
+            }
+            
+            .hero-cta-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .hero-indicators {
+                bottom: 3rem;
+            }
+
+            .hero-indicator {
+                width: 6px;
+                height: 6px;
+            }
+
+            .hero-indicator.active {
+                width: 22px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .destinations-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .nav-bar {
+                padding: 0.75rem 1rem;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+            .settings-container {
+                order: 3;
+            }
+
+            .settings-panel {
+                right: 0;
+                width: calc(100vw - 2rem);
+                max-width: 320px;
+            }
+
+            .profile-container {
+                order: 2;
+            }
+
+            .profile-btn {
+                padding: 0.45rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .profile-username {
+                max-width: 80px;
+            }
+
+            .profile-dropdown {
+                right: 0;
+                min-width: 180px;
+            }
+
+            .nav-btn {
+                padding: 0.45rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+            overflow-y: scroll; /* Always show scrollbar */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Chatbot Styles */
+        #chat-fab {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .chat-fab-icon {
+            font-size: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+        }
+
+        #chat-fab:hover {
+            transform: translateX(-50%) translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), 
+                        0 6px 12px rgba(0, 0, 0, 0.12),
+                        0 0 0 1px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        #chat-fab:active {
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        #chat-fab.fab-open {
+            width: 80px;
+            background: rgba(0, 113, 227, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-color: rgba(0, 113, 227, 0.5);
+        }
+
+        #chat-fab.fab-open .chat-fab-icon {
+            transform: rotate(180deg);
+            filter: brightness(0) invert(1);
+        }
+
+        #chat-popup {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px) scale(0.95);
+            width: 420px;
+            max-width: calc(100vw - 40px);
+            height: 550px;
+            max-height: calc(100vh - 150px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(60px) saturate(180%);
+            -webkit-backdrop-filter: blur(60px) saturate(180%);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 
+                        0 10px 25px rgba(0, 0, 0, 0.15),
+                        0 0 0 0.5px rgba(255, 255, 255, 0.2) inset;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #chat-popup.popup-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .chat-header {
+            background: rgba(248, 249, 250, 0.3);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            color: var(--ios-dark);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .chat-header .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .header-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--ios-dark);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            margin-right: 8px;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        #refresh-btn:hover {
+            background-color: #e9ecef;
+            color: #007bff;
+        }
+
+        #refresh-btn svg {
+            fill: currentColor;
+        }
+
+        .chat-close {
+            background: rgba(0, 0, 0, 0.08);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.3rem;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .chat-close:hover {
+            background: rgba(0, 0, 0, 0.15);
+            transform: rotate(90deg);
+        }
+
+        .chat-close:active {
+            transform: rotate(90deg);
+        }
+
+        #chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: url('{% static "home/images/1.png" %}');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        #chat-messages::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.5);
+            z-index: 0;
+        }
+
+        #chat-messages > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-chip {
+            background: rgba(0, 113, 227, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(0, 119, 237, 0.95);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .suggestion-chip:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--ios-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message.user .message-avatar {
+            background: var(--ios-gray);
+        }
+
+        .message-content {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            border: 0.5px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .message.user .message-content {
+            background: rgba(40, 167, 69, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25), 0 1px 3px rgba(40, 167, 69, 0.15);
+        }
+
+        /* Markdown Content Styling */
+        .message-content.markdown-body {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .message-content.markdown-body p {
+            margin: 0 0 10px 0;
+        }
+
+        .message-content.markdown-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-content.markdown-body ul,
+        .message-content.markdown-body ol {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+
+        .message-content.markdown-body strong {
+            font-weight: 700;
+            color: inherit;
+        }
+
+        .message-content.markdown-body table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .message-content.markdown-body th,
+        .message-content.markdown-body td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .message-content.markdown-body th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+
+        .message-content.markdown-body pre {
+            background: #2d2d2d;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .message-content.markdown-body code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .message-content.markdown-body pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .message-content.markdown-body a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .message-content.markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .chat-input-container {
+            padding: 12px 16px;
+            border-top: 0.5px solid rgba(0, 0, 0, 0.06);
+            background: rgba(248, 249, 250, 0.3);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #chat-input {
+            flex: 1;
+            border: 1.5px solid rgba(0, 0, 0, 0.08);
+            border-radius: 18px;
+            padding: 9px 14px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        #chat-input:focus {
+            border-color: var(--ios-blue);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        #chat-send-btn {
+            background: rgba(0, 113, 227, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        #chat-send-btn:hover {
+            background: rgba(0, 119, 237, 0.98);
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        #chat-send-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typingDots 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingDots {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile responsive for chatbot */
+        @media (max-width: 768px) {
+            #chat-popup {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 150px);
+                bottom: 75px;
+            }
+            
+            #chat-fab {
+                bottom: 15px;
+            }
+            
+            #chat-messages {
+                height: calc(100vh - 300px);
+            }
+        }
+
+        /* CSS cho nút ngôn ngữ mới */
+        .lang-btn {
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            color: var(--ios-dark);
+            font-size: 0.9rem;
+        }
+
+        .lang-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .lang-btn:active {
+            transform: scale(0.98);
+        }
+
+        #langFlag {
+            width: 24px;   /* Chiều rộng lá cờ */
+            height: auto;  /* Chiều cao tự động theo tỷ lệ */
+            border-radius: 4px; /* Bo góc nhẹ cho đẹp */
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Đổ bóng nhẹ */
+        }
+
+        /* Tùy chỉnh cho chế độ Simple Mode nếu cần */
+        body.simple-mode .lang-btn {
+            background: #f0f0f0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .nav-item-unified {
+        /* Phông chữ & Bố cục */
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Phông chữ hiện đại */
+        font-weight: 600; /* Độ đậm chữ thống nhất */
+        font-size: 15px;  /* Cỡ chữ thống nhất */
+        text-decoration: none !important; /* Bỏ gạch chân */
+        
+        /* Hình dáng nút */
+        display: inline-flex;
+        align-items: center;
+        gap: 8px; /* Khoảng cách giữa Icon và Chữ */
+        padding: 8px 16px;
+        border-radius: 25px; /* Bo tròn mềm mại */
+        border: none;
+        background: transparent; /* Nền trong suốt mặc định */
+        color: #333; /* Màu chữ mặc định (xám đen) */
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt mà */
+    }
+
+    /* 2. Hiệu ứng khi Rê chuột (Hover) - Áp dụng chung */
+    .nav-item-unified:hover {
+        background-color: rgba(0, 123, 255, 0.1); /* Nền xanh nhạt */
+        color: #007bff !important; /* Chữ chuyển màu xanh dương */
+        transform: translateY(-2px); /* Nổi lên nhẹ */
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15); /* Đổ bóng */
+    }
+
+    /* 3. Hiệu ứng khi Click (Active) */
+    .nav-item-unified:active {
+        transform: translateY(0); /* Lún xuống lại */
+        box-shadow: none;
+    }
+
+    /* 4. Tùy chỉnh riêng cho nút Đăng nhập/Đăng ký (nếu muốn nổi bật hơn) */
+    .btn-highlight {
+        background-color: #007bff;
+        color: white !important;
+    }
+    .btn-highlight:hover {
+        background-color: #0056b3; /* Xanh đậm hơn khi hover */
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+    }
+    
+    .hero-cta-btn {
+        display: inline-block;
+        margin-top: 0;
+        padding: 1.25rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--ios-dark);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 0.5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 
+                    0 4px 12px rgba(0, 0, 0, 0.15),
+                    0 0 0 0.5px rgba(255, 255, 255, 0.5) inset;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        letter-spacing: 0.5px;
+    }
+
+    .hero-cta-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3),
+                    0 6px 16px rgba(0, 0, 0, 0.2),
+                    0 0 0 0.5px rgba(255, 255, 255, 0.6) inset;
+        color: var(--ios-blue);
+    }
+
+    .hero-cta-btn:active {
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2),
+                    0 3px 10px rgba(0, 0, 0, 0.15),
+                    0 0 0 0.5px rgba(255, 255, 255, 0.5) inset;
+    }
+    
+    .hero-cta-btn i {
+        margin-right: 8px;
+    }
+    
+    .google-auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0.9rem;
+    margin-bottom: 1.5rem; /* Khoảng cách với dòng chuyển đổi Đăng ký/Đăng nhập */
+    background: white;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.google-auth-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #d2e3fc;
+    background-color: rgba(66, 133, 244, 0.04);
+    box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+    transform: translateY(-1px);
+}
+
+.google-auth-btn:active {
+    background-color: #ecf3fe;
+    transform: translateY(0);
+}
+
+/* Chỉnh sửa lại auth-divider một chút để khoảng cách đẹp hơn */
+.auth-divider {
+    text-align: center;
+    margin: 1.5rem 0; /* Tăng khoảng cách trên dưới */
+    position: relative;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 0.9rem;
+}
+    </style>
+</head>
+<body>
+    {% csrf_token %}
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='{% url 'welcome' %}'">Journify</div>
+        
+        <div class="nav-links">
+            
+            <a href="{% url 'map' %}" class="nav-item-unified nav-map-link" data-nav-key="map-link">
+        <span id="navMapIcon" class="nav-map-icon"><i class="fas fa-map-marked-alt"></i></span>
+        <span data-vi="Bản đồ" data-en="Map">Bản đồ</span>
+    </a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'shared-itineraries-gallery' %}" class="nav-item-unified" data-nav-key="community-link">
+                    <span data-vi="Lịch trình cộng đồng" data-en="Community Schedules">Lịch trình cộng đồng</span>
+                </a>
+            {% else %}
+                <button class="nav-item-unified" onclick="openModal('loginModal')" data-nav-key="community-link">
+                    <span data-vi="Lịch trình cộng đồng" data-en="Community Schedules">Lịch trình cộng đồng</span>
+                </button>
+            {% endif %}
+            
+
+    {% if user.is_authenticated %}
+        
+        {% block create_itinerary_button %}{% endblock %}
+
+        <div class="profile-container">
+            <button class="profile-btn nav-item-unified" onclick="toggleProfile()" title="Profile" style="padding-right: 10px;">
+                <span class="profile-icon">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                        👤
+                    {% endif %}
+                </span>
+                <span class="profile-username">{{ user.username }}</span>
+            </button>
+            
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="{% url 'profile' %}" class="profile-item">
+                    <span data-vi="Xem hồ sơ" data-en="View Profile">Xem hồ sơ</span>
+                </a>
+                <div class="profile-divider"></div>
+                <a href="{% url 'logout' %}" class="profile-item logout">
+                    <span data-vi="Đăng xuất" data-en="Logout">Đăng xuất</span>
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        <button class="nav-item-unified" onclick="openModal('loginModal')">
+            <span data-vi="Đăng nhập" data-en="Login">Đăng nhập</span>
+        </button>
+        
+        <button class="nav-item-unified" onclick="openModal('registerModal')" style="border-radius: 25px;">
+            <span data-vi="Đăng ký" data-en="Register">Đăng ký</span>
+        </button>
+    {% endif %}
+
+            <button class="nav-btn lang-btn" onclick="toggleLanguage()" title="Đổi ngôn ngữ / Switch Language">
+                <img id="langFlag" src="https://flagcdn.com/w40/vn.png" alt="Flag">
+                <span id="langText">VI</span>
+            </button>
+        </div>
+
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        // Hide the map icon when the user is on the map page
+        (function(){
+            try {
+                const mapIcon = document.getElementById('navMapIcon');
+                if (!mapIcon) return;
+                const currentPath = window.location.pathname || '';
+                // Rendered map URL (e.g. /map/)
+                const mapUrl = "{% url 'map' %}";
+                if (currentPath === mapUrl || currentPath.startsWith(mapUrl)) {
+                    mapIcon.style.display = 'none';
+                }
+            } catch (e) {
+                // silent
+            }
+        })();
+    </script>
+
+    <!-- Auth Modals -->
+    <!-- Login Modal -->
+    <div class="auth-modal-overlay" id="loginModal">
+        <div class="auth-modal">
+            <button class="auth-modal-close" onclick="closeModal('loginModal')">&times;</button>
+            <h2 class="auth-modal-title" data-vi="Đăng nhập" data-en="Login">Đăng nhập</h2>
+            <p class="auth-modal-subtitle" data-vi="Chào mừng trở lại! Hãy đăng nhập để tiếp tục" data-en="Welcome back! Please login to continue">Chào mừng trở lại! Hãy đăng nhập để tiếp tục</p>
+            
+            <div id="loginError" class="auth-error" style="display: none;"></div>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="loginUsername" data-vi="Tên đăng nhập" data-en="Username">Tên đăng nhập</label>
+                    <input type="text" id="loginUsername" name="username" class="auth-form-input" placeholder="Nhập tên đăng nhập" data-placeholder-vi="Nhập tên đăng nhập" data-placeholder-en="Enter username" required>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="loginPassword" data-vi="Mật khẩu" data-en="Password">Mật khẩu</label>
+                    <input type="password" id="loginPassword" name="password" class="auth-form-input" placeholder="Nhập mật khẩu" data-placeholder-vi="Nhập mật khẩu" data-placeholder-en="Enter password" required>
+                    <div style="text-align: right; margin-top: 8px;">
+         <a href="{% url 'forgot_password' %}" style="font-size: 0.9rem; color: #0071E3; text-decoration: none;">
+             <span data-vi="Quên mật khẩu?" data-en="Forgot Password?">Quên mật khẩu?</span>
+         </a>
+    </div>
+                </div>
+                
+                <button type="submit" class="auth-submit-btn" data-vi="Đăng nhập" data-en="Login">Đăng nhập</button>
+            </form>
+            
+            <div class="auth-divider" data-vi="hoặc" data-en="or">hoặc</div>
+    
+            <p class="auth-switch">
+                <span data-vi="Chưa có tài khoản?" data-en="Don't have an account?">Chưa có tài khoản?</span> <span class="auth-switch-link" onclick="switchToRegister()" data-vi="Đăng ký ngay" data-en="Register now">Đăng ký ngay</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="auth-modal-overlay" id="registerModal">
+        <div class="auth-modal">
+            <button class="auth-modal-close" onclick="closeModal('registerModal')">&times;</button>
+            <h2 class="auth-modal-title" data-vi="Đăng ký" data-en="Register">Đăng ký</h2>
+            <p class="auth-modal-subtitle" data-vi="Tạo tài khoản mới để bắt đầu hành trình" data-en="Create a new account to start your journey">Tạo tài khoản mới để bắt đầu hành trình</p>
+            
+            <div id="registerError" class="auth-error" style="display: none;"></div>
+            
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="registerUsername" data-vi="Tên đăng nhập" data-en="Username">Tên đăng nhập</label>
+                    <input type="text" id="registerUsername" name="username" class="auth-form-input" placeholder="Chọn tên đăng nhập" data-placeholder-vi="Chọn tên đăng nhập" data-placeholder-en="Choose a username" required>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="registerPassword" data-vi="Mật khẩu" data-en="Password">Mật khẩu</label>
+                    <input type="password" id="registerPassword" name="password1" class="auth-form-input" placeholder="Tạo mật khẩu" data-placeholder-vi="Tạo mật khẩu" data-placeholder-en="Create password" required>
+                </div>
+                
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="registerPasswordConfirm" data-vi="Xác nhận mật khẩu" data-en="Confirm Password">Xác nhận mật khẩu</label>
+                    <input type="password" id="registerPasswordConfirm" name="password2" class="auth-form-input" placeholder="Nhập lại mật khẩu" data-placeholder-vi="Nhập lại mật khẩu" data-placeholder-en="Re-enter password" required>
+                </div>
+                
+                <button type="submit" class="auth-submit-btn" data-vi="Đăng ký" data-en="Register">Đăng ký</button>
+            </form>
+            
+            <div class="auth-divider" data-vi="hoặc" data-en="or">hoặc</div>
+    
+            <p class="auth-switch">
+                <span data-vi="Đã có tài khoản?" data-en="Already have an account?">Đã có tài khoản?</span> <span class="auth-switch-link" onclick="switchToLogin()" data-vi="Đăng nhập" data-en="Login">Đăng nhập</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <div class="hero-slide active"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">Bắt đầu giấc mơ</h1>
+            <h2 class="hero-subtitle" id="heroSubtitle">Du lịch chỉ với một cú click</h2>
+
+            {% if user.is_authenticated %}
+                <button class="hero-cta-btn" onclick="scrollToDestinations()">
+                    <i class="fas fa-paper-plane"></i>
+                    <span data-vi="Tạo lịch trình ngay" data-en="Plan your trip now">Tạo lịch trình ngay</span>
+                </button>
+            {% else %}
+                <button class="hero-cta-btn" onclick="openModal('loginModal')">
+                    <i class="fas fa-paper-plane"></i>
+                    <span data-vi="Tạo lịch trình ngay" data-en="Plan your trip now">Tạo lịch trình ngay</span>
+                </button>
+            {% endif %}
+        </div>
+        <div class="hero-indicators">
+            <div class="hero-indicator active" onclick="goToSlide(0)"></div>
+            <div class="hero-indicator" onclick="goToSlide(1)"></div>
+            <div class="hero-indicator" onclick="goToSlide(2)"></div>
+            <div class="hero-indicator" onclick="goToSlide(3)"></div>
+            <div class="hero-indicator" onclick="goToSlide(4)"></div>
+            <div class="hero-indicator" onclick="goToSlide(5)"></div>
+            <div class="hero-indicator" onclick="goToSlide(6)"></div>
+            <div class="hero-indicator" onclick="goToSlide(7)"></div>
+            <div class="hero-indicator" onclick="goToSlide(8)"></div>
+            <div class="hero-indicator" onclick="goToSlide(9)"></div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content" id="destinations-section">
+        <!-- Search Section -->
+        <h2 class="section-title" data-vi="Chọn điểm đến của bạn" data-en="Choose Your Destination">Chọn điểm đến của bạn</h2>
+        
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Bạn muốn đi đâu?" id="searchInput" data-placeholder-vi="Bạn muốn đi đâu?" data-placeholder-en="Where do you want to go?" data-vi="" data-en="" onkeypress="if(event.key==='Enter') performSearch()">
+            <button class="search-icon" onclick="performSearch()" title="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Destinations -->
+        <h3 class="destinations-intro" data-vi="Hoặc bắt đầu với một số địa điểm nổi tiếng" data-en="Or start with some popular destinations">Hoặc bắt đầu với một số địa điểm nổi tiếng</h3>
+        
+        <div class="destinations-grid">
+            <div class="destination-card" onclick="selectDestination('dalat')">
+                <img src="{% static 'home/images/destinations/dalat.jpg' %}" alt="Da Lat" class="destination-image">
+                <div class="destination-overlay">
+                    <h3 class="destination-name" data-vi="Đà Lạt" data-en="Da Lat">Đà Lạt</h3>
+                </div>
+                <span class="destination-badge" data-vi="Có sẵn" data-en="Available">Có sẵn</span>
+            </div>
+            
+            <div class="destination-card disabled">
+                <img src="{% static 'home/images/destinations/danang.jpg' %}" alt="Da Nang" class="destination-image">
+                <div class="destination-overlay">
+                    <h3 class="destination-name" data-vi="Đà Nẵng" data-en="Da Nang">Đà Nẵng</h3>
+                </div>
+                <span class="destination-badge coming-soon-badge" data-vi="Sắp ra mắt" data-en="Coming Soon">Sắp ra mắt</span>
+            </div>
+            
+            <div class="destination-card disabled">
+                <img src="{% static 'home/images/destinations/hue.jpg' %}" alt="Hue" class="destination-image">
+                <div class="destination-overlay">
+                    <h3 class="destination-name" data-vi="Huế" data-en="Hue">Huế</h3>
+                </div>
+                <span class="destination-badge coming-soon-badge" data-vi="Sắp ra mắt" data-en="Coming Soon">Sắp ra mắt</span>
+            </div>
+            
+            <div class="destination-card disabled">
+                <img src="{% static 'home/images/destinations/vungtau.jpg' %}" alt="Vung Tau" class="destination-image">
+                <div class="destination-overlay">
+                    <h3 class="destination-name" data-vi="Vũng Tàu" data-en="Vung Tau">Vũng Tàu</h3>
+                </div>
+                <span class="destination-badge coming-soon-badge" data-vi="Sắp ra mắt" data-en="Coming Soon">Sắp ra mắt</span>
+            </div>
+        </div>
+
+        <!-- QR Import Intro -->
+        <h3 class="qr-intro-text" data-vi="Tiếp tục từ mã QR lịch trình" data-en="Continue from an itinerary QR code">Tiếp tục từ mã QR lịch trình</h3>
+
+        <!-- QR Import Section -->
+        <section class="qr-import-section" id="qr-import-section">
+            <div class="qr-import-card">
+                <div class="qr-import-text">
+                    <h3 data-vi="Mở lịch trình từ mã QR" data-en="Open an itinerary from a QR code">Mở lịch trình từ mã QR</h3>
+                    <p data-vi="Đã lưu hình QR sau khi tạo lịch trình? Tải ảnh lên để tiếp tục ngay." data-en="Saved the QR image when you generated a plan? Upload it to jump back in.">Đã lưu hình QR sau khi tạo lịch trình? Tải ảnh lên để tiếp tục ngay.</p>
+                </div>
+                <div class="qr-import-body">
+                    <div class="qr-upload-area" id="qr-upload-area" role="button" tabindex="0">
+                        <div class="qr-upload-icon">📱</div>
+                        <p class="qr-upload-title" data-vi="Chọn ảnh QR từ máy tính" data-en="Pick a QR image from your computer">Chọn ảnh QR từ máy tính</p>
+                        <p class="qr-upload-hint" data-vi="Hỗ trợ PNG, JPG, HEIC (nếu trình duyệt cho phép)" data-en="Supports PNG, JPG, HEIC (if supported by your browser)">Hỗ trợ PNG, JPG, HEIC (nếu trình duyệt cho phép)</p>
+                        <button type="button" class="qr-import-btn" data-vi="Chọn ảnh" data-en="Select image">Chọn ảnh</button>
+                    </div>
+                    <div class="qr-import-status" id="qr-import-status" data-state="info" data-vi="Không cần đăng nhập — chỉ cần tải ảnh QR bạn đã lưu khi tạo lịch trình." data-en="No sign-in required—just upload the QR image you saved when planning.">Không cần đăng nhập — chỉ cần tải ảnh QR bạn đã lưu khi tạo lịch trình.</div>
+                </div>
+                <input type="file" id="qr-upload-input" accept="image/*" style="display: none;">
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-it-works">
+            <h2 class="how-it-works-title" data-vi="Cách thức hoạt động" data-en="How It Works">Cách thức hoạt động</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title" data-vi="Chọn điểm đến" data-en="Choose Destination">Chọn điểm đến</h3>
+                    <p class="step-description" data-vi="Chọn điểm đến và nhập yêu cầu của bạn." data-en="Select your destination and enter your requirements.">Chọn điểm đến và nhập yêu cầu của bạn.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title" data-vi="Nhận gợi ý từ AI" data-en="Get AI Suggestions">Nhận gợi ý từ AI</h3>
+                    <p class="step-description" data-vi="AI sẽ viết danh sách các đại điểm tham quan và quán ăn dựa trên yêu cầu của bạn." data-en="AI will generate a list of attractions and restaurants based on your preferences.">AI sẽ viết danh sách các đại điểm tham quan và quán ăn dựa trên yêu cầu của bạn.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title" data-vi="Tùy chỉnh kế hoạch" data-en="Customize Plan">Tùy chỉnh kế hoạch</h3>
+                    <p class="step-description" data-vi="Chỉnh sửa danh sách theo ý muốn bằng cách thêm hoặc xóa các địa điểm." data-en="Edit the list as you wish by adding or removing locations.">Chỉnh sửa danh sách theo ý muốn bằng cách thêm hoặc xóa các địa điểm.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title" data-vi="Lộ trình hoàn hảo" data-en="Perfect Itinerary">Lộ trình hoàn hảo</h3>
+                    <p class="step-description" data-vi="Chờ AI tìm ra kế hoạch du lịch hoàn hảo dành cho bạn." data-en="Let AI find the perfect travel plan for you.">Chờ AI tìm ra kế hoạch du lịch hoàn hảo dành cho bạn.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Us -->
+        <section class="why-us">
+            <h2 class="why-us-title" data-vi="Tại sao chọn chúng tôi?" data-en="Why Choose Us?">Tại sao chọn chúng tôi?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3 class="feature-title" data-vi="Lịch trình chi tiết" data-en="Detailed Itinerary">Lịch trình chi tiết</h3>
+                    <p class="feature-description" data-vi="Kế hoạch chi tiết từng giờ, phù hợp với tâm trạng, ngân sách và thời gian của bạn." data-en="Hour-by-hour detailed plans tailored to your mood, budget and time.">Kế hoạch chi tiết từng giờ, phù hợp với tâm trạng, ngân sách và thời gian của bạn.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3 class="feature-title" data-vi="Kế hoạch linh hoạt" data-en="Flexible Planning">Kế hoạch linh hoạt</h3>
+                    <p class="feature-description" data-vi="AI tức thời lên lại kế hoạch chuyến đi của bạn, tính đến các yếu tố thời gian thực và thời gian di chuyển." data-en="AI instantly replans your trip, accounting for real-time factors and travel time.">AI tức thời lên lại kế hoạch chuyến đi của bạn, tính đến các yếu tố thời gian thực và thời gian di chuyển.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3 class="feature-title" data-vi="AI Đàm thoại" data-en="Conversational AI">AI Đàm thoại</h3>
+                    <p class="feature-description" data-vi="Mô tả nhu cầu của bạn bằng ngôn ngữ tự nhiên, và nhận được các gợi ý chủ động, cá nhân." data-en="Describe your needs in natural language and receive proactive, personalized suggestions.">Mô tả nhu cầu của bạn bằng ngôn ngữ tự nhiên, và nhận được các gợi ý chủ động, cá nhân.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-logo">Journify</div>
+        <div class="footer-divider"></div>
+        <div class="footer-contact">
+            <a href="https://journify.vn" class="footer-link">journify.vn</a>
+            <a href="tel:0123456789" class="footer-link">+84 123 456 789</a>
+            
+            <a href="mailto:contact@journify.vn" class="footer-link">contact@journify.vn</a>
+            
+            <a href="https://www.facebook.com/trang-cua-ban" target="_blank" class="footer-link">Facebook: Journify Vietnam</a>
+        </div>
+    </footer>
+
+    <!-- Chatbot -->
+    <div id="chat-popup">
+        <div class="chat-header">
+            {% if user.is_authenticated %}
+                <div class="header-info">
+                    <h3><span data-vi="Xin chào" data-en="Hello">Xin chào</span>, {{ user.username }}!</h3>
+                </div>
+            {% else %}
+                <div class="header-info">
+                    <h3 data-vi="Trợ lý AI" data-en="AI Assistant">Trợ lý AI</h3>
+                </div>
+            {% endif %}
+            <button id="refresh-btn" title="Xóa lịch sử chat" data-title-vi="Xóa lịch sử chat" data-title-en="Clear chat history">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                </svg>
+            </button>
+            <button class="chat-close">&times;</button>
+        </div>
+        <div id="chat-messages">
+            <div class="message">
+                <div class="message-avatar">
+                    <svg viewBox="0 0 24 24" fill="white" style="width: 20px; height: 20px;">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        <circle cx="8.5" cy="10.5" r="1.5"/>
+                        <circle cx="15.5" cy="10.5" r="1.5"/>
+                        <path d="M12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                    </svg>
+                </div>
+                <div class="message-content" data-vi="Xin chào! Tôi có thể giúp gì cho bạn?" data-en="Hello! How can I help you?">Xin chào! Tôi có thể giúp gì cho bạn?</div>
+            </div>
+            <div class="suggestion-chips">
+                <button class="suggestion-chip" 
+                    data-suggestion-vi="Hồ Xuân Hương ở đâu?" 
+                    data-suggestion-en="Where is Xuan Huong Lake?"
+                    data-vi="Hồ Xuân Hương ở đâu?" 
+                    data-en="Where is Xuan Huong Lake?">Hồ Xuân Hương ở đâu?</button>
+                <button class="suggestion-chip" 
+                    data-suggestion-vi="Món ăn ngon ở Đà Lạt?" 
+                    data-suggestion-en="What are good foods in Dalat?"
+                    data-vi="Ăn gì ngon?" 
+                    data-en="Good food?">Ăn gì ngon?</button>
+                <button class="suggestion-chip" 
+                    data-suggestion-vi="Địa điểm check-in đẹp?" 
+                    data-suggestion-en="Where are nice check-in spots?"
+                    data-vi="Check-in ở đâu?" 
+                    data-en="Check-in spots?">Check-in ở đâu?</button>
+                <button class="suggestion-chip" 
+                    data-suggestion-vi="Quán cafe view đẹp?" 
+                    data-suggestion-en="Cafes with nice views?"
+                    data-vi="Cafe view đẹp" 
+                    data-en="Scenic cafes">Cafe view đẹp</button>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." data-placeholder-vi="Nhập tin nhắn..." data-placeholder-en="Type a message..." data-vi="" data-en="">
+            <button id="chat-send-btn">➤</button>
+        </div>
+    </div>
+
+    <button id="chat-fab">
+        <span class="chat-fab-icon">▲</span>
+    </button>
+
+    <script>
+        // Global variables
+        let currentLanguage = localStorage.getItem('language') || 'vi';
+        let currentStyle = localStorage.getItem('styleMode') || 'simple';
+        let settingsOpen = false;
+        
+        // ===== SETTINGS PANEL FUNCTIONS =====
+        function toggleSettings() {
+            settingsOpen = !settingsOpen;
+            const panel = document.getElementById('settingsPanel');
+            const btn = document.querySelector('.settings-btn');
+            
+            if (settingsOpen) {
+                panel.classList.add('active');
+                btn.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+                btn.classList.remove('active');
+            }
+        }
+
+        // Close settings when clicking outside
+        document.addEventListener('click', function(e) {
+            const settingsContainer = document.querySelector('.settings-container');
+            if (settingsContainer && !settingsContainer.contains(e.target) && settingsOpen) {
+                toggleSettings();
+            }
+        });
+        
+        // ===== STYLE TOGGLE FUNCTIONS =====
+        function toggleStyle(mode) {
+            currentStyle = mode;
+            localStorage.setItem('styleMode', mode);
+            
+            const simpleBtn = document.getElementById('simpleBtn');
+            const glassBtn = document.getElementById('glassBtn');
+            const container = document.getElementById('styleToggleContainer');
+            
+            if (mode === 'simple') {
+                document.body.classList.add('simple-mode');
+                simpleBtn.classList.add('active');
+                glassBtn.classList.remove('active');
+                container.classList.remove('glass-active');
+            } else {
+                document.body.classList.remove('simple-mode');
+                glassBtn.classList.add('active');
+                simpleBtn.classList.remove('active');
+                container.classList.add('glass-active');
+            }
+            
+            // Trigger storage event for other tabs/windows
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'styleMode',
+                newValue: mode
+            }));
+        }
+        
+        function applyStyleMode() {
+            const container = document.getElementById('styleToggleContainer');
+            if (currentStyle === 'simple') {
+                document.body.classList.add('simple-mode');
+                const simpleBtn = document.getElementById('simpleBtn');
+                const glassBtn = document.getElementById('glassBtn');
+                if (simpleBtn && glassBtn) {
+                    simpleBtn.classList.add('active');
+                    glassBtn.classList.remove('active');
+                    if (container) container.classList.remove('glass-active');
+                }
+            } else {
+                const glassBtn = document.getElementById('glassBtn');
+                const simpleBtn = document.getElementById('simpleBtn');
+                if (glassBtn && simpleBtn && container) {
+                    glassBtn.classList.add('active');
+                    simpleBtn.classList.remove('active');
+                    container.classList.add('glass-active');
+                }
+            }
+        }
+        
+        // ===== MODAL FUNCTIONS =====
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // Thêm class closing để chạy animation
+                modal.classList.add('closing');
+                const modalContent = modal.querySelector('.auth-modal');
+                if (modalContent) {
+                    modalContent.classList.add('closing');
+                }
+                
+                // Đợi animation hoàn tất rồi mới ẩn modal
+                setTimeout(() => {
+                    modal.classList.remove('active', 'closing');
+                    if (modalContent) {
+                        modalContent.classList.remove('closing');
+                    }
+                    
+                    // Clear error messages and form
+                    if (modalId === 'loginModal') {
+                        const errorDiv = document.getElementById('loginError');
+                        const form = document.getElementById('loginForm');
+                        if (errorDiv) errorDiv.style.display = 'none';
+                        if (form) form.reset();
+                    } else if (modalId === 'registerModal') {
+                        const errorDiv = document.getElementById('registerError');
+                        const form = document.getElementById('registerForm');
+                        if (errorDiv) errorDiv.style.display = 'none';
+                        if (form) form.reset();
+                    }
+                }, 300);
+            }
+        }
+
+        function switchToLogin() {
+            closeModal('registerModal');
+            setTimeout(() => openModal('loginModal'), 100);
+        }
+
+        function switchToRegister() {
+            closeModal('loginModal');
+            setTimeout(() => openModal('registerModal'), 100);
+        }
+
+        // ===== CHATBOT FUNCTIONS =====
+        // Chatbot logic is handled by static/home/js/chatbot.js
+        
+        // Close chatbot when clicking outside
+        document.addEventListener('click', function(event) {
+            const chatPopup = document.getElementById('chat-popup');
+            const chatFab = document.getElementById('chat-fab');
+            
+            // Check if popup is open by checking class
+            const isOpen = chatPopup && chatPopup.classList.contains('popup-open');
+            
+            if (isOpen && chatPopup && chatFab) {
+                if (!chatPopup.contains(event.target) && !chatFab.contains(event.target)) {
+                    // Close it by removing classes
+                    chatPopup.classList.remove('popup-open');
+                    chatFab.classList.remove('fab-open');
+                }
+            }
+        });
+
+        // ===== LANGUAGE FUNCTIONS =====
+        // ===== LANGUAGE FUNCTIONS =====
+        function toggleLanguage() {
+            // Nếu đang là vi thì chuyển sang en và ngược lại
+            const newLang = currentLanguage === 'vi' ? 'en' : 'vi';
+            switchLanguage(newLang);
+        }
+
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+            applyLanguage();
+            // Update hero text based on current slide
+            if (typeof updateHeroText === 'function' && typeof currentSlideIndex !== 'undefined') {
+                updateHeroText(currentSlideIndex);
+            }
+            // Xóa phần cập nhật nút trong Settings panel cũ vì đã xóa HTML đó
+        }
+        
+        function applyLanguage() {
+            // Cập nhật nội dung các thẻ có data-vi/data-en
+            const elements = document.querySelectorAll('[data-vi], [data-en]');
+            elements.forEach(el => {
+                const viText = el.getAttribute('data-vi');
+                const enText = el.getAttribute('data-en');
+                if (viText && enText) {
+                    el.textContent = currentLanguage === 'vi' ? viText : enText;
+                }
+            });
+            
+            // Cập nhật placeholder
+            const placeholders = document.querySelectorAll('[data-placeholder-vi], [data-placeholder-en]');
+            placeholders.forEach(el => {
+                const viPlaceholder = el.getAttribute('data-placeholder-vi');
+                const enPlaceholder = el.getAttribute('data-placeholder-en');
+                if (viPlaceholder && enPlaceholder) {
+                    el.placeholder = currentLanguage === 'vi' ? viPlaceholder : enPlaceholder;
+                }
+            });
+
+            // Cập nhật title (tooltips)
+            const titleElements = document.querySelectorAll('[data-title-vi][data-title-en]');
+            titleElements.forEach(el => {
+                const viTitle = el.getAttribute('data-title-vi');
+                const enTitle = el.getAttribute('data-title-en');
+                if (viTitle && enTitle) {
+                    el.title = currentLanguage === 'vi' ? viTitle : enTitle;
+                }
+            });
+
+            // --- ĐOẠN MỚI THÊM: Cập nhật nút cờ trên menu ---
+            const flagEl = document.getElementById('langFlag');
+            const textEl = document.getElementById('langText');
+            if (flagEl && textEl) {
+                if (currentLanguage === 'vi') {
+                    flagEl.src = 'https://flagcdn.com/w40/vn.png'; // Cờ Việt Nam
+                    textEl.textContent = 'VI';
+                } else {
+                    flagEl.src = 'https://flagcdn.com/w40/gb.png'; // Cờ Anh
+                    textEl.textContent = 'EN';
+                }
+            }
+        }
+
+        // ===== DESTINATION FUNCTIONS =====
+        const qrDecodeCanvas = document.createElement('canvas');
+        const qrDecodeContext = qrDecodeCanvas.getContext('2d');
+
+        function openQrUploadDialog() {
+            const input = document.getElementById('qr-upload-input');
+            if (input) {
+                input.click();
+            }
+        }
+
+        function initializeQrImport() {
+            const input = document.getElementById('qr-upload-input');
+            const area = document.getElementById('qr-upload-area');
+            const statusEl = document.getElementById('qr-import-status');
+            if (!input || !area || !statusEl) {
+                return;
+            }
+
+            const openDialogFromKeyboard = event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openQrUploadDialog();
+                }
+            };
+
+            area.addEventListener('click', openQrUploadDialog);
+            area.addEventListener('keypress', openDialogFromKeyboard);
+
+            const handleFile = file => {
+                if (file) {
+                    processQrImage(file);
+                }
+            };
+
+            input.addEventListener('change', event => {
+                const file = event.target.files && event.target.files[0];
+                handleFile(file);
+                input.value = '';
+            });
+
+            ['dragenter', 'dragover'].forEach(evt => {
+                area.addEventListener(evt, event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    area.classList.add('drag-active');
+                });
+            });
+
+            area.addEventListener('dragleave', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!area.contains(event.relatedTarget)) {
+                    area.classList.remove('drag-active');
+                }
+            });
+
+            area.addEventListener('dragend', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                area.classList.remove('drag-active');
+            });
+
+            area.addEventListener('drop', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                area.classList.remove('drag-active');
+                const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+                handleFile(file);
+            });
+
+            const button = area.querySelector('.qr-import-btn');
+            if (button) {
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    openQrUploadDialog();
+                });
+            }
+        }
+
+        function setQrStatus(message, state = 'info') {
+            const statusEl = document.getElementById('qr-import-status');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.dataset.state = state;
+        }
+
+        function normalizeQrDestination(raw) {
+            if (!raw) {
+                return null;
+            }
+            const trimmed = raw.trim();
+            if (/^https?:\/\//i.test(trimmed)) {
+                return trimmed;
+            }
+            if (trimmed.includes('://')) {
+                return null;
+            }
+            if (trimmed.startsWith('/')) {
+                return `${window.location.origin}${trimmed}`;
+            }
+            return `${window.location.origin}/${trimmed.replace(/^\/+/, '')}`;
+        }
+
+        function processQrImage(file) {
+            if (!file) {
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                const msg = currentLanguage === 'vi' ? 'Vui lòng chọn một tệp hình ảnh hợp lệ.' : 'Please choose a valid image file.';
+                setQrStatus(msg, 'error');
+                return;
+            }
+            if (typeof jsQR === 'undefined') {
+                const msg = currentLanguage === 'vi' ? 'Trình quét QR chưa sẵn sàng. Vui lòng tải lại trang.' : 'QR scanner is not available. Please refresh and try again.';
+                setQrStatus(msg, 'error');
+                return;
+            }
+            const scanningMsg = currentLanguage === 'vi' ? 'Đang đọc mã QR...' : 'Scanning QR code...';
+            setQrStatus(scanningMsg, 'loading');
+
+            const reader = new FileReader();
+            reader.onload = event => {
+                const img = new Image();
+                img.onload = () => {
+                    if (!qrDecodeContext) {
+                        const msg = currentLanguage === 'vi' ? 'Trình duyệt không hỗ trợ giải mã QR.' : 'QR decoding is not supported in this browser.';
+                        setQrStatus(msg, 'error');
+                        return;
+                    }
+                    qrDecodeCanvas.width = img.width;
+                    qrDecodeCanvas.height = img.height;
+                    qrDecodeContext.drawImage(img, 0, 0, qrDecodeCanvas.width, qrDecodeCanvas.height);
+                    const imageData = qrDecodeContext.getImageData(0, 0, qrDecodeCanvas.width, qrDecodeCanvas.height);
+                    const code = jsQR(imageData.data, qrDecodeCanvas.width, qrDecodeCanvas.height, { inversionAttempts: 'attemptBoth' });
+
+                    if (code && code.data) {
+                        const destination = normalizeQrDestination(code.data);
+                        if (!destination) {
+                            const invalidMsg = currentLanguage === 'vi' ? 'Mã QR này không chứa đường dẫn lịch trình hợp lệ.' : 'This QR does not contain a valid itinerary link.';
+                            setQrStatus(invalidMsg, 'error');
+                            return;
+                        }
+                        const successMsg = currentLanguage === 'vi' ? 'Đã giải mã. Đang mở lịch trình...' : 'QR recognized. Opening itinerary...';
+                        setQrStatus(successMsg, 'success');
+                        setTimeout(() => {
+                            window.location.href = destination;
+                        }, 600);
+                    } else {
+                        const failMsg = currentLanguage === 'vi' ? 'Không tìm thấy mã QR trong ảnh này.' : 'No QR code detected in this image.';
+                        setQrStatus(failMsg, 'error');
+                    }
+                };
+                img.onerror = () => {
+                    const msg = currentLanguage === 'vi' ? 'Không thể đọc ảnh đã chọn.' : 'Unable to load the selected image.';
+                    setQrStatus(msg, 'error');
+                };
+                img.src = event.target.result;
+            };
+            reader.onerror = () => {
+                const msg = currentLanguage === 'vi' ? 'Không thể mở tệp hình ảnh.' : 'Unable to open the image file.';
+                setQrStatus(msg, 'error');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim().toLowerCase();
+            
+            if (!query) {
+                return;
+            }
+            
+            // Search through destination cards
+            const cards = document.querySelectorAll('.destination-card');
+            let found = false;
+            
+            cards.forEach(card => {
+                const nameElement = card.querySelector('.destination-name');
+                const viName = nameElement.getAttribute('data-vi')?.toLowerCase() || '';
+                const enName = nameElement.getAttribute('data-en')?.toLowerCase() || '';
+                
+                if (viName.includes(query) || enName.includes(query)) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                    }, 500);
+                    found = true;
+                }
+            });
+            
+            if (!found) {
+                const msg = currentLanguage === 'vi' ? 
+                    'Không tìm thấy điểm đến phù hợp!' : 
+                    'No matching destination found!';
+                alert(msg);
+            }
+        }
+        
+        function scrollToDestinations() {
+            const mainContent = document.getElementById('destinations-section');
+            if (mainContent) {
+                mainContent.scrollIntoView({ behavior: 'auto', block: 'start' });
+            }
+        }
+        
+        function selectDestination(destination) {
+            // Check if user is authenticated
+            {% if user.is_authenticated %}
+                if (destination === 'dalat') {
+                    window.location.href = "{% url 'home' %}";
+                } else {
+                    const msg = currentLanguage === 'vi' ? 
+                        'Điểm đến này sẽ sớm ra mắt!' : 
+                        'This destination will be available soon!';
+                    alert(msg);
+                }
+            {% else %}
+                // User is not authenticated, show login modal
+                openModal('loginModal');
+            {% endif %}
+        }
+
+        function updateAuthUI(username) {
+            const navLinks = document.querySelector('.nav-links');
+            if (!navLinks) return;
+            
+            // 1. Xóa các nút login/signup cũ (nếu có)
+            const loginBtn = navLinks.querySelector('.nav-btn.login');
+            const signupBtn = navLinks.querySelector('.nav-btn.signup');
+            if (loginBtn) loginBtn.remove();
+            if (signupBtn) signupBtn.remove();
+
+            // 2. QUAN TRỌNG: Xóa profile và nút tạo lịch trình CŨ (để tránh bị lặp)
+            const existingProfile = navLinks.querySelector('.profile-container');
+            if (existingProfile) existingProfile.remove();
+
+            // Xóa nút "Tạo lịch trình" cũ bằng cách tìm link có chứa text này
+            const existingLinks = navLinks.querySelectorAll('.nav-text-link');
+            existingLinks.forEach(link => {
+                // Kiểm tra nếu link này dẫn đến trang home hoặc có chữ "Tạo lịch trình"
+                if (link.getAttribute('href') === "{% url 'home' %}" || link.textContent.includes('Tạo lịch trình')) {
+                    link.remove();
+                }
+            });
+            
+            // 3. Tạo và thêm các phần tử MỚI
+            const settingsContainer = navLinks.querySelector('.settings-container');
+
+            let communityLink = navLinks.querySelector('[data-nav-key="community-link"]');
+            if (!communityLink) {
+                communityLink = document.createElement('a');
+                communityLink.href = "{% url 'shared-itineraries-gallery' %}";
+                communityLink.className = 'nav-text-link';
+                communityLink.setAttribute('data-nav-key', 'community-link');
+                communityLink.innerHTML = '<span data-vi="Lịch trình cộng đồng" data-en="Community Schedules">Lịch trình cộng đồng</span>';
+            }
+
+            // Tạo nút "Tạo lịch trình"
+            const planLink = document.createElement('button');
+            planLink.onclick = scrollToDestinations;
+            planLink.className = 'nav-text-link';
+            planLink.style.cssText = 'background: none; border: none; cursor: pointer; padding: 0.5rem 1.2rem;';
+            planLink.innerHTML = '<span data-vi="Tạo lịch trình" data-en="Create Itinerary">Tạo lịch trình</span>';
+            
+            // Tạo Profile Container
+            const profileContainer = document.createElement('div');
+            profileContainer.className = 'profile-container';
+            profileContainer.innerHTML = `
+    <button class="profile-btn" onclick="toggleProfile()" title="Profile">
+        <span class="profile-icon">
+            {% if user.first_name %}{{ user.first_name|slice:":1" }}{% else %}👤{% endif %}
+        </span>
+        <span class="profile-username" data-username="${username}">${username}</span>
+    </button>
+    <div class="profile-dropdown" id="profileDropdown">
+        <a href="/profile/" class="profile-item">
+            <span data-vi="Xem hồ sơ" data-en="View Profile">Xem hồ sơ</span>
+        </a>
+        <div class="profile-divider"></div>
+        <a href="{% url 'logout' %}" class="profile-item logout">
+            <span data-vi="Đăng xuất" data-en="Logout">Đăng xuất</span>
+        </a>
+    </div>
+`;
+            
+            // Chèn vào trước nút Cài đặt
+            if (settingsContainer) {
+                            navLinks.insertBefore(communityLink, settingsContainer);
+                            navLinks.insertBefore(planLink, settingsContainer);
+                            navLinks.insertBefore(profileContainer, settingsContainer);
+            } else {
+                            navLinks.appendChild(communityLink);
+                navLinks.appendChild(planLink);
+                navLinks.appendChild(profileContainer);
+            }
+            
+            // Cập nhật ngôn ngữ
+            applyLanguage();
+        }
+
+        function toggleProfile() {
+            const dropdown = document.getElementById('profileDropdown');
+            const btn = document.querySelector('.profile-btn');
+            
+            if (dropdown && btn) {
+                dropdown.classList.toggle('active');
+                btn.classList.toggle('active');
+            }
+        }
+        
+        // Close profile dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const profileContainer = document.querySelector('.profile-container');
+            if (profileContainer && !profileContainer.contains(e.target)) {
+                const dropdown = document.getElementById('profileDropdown');
+                const btn = document.querySelector('.profile-btn');
+                if (dropdown) dropdown.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+            }
+        });
+
+        // Close dropdowns when scrolling
+        window.addEventListener('scroll', function() {
+            // Close profile dropdown
+            const profileDropdown = document.getElementById('profileDropdown');
+            const profileBtn = document.querySelector('.profile-btn');
+            if (profileDropdown && profileDropdown.classList.contains('active')) {
+                profileDropdown.classList.remove('active');
+                if (profileBtn) profileBtn.classList.remove('active');
+            }
+            
+            // Close settings panel
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsBtn = document.querySelector('.settings-btn');
+            if (settingsPanel && settingsPanel.classList.contains('active')) {
+                settingsPanel.classList.remove('active');
+                if (settingsBtn) settingsBtn.classList.remove('active');
+                settingsOpen = false;
+            }
+        });
+
+        // ===== CSRF TOKEN =====
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // ===== FORM HANDLERS =====
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const errorDiv = document.getElementById('loginError');
+            const submitBtn = form.querySelector('.auth-submit-btn');
+            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+            
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = currentLanguage === 'vi' ? 'Đang đăng nhập...' : 'Logging in...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Close modal
+                    closeModal('loginModal');
+                    // Update UI to show logged in state
+                    window.location.reload();
+                    // Clear form
+                    form.reset();
+                } else {
+                    if (data.error) {
+                        errorDiv.textContent = data.error;
+                        errorDiv.removeAttribute('data-vi');
+                        errorDiv.removeAttribute('data-en');
+                    } else {
+                        errorDiv.setAttribute('data-vi', 'Tên đăng nhập hoặc mật khẩu không đúng');
+                        errorDiv.setAttribute('data-en', 'Invalid username or password');
+                        errorDiv.textContent = errorDiv.getAttribute(`data-${currentLanguage}`);
+                    }
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = currentLanguage === 'vi' ? 
+                    'Có lỗi xảy ra. Vui lòng thử lại sau.' :
+                    'An error occurred. Please try again later.';
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const errorDiv = document.getElementById('registerError');
+            const submitBtn = form.querySelector('.auth-submit-btn');
+            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+            
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = currentLanguage === 'vi' ? 'Đang đăng ký...' : 'Registering...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/register/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Close modal
+                    closeModal('registerModal');
+                    window.location.reload();
+                } else {
+                    errorDiv.textContent = data.error || (currentLanguage === 'vi' ? 
+                        'Tên đăng nhập đã được sử dụng hoặc mật khẩu không hợp lệ' :
+                        'Username already exists or password is invalid');
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                errorDiv.textContent = currentLanguage === 'vi' ? 
+                    'Có lỗi xảy ra. Vui lòng thử lại sau.' :
+                    'An error occurred. Please try again later.';
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        // Listen for settings changes from other tabs/windows
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'styleMode') {
+                const newMode = e.newValue || 'simple';
+                if (newMode !== currentStyle) {
+                    toggleStyle(newMode);
+                }
+            } else if (e.key === 'language') {
+                const newLang = e.newValue || 'vi';
+                if (newLang !== currentLanguage) {
+                    switchLanguage(newLang);
+                }
+            }
+        });
+
+        // ===== DOM READY =====
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Apply language
+            applyLanguage();
+            
+            // Apply style mode
+            applyStyleMode();
+
+            // Activate QR import interactions
+            initializeQrImport();
+            
+            // Modal overlay click to close
+            document.querySelectorAll('.auth-modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) closeModal(this.id);
+                });
+            });
+
+            // Search functionality - supports both Vietnamese and English
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const value = e.target.value.toLowerCase().trim();
+                    document.querySelectorAll('.destination-card').forEach(card => {
+                        const nameElement = card.querySelector('.destination-name');
+                        
+                        // Get both Vietnamese and English names
+                        const viName = (nameElement.getAttribute('data-vi') || '').toLowerCase();
+                        const enName = (nameElement.getAttribute('data-en') || '').toLowerCase();
+                        const currentName = nameElement.textContent.toLowerCase();
+                        
+                        // Check if search value matches any of the names
+                        const matches = value === '' || 
+                                      viName.includes(value) || 
+                                      enName.includes(value) ||
+                                      currentName.includes(value);
+                        
+                        card.style.display = matches ? 'block' : 'none';
+                    });
+                });
+            }
+
+            // Scroll animations
+            const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.step-card, .feature-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            });
+
+            // Scroll reveal for destinations and QR section
+            const fadeObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            // Observe destinations intro, grid, QR intro, and QR section
+            const elementsToFade = document.querySelectorAll('.destinations-intro, .destinations-grid, .qr-intro-text, .qr-import-section');
+            elementsToFade.forEach(el => fadeObserver.observe(el));
+
+            // Reset scroll position on page load
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+            window.scrollTo(0, 0);
+
+            // Preload all hero images to prevent lag on first clicks
+            const heroImagePaths = [
+                "{% static 'home/images/hero/1.jpg' %}",
+                "{% static 'home/images/hero/2.jpg' %}",
+                "{% static 'home/images/hero/3.jpg' %}",
+                "{% static 'home/images/hero/4.jpg' %}",
+                "{% static 'home/images/hero/5.jpg' %}",
+                "{% static 'home/images/hero/6.jpg' %}",
+                "{% static 'home/images/hero/7.jpg' %}",
+                "{% static 'home/images/hero/8.jpg' %}",
+                "{% static 'home/images/hero/9.jpg' %}",
+                "{% static 'home/images/hero/10.jpg' %}"
+            ];
+            
+            heroImagePaths.forEach(path => {
+                const img = new Image();
+                img.src = path;
+            });
+
+            // Hero Slideshow
+            window.currentSlideIndex = 0; // Make it globally accessible
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.hero-indicator');
+            const totalSlides = slides.length;
+            let slideInterval;
+
+            // Text content for each slide
+            const slideTexts = [
+                {
+                    title: { vi: 'Bắt đầu giấc mơ', en: 'Start Your Dream' },
+                    subtitle: { vi: 'Du lịch chỉ với một cú click', en: 'Travel with just one click' }
+                },
+                {
+                    title: { vi: 'Khám phá Việt Nam', en: 'Discover Vietnam' },
+                    subtitle: { vi: 'Thiên đường điểm đến châu Á', en: 'The paradise of Asia' }
+                },
+                {
+                    title: { vi: 'Trải nghiệm độc đáo', en: 'Unique Experiences' },
+                    subtitle: { vi: 'Mỗi chuyến đi là một câu chuyện', en: 'Every journey tells a story' }
+                },
+                {
+                    title: { vi: 'Lên kế hoạch dễ dàng', en: 'Plan Effortlessly' },
+                    subtitle: { vi: 'AI giúp bạn tối ưu mọi hành trình', en: 'AI optimizes your perfect trip' }
+                },
+                {
+                    title: { vi: 'Nơi ký ức bắt đầu', en: 'Where Memories Begin' },
+                    subtitle: { vi: 'Những khoảnh khắc đáng nhớ chờ bạn', en: 'Unforgettable moments await you' }
+                },
+                {
+                    title: { vi: 'Phiêu lưu mới mẻ', en: 'Fresh Adventures' },
+                    subtitle: { vi: 'Khám phá vẻ đẹp tiềm ẩn', en: 'Uncover hidden beauty' }
+                },
+                {
+                    title: { vi: 'Hành trình của bạn', en: 'Your Journey' },
+                    subtitle: { vi: 'Được thiết kế riêng cho bạn', en: 'Tailored just for you' }
+                },
+                {
+                    title: { vi: 'Tận hưởng từng giây', en: 'Savor Every Moment' },
+                    subtitle: { vi: 'Để chúng tôi lo phần còn lại', en: 'Let us handle the rest' }
+                },
+                {
+                    title: { vi: 'Đi để trở về', en: 'Travel to Return' },
+                    subtitle: { vi: 'Với trái tim tràn đầy cảm xúc', en: 'With a heart full of emotions' }
+                },
+                {
+                    title: { vi: 'Chuyến đi hoàn hảo', en: 'The Perfect Trip' },
+                    subtitle: { vi: 'Bắt đầu từ đây, bắt đầu từ bây giờ', en: 'Starts here, starts now' }
+                }
+            ];
+
+            const heroTitle = document.getElementById('heroTitle');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+
+            function updateHeroText(index) {
+                const text = slideTexts[index];
+                // Use global currentLanguage variable instead of static lang
+                const lang = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 'en' : 'vi';
+                
+                heroTitle.style.opacity = '0';
+                heroSubtitle.style.opacity = '0';
+                
+                setTimeout(() => {
+                    heroTitle.textContent = text.title[lang];
+                    heroSubtitle.textContent = text.subtitle[lang];
+                    heroTitle.style.opacity = '1';
+                    heroSubtitle.style.opacity = '1';
+                }, 750);
+            }
+            
+            // Make updateHeroText globally accessible
+            window.updateHeroText = updateHeroText;
+
+            function goToSlide(index) {
+                // Remove active class from current slide and indicator
+                slides[window.currentSlideIndex].classList.remove('active');
+                indicators[window.currentSlideIndex].classList.remove('active');
+                
+                // Update index
+                window.currentSlideIndex = index;
+                
+                // Add active class to new slide and indicator
+                slides[window.currentSlideIndex].classList.add('active');
+                indicators[window.currentSlideIndex].classList.add('active');
+                
+                // Update text content
+                updateHeroText(window.currentSlideIndex);
+            }
+            window.goToSlide = goToSlide;
+
+            function nextSlide() {
+                const nextIndex = (window.currentSlideIndex + 1) % totalSlides;
+                goToSlide(nextIndex);
+            }
+
+            function previousSlide() {
+                const prevIndex = (window.currentSlideIndex - 1 + totalSlides) % totalSlides;
+                goToSlide(prevIndex);
+            }
+
+            function startSlideshow() {
+                if (slideInterval) clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 4000); // 4s tự chuyển (tối ưu cho website du lịch)
+            }
+
+            // Bắt đầu slideshow - luôn chạy liên tục
+            startSlideshow();
+
+            // Xử lý sự kiện click vào banner để chuyển ảnh
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                // Thêm con trỏ chuột dạng bàn tay để người dùng biết có thể click
+                heroSection.style.cursor = 'pointer';
+
+                heroSection.addEventListener('click', function(e) {
+                    // Nếu click vào nút (button) hoặc liên kết (a) hoặc chấm tròn (indicators) thì KHÔNG chuyển ảnh
+                    if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.hero-indicators')) {
+                        return;
+                    }
+
+                    // Detect click zone: left half = previous, right half = next
+                    const clickX = e.clientX;
+                    const heroWidth = heroSection.offsetWidth;
+                    const isLeftHalf = clickX < heroWidth / 2;
+
+                    if (isLeftHalf) {
+                        previousSlide(); // Navigate to previous slide
+                    } else {
+                        nextSlide(); // Navigate to next slide
+                    }
+
+                    // Reset timer để đảm bảo luôn có đủ 4s sau khi click
+                    startSlideshow();
+                });
+            }
+
+            // Parallax effect on scroll
+            window.addEventListener('scroll', function() {
+                const heroSlides = document.querySelectorAll('.hero-slide');
+                const scrollTop = window.pageYOffset;
+                
+                // Transform slides with parallax effect
+                heroSlides.forEach(slide => {
+                    slide.style.transform = `translateY(${scrollTop * 0.5}px) scale(1.1)`;
+                });
+            });
+            
+            // Check for scroll parameter in URL (từ profile page)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('scroll') === 'destinations') {
+                // Xóa parameter khỏi URL
+                window.history.replaceState({}, '', '{% url "welcome" %}');
+                
+                setTimeout(() => {
+        // Gọi trực tiếp hàm scroll có sẵn trong welcome.html
+        if (typeof scrollToDestinations === 'function') {
+            scrollToDestinations();
+        } else {
+            // Fallback nếu hàm chưa load kịp
+            const mainContent = document.getElementById('destinations-section');
+            if (mainContent) {
+                mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    }, 300);
+            }
+        });
+    </script>
+    <!-- Chatbot Script -->
+    <script src="{% static 'home/js/chatbot.js' %}"></script>
+</body>
+</html>

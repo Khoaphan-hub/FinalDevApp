@@ -1,0 +1,2345 @@
+{% extends 'base.html' %}
+{% load currency_filters %}
+{% load static %}
+
+{% block title %}Select Destinations & Eateries - Plan Your Trip{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    .main-content {
+        display: block;
+        padding: 20px;
+        min-height: auto;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .planner-header {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .planner-header a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .step-number {
+        color: #13a4ec;
+        font-weight: 600;
+    }
+
+    .step-divider {
+        color: #ccc;
+        margin: 0 0.5rem;
+    }
+
+    .tab-container {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tab-header {
+        display: flex;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .tab-button {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #6b7280;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .tab-button:hover {
+        color: #13a4ec;
+        background: #f0f9ff;
+    }
+
+    .tab-button.active {
+        color: #13a4ec;
+        background: #ffffff;
+        font-weight: 700;
+    }
+
+    .tab-button.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #13a4ec 0%, #0ea5e9 100%);
+        box-shadow: 0 2px 4px rgba(19, 164, 236, 0.3);
+    }
+
+    .tab-content {
+        padding: 2rem;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+
+    .trip-summary {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .trip-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .trip-summary-item {
+        background: #f9fafb;
+        border-radius: 6px;
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+    .trip-summary-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+
+    .trip-summary-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .trip-summary-value.budget-remaining {
+        color: #059669;
+    }
+
+    .trip-summary-value.budget-warning {
+        color: #dc2626;
+    }
+
+    .mood-tags {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: #f0f9ff;
+        border-radius: 6px;
+        border: 1px solid #bae6fd;
+    }
+
+    .mood-tags-label {
+        font-size: 0.875rem;
+        color: #0369a1;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .mood-tags-value {
+        font-size: 0.875rem;
+        color: #0c4a6e;
+    }
+
+    /* Tag color styles */
+    .tag {
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    /* Nature tags - Green shades */
+    .tag-pure-nature {
+        background: #d1fae5;
+        border: 1px solid #6ee7b7;
+        color: #065f46;
+    }
+
+    .tag-50-nature {
+        background: #d9f99d;
+        border: 1px solid #bef264;
+        color: #365314;
+    }
+
+    /* Healing/Spiritual tags - Purple/Lavender */
+    .tag-healing {
+        background: #e9d5ff;
+        border: 1px solid #c084fc;
+        color: #6b21a8;
+    }
+
+    .tag-spiritual {
+        background: #ddd6fe;
+        border: 1px solid #a78bfa;
+        color: #5b21b6;
+    }
+
+    /* Activity tags - Blue/Cyan */
+    .tag-sporty {
+        background: #bfdbfe;
+        border: 1px solid #60a5fa;
+        color: #1e40af;
+    }
+
+    /* Food/Social tags - Orange/Warm colors */
+    .tag-cafe {
+        background: #fed7aa;
+        border: 1px solid #fdba74;
+        color: #9a3412;
+    }
+
+    .tag-eating {
+        background: #fecaca;
+        border: 1px solid #f87171;
+        color: #991b1b;
+    }
+
+    /* Human/Culture tags - Amber/Brown */
+    .tag-50-human {
+        background: #fde68a;
+        border: 1px solid #fbbf24;
+        color: #78350f;
+    }
+
+    .tag-history {
+        background: #fcd34d;
+        border: 1px solid #f59e0b;
+        color: #92400e;
+    }
+
+    .tag-manmade {
+        background: #e0e7ff;
+        border: 1px solid #a5b4fc;
+        color: #3730a3;
+    }
+
+    /* Bizarre tag - Pink/Magenta */
+    .tag-bizarre {
+        background: #fce7f3;
+        border: 1px solid #f9a8d4;
+        color: #9f1239;
+    }
+
+    /* Default tag */
+    .tag-default {
+        background: #f8faff;
+        border: 1px solid #cbd5f5;
+        color: #4b5563;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+
+    .autofill-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .clear-btn {
+        background: transparent;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .clear-btn:hover {
+        background: #fee2e2;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .autofill-btn {
+        background: #0ea5e9;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .autofill-btn:hover {
+        background: #0284c7;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .autofill-status {
+        font-size: 0.875rem;
+        color: #047857;
+        font-weight: 500;
+    }
+
+    .autofill-status.warning {
+        color: #b91c1c;
+    }
+    
+    .autofill-status:empty {
+        display: none;
+    }
+
+    /* Filter chips for time slots */
+    .filter-chips {
+        display: flex;
+        gap: 0.5rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .filter-chip {
+        padding: 0.5rem 1rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+    }
+
+    .filter-chip:hover {
+        background: #e5e7eb;
+        border-color: #d1d5db;
+        transform: translateY(-1px);
+    }
+
+    .filter-chip.active {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #ffffff;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+    }
+
+    .items-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .items-grid::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .items-grid::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .items-grid::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .item-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .item-card.selected {
+        border-color: #13a4ec;
+        box-shadow: 0 0 0 2px rgba(19, 164, 236, 0.2);
+    }
+
+    .item-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .item-details {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .item-name {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-category {
+        font-size: 0.875rem;
+        color: #13a4ec;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-highlight {
+        font-size: 0.9rem;
+        color: #374151;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+    }
+
+    .item-price {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-distance {
+        font-size: 0.875rem;
+        color: #059669;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .item-button {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: auto;
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1;
+    }
+
+    .btn-add {
+        background: #13a4ec;
+        color: white;
+    }
+
+    .btn-add:hover {
+        background: #0ea5e9;
+    }
+
+    .btn-remove {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-remove:hover {
+        background: #dc2626;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 2rem;
+    }
+
+    .itinerary-summary {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .itinerary-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+
+    .selected-items-list {
+        margin-bottom: 1.5rem;
+        min-height: 100px;
+    }
+
+    .selected-items-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .selected-items-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .selected-items-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .selected-items-list::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #6b7280;
+        padding: 2rem 0;
+        font-style: italic;
+    }
+
+    .selected-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        transition: background 0.2s;
+    }
+
+    .selected-item:hover {
+        background: #f3f4f6;
+    }
+
+    .selected-item-name {
+        font-weight: 500;
+        color: #1f2937;
+    }
+
+    .selected-item-price {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .selected-item-remove {
+        background: transparent;
+        border: none;
+        color: #dc2626;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        line-height: 1;
+        transition: all 0.2s;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .selected-item-remove:hover {
+        background: #fee2e2;
+        transform: scale(1.1);
+    }
+
+    .budget-summary {
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .budget-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .budget-row:last-child {
+        margin-bottom: 0;
+        padding-top: 0.5rem;
+        border-top: 1px solid #e5e7eb;
+        font-weight: 600;
+    }
+
+    .budget-row.warning {
+        color: #dc2626;
+    }
+
+    .generate-btn {
+        width: 100%;
+        background: #13a4ec;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-bottom: 1rem;
+    }
+
+    .generate-btn:hover {
+        background: #0ea5e9;
+    }
+
+    .generate-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .weather-widget {
+        border-radius: 16px;
+        color: white;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        transition: all 0.3s ease;
+        /* Mặc định gradient nếu JS chưa load */
+        background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    }
+
+    /* Các trạng thái thời tiết */
+    .bg-clear { background: linear-gradient(135deg, #f59e0b, #f97316); } /* Nắng: Cam/Vàng */
+    .bg-clouds { background: linear-gradient(135deg, #64748b, #475569); } /* Mây: Xám xanh */
+    .bg-rain { background: linear-gradient(135deg, #334155, #1e293b); }   /* Mưa: Xám đậm */
+    .bg-drizzle { background: linear-gradient(135deg, #0ea5e9, #0284c7); } /* Mưa phùn: Xanh dương */
+    .bg-thunderstorm { background: linear-gradient(135deg, #4c1d95, #312e81); } /* Bão: Tím than */
+    .bg-snow { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0c4a6e; } /* Tuyết: Trắng xanh */
+    .bg-mist { background: linear-gradient(135deg, #94a3b8, #64748b); } /* Sương mù */
+
+    .weather-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .weather-city-name {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .weather-desc-text {
+        font-size: 1.1rem;
+        text-transform: capitalize;
+        opacity: 0.9;
+    }
+
+    .weather-main-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 24px;
+    }
+
+    .weather-icon-large {
+        width: 80px;
+        height: 80px;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    }
+
+    .weather-temp-big {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -2px;
+    }
+
+    /* Grid thông tin chi tiết (Độ ẩm, gió...) */
+    .weather-details-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .weather-detail-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .detail-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .main-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            position: static;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="planner-header">
+        <h1 data-vi="Chọn Điểm Đến & Nhà Hàng" data-en="Select Your Destinations & Eateries">Chọn Điểm Đến & Nhà Hàng</h1>
+        <div>
+            <a href="{% url 'home' %}" style="margin-right: 1rem;" data-vi="← Quay lại Bước 2" data-en="← Back to Step 2">← Quay lại Bước 2</a>
+            {% if form_errors %}
+                <span style="color: #ef4444; font-weight: 500;" data-vi="Vui lòng sửa lỗi bên dưới" data-en="Please fix errors below">Vui lòng sửa lỗi bên dưới</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if form_errors %}
+        <div style="background: #fee2e2; border: 1px solid #ef4444; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <strong style="color: #dc2626;" data-vi="Lỗi xác thực:" data-en="Validation Errors:">Lỗi xác thực:</strong>
+            <ul style="margin: 0.5rem 0 0 1.5rem; color: #dc2626;">
+                {% for error in form_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step-item">
+            <span style="color: #10b981;" data-vi="✓ 1. Ràng buộc" data-en="✓ 1. Constraints">✓ 1. Ràng buộc</span>
+        </div>
+        <span class="step-divider">/</span>
+        <div class="step-item">
+            <span style="color: #10b981;" data-vi="✓ 2. Điểm xuất phát" data-en="✓ 2. Start Point">✓ 2. Điểm xuất phát</span>
+        </div>
+        <span class="step-divider">/</span>
+        <div class="step-item">
+            <span class="step-number" data-vi="3. Điểm đến" data-en="3. Destinations">3. Điểm đến</span>
+        </div>
+        <span class="step-divider">/</span>
+        <div class="step-item">
+            <span class="step-number" data-vi="4. Nhà hàng" data-en="4. Eateries">4. Nhà hàng</span>
+        </div>
+    </div>
+
+    <!-- Trip Summary -->
+    <div class="trip-summary">
+        <div class="trip-summary-grid">
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Thời gian" data-en="Duration">Thời gian</div>
+                <div class="trip-summary-value" id="tripDays" data-vi="4 ngày" data-en="4 days">4 ngày</div>
+            </div>
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Tối đa điểm/Ngày" data-en="Max POIs/Day">Tối đa điểm/Ngày</div>
+                <div class="trip-summary-value" id="maxPOIsPerDay">3 places</div>
+            </div>
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Tổng ngân sách" data-en="Total Budget">Tổng ngân sách</div>
+                <div class="trip-summary-value" id="tripBudget">₫10,000,000</div>
+            </div>
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Ngân sách còn lại" data-en="Budget Remaining">Ngân sách còn lại</div>
+                <div class="trip-summary-value budget-remaining" id="budgetRemaining">₫10,000,000</div>
+            </div>
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Điểm xuất phát" data-en="Starting Point">Điểm xuất phát</div>
+                <div class="trip-summary-value" id="startPoint">Dalat Center</div>
+            </div>
+            <div class="trip-summary-item">
+                <div class="trip-summary-label" data-vi="Mục đã chọn" data-en="Selected Items">Mục đã chọn</div>
+                <div class="trip-summary-value" id="selectedCount">0 items</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Main Content -->
+        <div>
+            {% if mood %}
+            <!-- Mood Highlight Section -->
+            <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                <h3 style="margin-top: 0;" data-vi="Tâm trạng bạn chọn: {{ mood }}" data-en="Your Selected Mood: {{ mood }}">Tâm trạng bạn chọn: {{ mood }}</h3>
+                {% if mood_tags %}
+                    <p style="margin: 0.5rem 0;" data-vi="Chúng tôi sẽ ưu tiên các điểm tham quan với nhãn như:" data-en="We're prioritizing POIs with tags like:">Chúng tôi sẽ ưu tiên các điểm tham quan với nhãn như:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                        {% for tag in mood_tags %}
+                            <span class="tag tag-{{ tag|tag_to_class }}" data-vi="{{ tag|translate_tag_vi }}" data-en="{{ tag }}">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Tab Container -->
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-button active" onclick="switchTab('destinations', event)">
+                        <span class="material-icons" style="margin-right: 0.5rem;"></span>
+                        <span data-vi="Điểm đến" data-en="Destinations">Điểm đến</span>
+                    </button>
+                    <button class="tab-button" onclick="switchTab('eateries', event)">
+                        <span class="material-icons" style="margin-right: 0.5rem;"></span>
+                        <span data-vi="Nhà hàng" data-en="Eateries">Nhà hàng</span>
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Destinations Tab -->
+                    <div id="destinations-tab" class="tab-pane active">
+                        
+                        <!-- Search Box with Real-time Prefix Tree Search -->
+                        <div class="search-box" style="margin-bottom: 1rem; position: relative;">
+                            <label for="poiSearchInput" style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-vi="Tìm kiếm Điểm tham quan & Nhà hàng" data-en="Search POIs & Eateries">Tìm kiếm Điểm tham quan & Nhà hàng</label>
+                            <input type="text" id="poiSearchInput" placeholder="Bắt đầu gõ để tìm kiếm..." 
+                                   data-placeholder-vi="Bắt đầu gõ để tìm kiếm..."
+                                   data-placeholder-en="Start typing to search..."
+                                   oninput="searchRealtime()" 
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;">
+                            <p style="font-size: 0.875rem; color: #6b7280; margin: 0.5rem 0 0 0;" data-vi="Tìm theo tên - kết quả cập nhật khi bạn gõ" data-en="Search by name - results update as you type">Tìm theo tên - kết quả cập nhật khi bạn gõ</p>
+                            <div id="poi-search-results" style="margin-top: 0.5rem;"></div>
+                        </div>
+
+                        <h3 data-vi="Chọn điểm yêu thích của bạn" data-en="Pick Your Favorite Spots">Chọn điểm yêu thích của bạn</h3>
+                        
+                        {% if mood %}
+                        <!-- Matches Your Mood Section -->
+                        <div style="margin-top: 1.5rem; margin-bottom: 3rem; padding: 1.5rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 2px solid #bae6fd;">
+                            <h4 style="color: #0369a1; margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">✨</span>
+                                <span data-vi="Phù hợp với tâm trạng của bạn" data-en="Matches Your Mood">Phù hợp với tâm trạng của bạn</span>
+                            </h4>
+                            <div class="items-grid" id="mood-matched-grid" style="margin: 0;">
+                            {% for poi in pois %}
+                                {% if poi.matched_mood %}
+                            <div class="item-card" data-item-type="poi" data-item-id="{{ poi.id }}" data-item-name="{{ poi.name|escape }}" data-item-price="{{ poi.budget_price|default:0 }}" data-distance-km="{{ poi.distance_km|default:'' }}">
+                                <img src="{% if poi.image_url %}{{ poi.image_url }}{% else %}https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400{% endif %}" 
+                                     alt="{{ poi.name }}" class="item-image">
+                                <div class="item-details">
+                                    <div class="item-name" data-vi="{{ poi.name }}" data-en="{{ poi.name_en|default:poi.name }}">{{ poi.name }}</div>
+                                    <div class="item-category" data-vi="{{ poi.tags|default:'General'|translate_tag_vi }}" data-en="{{ poi.tags_en|default:poi.tags|default:'General' }}">{{ poi.tags|default:"General" }}</div>
+                                    {% if poi.address %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;"><span data-vi="📍 {{ poi.address }}" data-en="📍 {{ poi.address_en|default:poi.address }}">📍 {{ poi.address }}</span></div>
+                                    {% endif %}
+                                    {% if poi.highlight %}
+                                    <div class="item-highlight">
+                                        <span data-vi="💡 {{ poi.highlight|capfirst }}" data-en="💡 {{ poi.highlight_en|default:poi.highlight|capfirst }}">💡 {{ poi.highlight|capfirst }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if poi.budget_price %}
+                                    <div class="item-price">
+                                        <span class="price-icon">🪙</span>
+                                        
+                                        ₫{{ poi.budget_price|floatformat:0 }}
+                                    </div>
+                                    {% endif %}
+                                    {% if poi.distance_km is not None %}
+                                    <div class="item-distance">🚗 {{ poi.distance_km }} km away</div>
+                                    {% endif %}
+                                    {% if poi.open_hours %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">⏰ {{ poi.open_hours }}</div>
+                                    {% endif %}
+                                    {% if poi.rating %}
+                                    <div style="font-size: 0.875rem; color: #f59e0b; margin-bottom: 0.5rem;">⭐ {{ poi.rating }}/5</div>
+                                    {% endif %}
+                                    {% if poi.tiktok_link %}
+                                    <div style="margin-bottom: 0.5rem;"><a href="{{ poi.tiktok_link }}" target="_blank" style="font-size: 0.875rem; color: #13a4ec; text-decoration: none;">📱 View on TikTok</a></div>
+                                    {% endif %}
+                                    <button class="item-button btn-add" id="poi-btn-{{ poi.id }}" onclick="toggleItem('poi', {{ poi.id }}, '{{ poi.name|escapejs }}', {{ poi.budget_price|default:0 }}, event)">
+                                        <span class="btn-icon">+</span> Add to Trip
+                                    </button>
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div style="margin: 4rem 0 3rem 0; position: relative; text-align: center;">
+                            <div style="border-top: 3px solid #e5e7eb; position: relative;">
+                                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: white; padding: 0.5rem 1.5rem; color: #374151; font-size: 1rem; font-weight: 700; border-radius: 20px; border: 2px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" data-vi="HOẶC KHÁM PHÁ THÊM" data-en="OR EXPLORE MORE">
+                                    HOẶC KHÁM PHÁ THÊM
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- More Options Section -->
+                        <div style="margin-top: 2rem; margin-bottom: 2rem; padding: 1.5rem; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                            <h4 style="color: #374151; margin: 0 0 1rem 0; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">🗺️</span>
+                                <span data-vi="Nhiều lựa chọn hơn" data-en="More Options">Nhiều lựa chọn hơn</span>
+                                <span style="font-size: 0.875rem; font-weight: 400; color: #9ca3af;" data-vi="(Tất cả điểm đến được sắp xếp theo khoảng cách)" data-en="(All destinations sorted by distance)">(Tất cả điểm đến được sắp xếp theo khoảng cách)</span>
+                            </h4>
+                            <div class="items-grid" id="more-options-grid">
+                            {% for poi in pois %}
+                                {% if not poi.matched_mood %}
+                            <div class="item-card" data-item-type="poi" data-item-id="{{ poi.id }}" data-item-name="{{ poi.name|escape }}" data-item-price="{{ poi.budget_price|default:0 }}" data-distance-km="{{ poi.distance_km|default:'' }}">
+                                <img src="{% if poi.image_url %}{{ poi.image_url }}{% else %}https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400{% endif %}" 
+                                     alt="{{ poi.name }}" class="item-image">
+                                <div class="item-details">
+                                    <div class="item-name" data-vi="{{ poi.name }}" data-en="{{ poi.name_en|default:poi.name }}">{{ poi.name }}</div>
+                                    <div class="item-category" data-vi="{{ poi.tags|default:'General'|translate_tag_vi }}" data-en="{{ poi.tags_en|default:poi.tags|default:'General' }}">{{ poi.tags|default:"General" }}</div>
+                                    {% if poi.address %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;"><span data-vi="📍 {{ poi.address }}" data-en="📍 {{ poi.address_en|default:poi.address }}">📍 {{ poi.address }}</span></div>
+                                    {% endif %}
+                                    {% if poi.highlight %}
+                                    <div class="item-highlight">
+                                        <span data-vi="💡 {{ poi.highlight|capfirst }}" data-en="💡 {{ poi.highlight_en|default:poi.highlight|capfirst }}">💡 {{ poi.highlight|capfirst }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if poi.budget_price %}
+                                    <div class="item-price">
+                                        <span class="price-icon">🪙</span>
+                                        
+                                        ₫{{ poi.budget_price|floatformat:0 }}
+                                    </div>
+                                    {% endif %}
+                                    {% if poi.distance_km is not None %}
+                                    <div class="item-distance">🚗 {{ poi.distance_km }} km away</div>
+                                    {% endif %}
+                                    {% if poi.open_hours %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">⏰ {{ poi.open_hours }}</div>
+                                    {% endif %}
+                                    {% if poi.rating %}
+                                    <div style="font-size: 0.875rem; color: #f59e0b; margin-bottom: 0.5rem;">⭐ {{ poi.rating }}/5</div>
+                                    {% endif %}
+                                    {% if poi.tiktok_link %}
+                                    <div style="margin-bottom: 0.5rem;"><a href="{{ poi.tiktok_link }}" target="_blank" style="font-size: 0.875rem; color: #13a4ec; text-decoration: none;">📱 View on TikTok</a></div>
+                                    {% endif %}
+                                    <button class="item-button btn-add" id="poi-btn-{{ poi.id }}" onclick="toggleItem('poi', {{ poi.id }}, '{{ poi.name|escapejs }}', {{ poi.budget_price|default:0 }}, event)">
+                                        <span class="btn-icon">+</span> <span data-vi="Thêm vào chuyến đi" data-en="Add to Trip">Thêm vào chuyến đi</span>
+                                    </button>
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Eateries Tab -->
+                    <div id="eateries-tab" class="tab-pane">
+                        
+                        <!-- Search Box with Real-time Prefix Tree Search -->
+                        <div class="search-box" style="margin-bottom: 1rem; position: relative;">
+                            <label for="eaterySearchInput" style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-vi="Tìm kiếm Điểm tham quan & Nhà hàng" data-en="Search POIs & Eateries">Tìm kiếm Điểm tham quan & Nhà hàng</label>
+                            <input type="text" id="eaterySearchInput" placeholder="Bắt đầu gõ để tìm kiếm..." data-placeholder-vi="Bắt đầu gõ để tìm kiếm..." data-placeholder-en="Start typing to search..."
+                                   oninput="searchRealtime('eatery')" 
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;">
+                            <p style="font-size: 0.875rem; color: #6b7280; margin: 0.5rem 0 0 0;" data-vi="Tìm theo tên - kết quả cập nhật khi bạn gõ" data-en="Search by name - results update as you type">Tìm theo tên - kết quả cập nhật khi bạn gõ</p>
+                            <div id="eatery-search-results" style="margin-top: 0.5rem;"></div>
+                        </div>
+                        
+                        <!-- Time Slot Filters -->
+                        <div class="filter-chips">
+                            <div class="filter-chip active" data-slot="all" onclick="filterByTimeSlot('all')" data-vi="Tất cả" data-en="All">Tất cả</div>
+                            <div class="filter-chip" data-slot="morning" onclick="filterByTimeSlot('morning')" data-vi="Buổi sáng" data-en="Morning">Buổi sáng</div>
+                            <div class="filter-chip" data-slot="afternoon" onclick="filterByTimeSlot('afternoon')" data-vi="Buổi chiều" data-en="Afternoon">Buổi chiều</div>
+                            <div class="filter-chip" data-slot="evening" onclick="filterByTimeSlot('evening')" data-vi="Buổi tối" data-en="Evening">Buổi tối</div>
+                        </div>
+                        
+                        <div class="items-grid" id="eateries-grid">
+                            {% for eatery in eateries %}
+                            <div class="item-card" data-item-type="eatery" data-item-id="{{ eatery.id }}" data-item-name="{{ eatery.name|escape }}" data-item-price="{{ eatery.budget_price|default:0 }}" data-time-slot="{{ eatery.time_tags|default:'all' }}" data-distance-km="{{ eatery.distance_km|default:'' }}">
+                                <img src="{% if eatery.image_url %}{{ eatery.image_url }}{% else %}https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400{% endif %}" 
+                                     alt="{{ eatery.name }}" class="item-image">
+                                <div class="item-details">
+                                    <div class="item-name" data-vi="{{ eatery.name }}" data-en="{{ eatery.name_en|default:eatery.name }}">{{ eatery.name }}</div>
+                                    <div class="item-category" data-vi="Nhà hàng" data-en="Restaurant">Nhà hàng</div>
+                                    {% if eatery.address %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;"><span data-vi="📍 {{ eatery.address }}" data-en="📍 {{ eatery.address_en|default:eatery.address }}">📍 {{ eatery.address }}</span></div>
+                                    {% endif %}
+                                    <div class="item-price">
+                                        {% if eatery.price_min and eatery.price_max %}
+                                            ₫{{ eatery.price_min|floatformat:0 }} - ₫{{ eatery.price_max|floatformat:0 }}
+                                        {% elif eatery.price_min %}
+                                            <span data-vi="Từ" data-en="From">Từ</span> ₫{{ eatery.price_min|floatformat:0 }}
+                                        {% else %}
+                                            <span data-vi="Giá thay đổi" data-en="Price varies">Giá thay đổi</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if eatery.distance_km is not None %}
+                                    <div class="item-distance">🚗 {{ eatery.distance_km }} <span data-vi="km" data-en="km away">km</span></div>
+                                    {% endif %}
+                                    {% if eatery.open_hours %}
+                                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">⏰ {{ eatery.open_hours }}</div>
+                                    {% endif %}
+                                    {% if eatery.rating %}
+                                    <div style="font-size: 0.875rem; color: #f59e0b; margin-bottom: 0.5rem;">⭐ {{ eatery.rating }}/5</div>
+                                    {% endif %}
+                                    {% if eatery.time_tags %}
+                                    <div style="font-size: 0.875rem; color: #8b5cf6; margin-bottom: 0.5rem;">🍽️ <span data-vi="{{ eatery.time_tags }}" data-en="{{ eatery.time_tags_en|default:eatery.time_tags }}">{{ eatery.time_tags }}</span></div>
+                                    {% endif %}
+                                    {% if eatery.tiktok_link %}
+                                    <div style="margin-bottom: 0.5rem;"><a href="{{ eatery.tiktok_link }}" target="_blank" style="font-size: 0.875rem; color: #13a4ec; text-decoration: none;" data-vi="📱 Xem trên TikTok" data-en="📱 View on TikTok">📱 Xem trên TikTok</a></div>
+                                    {% endif %}
+                                    <button class="item-button btn-add" id="eatery-btn-{{ eatery.id }}" onclick="toggleItem('eatery', {{ eatery.id }}, '{{ eatery.name|escapejs }}', {{ eatery.budget_price|default:0 }}, event)">
+                                        <span class="btn-icon">+</span> <span data-vi="Thêm vào chuyến đi" data-en="Add to Trip">Thêm vào chuyến đi</span>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="itinerary-summary">
+                <h2 class="itinerary-title" data-vi="Lịch trình Đà Lạt của bạn" data-en="Your Dalat Itinerary">Lịch trình Đà Lạt của bạn</h2>
+                
+                <div class="budget-summary" id="budgetSummary">
+                    <div class="budget-row">
+                        <span data-vi="Tổng ngân sách:" data-en="Total Budget:">Tổng ngân sách:</span>
+                        <span id="totalBudgetSidebar">₫10,000,000</span>
+                    </div>
+                    <div class="budget-row">
+                        <span data-vi="Chi phí đã chọn:" data-en="Selected Cost:">Chi phí đã chọn:</span>
+                        <span id="selectedCost">₫0</span>
+                    </div>
+                    <div class="budget-row" id="remainingRow">
+                        <span data-vi="Còn lại:" data-en="Remaining:">Còn lại:</span>
+                        <span id="remainingBudgetSidebar">₫10,000,000</span>
+                    </div>
+                </div>
+                
+                <div class="autofill-controls" style="margin: 1rem 0; display: grid; gap: 0.75rem; grid-template-columns: 1fr;">
+                    <div style="display: grid; grid-template-columns: 1fr 40px; gap: 0.5rem; align-items: stretch;">
+                        <button type="button" class="autofill-btn" onclick="autofillItems('poi')" style="padding: 0.625rem 0.875rem; white-space: nowrap;" data-vi="🎯 Tự động điền điểm đến" data-en="🎯 Auto-fill Destinations">
+                            🎯 Tự động điền điểm đến
+                        </button>
+                        <button type="button" class="clear-btn" onclick="clearSelections('poi')" style="padding: 0.625rem 0.5rem; white-space: nowrap;">
+                            ✕
+                        </button>
+                    </div>
+                    <div id="poi-autofill-status" class="autofill-status" style="font-size: 0.75rem; min-height: 1rem; line-height: 1.3; text-align: left; padding: 0 0.25rem;"></div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 40px; gap: 0.5rem; align-items: stretch;">
+                        <button type="button" class="autofill-btn" onclick="autofillItems('eatery')" style="padding: 0.625rem 0.875rem; white-space: nowrap;" data-vi="🍽️ Tự động điền nhà hàng" data-en="🍽️ Auto-fill Eateries">
+                            🍽️ Tự động điền nhà hàng
+                        </button>
+                        <button type="button" class="clear-btn" onclick="clearSelections('eatery')" style="padding: 0.625rem 0.5rem; white-space: nowrap;">
+                            ✕
+                        </button>
+                    </div>
+                    <div id="eatery-autofill-status" class="autofill-status" style="font-size: 0.75rem; min-height: 1rem; line-height: 1.3; text-align: left; padding: 0 0.25rem;"></div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" disabled onclick="generateTrip()" data-vi="Tạo chuyến đi của tôi" data-en="Generate My Trip">
+                    Tạo chuyến đi của tôi
+                </button>
+                
+                <div class="selected-items-list" id="selectedItemsList" style="max-height: 400px; overflow-y: auto; margin-top: 1rem; padding-right: 0.5rem;">
+                    <div class="empty-state" data-vi="Bắt đầu thêm điểm đến và nhà hàng để xem chuyến đi của bạn thành hình!" data-en="Start adding destinations and eateries to see your trip take shape!">
+                        Bắt đầu thêm điểm đến và nhà hàng để xem chuyến đi của bạn thành hình!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Map (replaced by Weather Card) -->
+            <div class="map-container" id="map"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // State management
+    let selectedItems = {
+        pois: [],
+        eateries: []
+    };
+    
+    // Item Names Lookup for Localization
+    const itemNames = {
+        poi: {
+            {% for poi in pois %}
+            {{ poi.id }}: { vi: "{{ poi.name|escapejs }}", en: "{{ poi.name_en|default:poi.name|escapejs }}" },
+            {% endfor %}
+        },
+        eatery: {
+            {% for eatery in eateries %}
+            {{ eatery.id }}: { vi: "{{ eatery.name|escapejs }}", en: "{{ eatery.name_en|default:eatery.name|escapejs }}" },
+            {% endfor %}
+        }
+    };
+
+    // Tag Translations
+    const TAG_TRANSLATIONS = {
+        'Pure nature': 'Thiên nhiên',
+        '50% nature': '50% thiên nhiên',
+        'Healing': 'Chữa lành',
+        'Spiritual': 'Tâm linh',
+        'Sporty': 'Thể thao',
+        'Cafe': 'Cà phê',
+        'Eating': 'Ăn uống',
+        '50% human': '50% con người',
+        'History': 'Lịch sử',
+        'Manmade': 'Nhân tạo',
+        'Bizarre': 'Kỳ lạ',
+        'General': 'Chung'
+    };
+    
+    function translateTags(tags) {
+        if (!tags) return '';
+        const currentLang = localStorage.getItem('language') || 'vi';
+        if (currentLang === 'en') return tags;
+        
+        return tags.split(',').map(t => {
+            t = t.trim();
+            return TAG_TRANSLATIONS[t] || t;
+        }).join(', ');
+    }
+
+    let tripSetup = {};
+    let map;
+
+    // Helper function for multilingual messages
+    function getTranslatedMessage(viMessage, enMessage) {
+        const currentLang = localStorage.getItem('language') || 'vi';
+        return currentLang === 'vi' ? viMessage : enMessage;
+    }
+    
+    // Function to update sidebar when language changes
+    function updateSidebarLanguage(e) {
+        // Re-render selected items list to update any dynamic text
+        updateSelectedItemsList();
+        updateAutofillStatusLanguage();
+        updateTripSummary();
+    }
+    
+    function updateAutofillStatusLanguage() {
+        ['poi', 'eatery'].forEach(type => {
+            const statusEl = document.getElementById(type === 'poi' ? 'poi-autofill-status' : 'eatery-autofill-status');
+            if (statusEl && statusEl.dataset.msgKey) {
+                const key = statusEl.dataset.msgKey;
+                let args = [];
+                try {
+                    args = JSON.parse(statusEl.dataset.msgArgs || '[]');
+                } catch (e) {
+                    console.error('Error parsing msgArgs', e);
+                }
+                const newMessage = translateError(key, ...args);
+                statusEl.textContent = newMessage;
+            }
+        });
+    }
+    
+    // Listen for language change events
+    window.addEventListener('languageChanged', updateSidebarLanguage);
+    
+    // Helper to translate error messages with dynamic values
+    function translateError(key, ...rawArgs) {
+        const currentLang = localStorage.getItem('language') || 'vi';
+        
+        // Preprocess args to select correct language if arg is an object
+        const args = rawArgs.map(arg => {
+            if (arg && typeof arg === 'object' && arg.vi && arg.en) {
+                return arg[currentLang];
+            }
+            return arg;
+        });
+
+        const messages = {
+            needMorePOIs: {
+                vi: `Cần ${args[0]} điểm đến nhưng chỉ có ${args[1]} trong dữ liệu của bạn. Vui lòng giảm số ngày hoặc giới hạn POI.`,
+                en: `Need ${args[0]} destinations but only ${args[1]} are available in your dataset. Please reduce your day or POI limits.`
+            },
+            needMoreEateries: {
+                vi: `Cần ${args[0]} nhà hàng nhưng chỉ có ${args[1]} có sẵn. Vui lòng điều chỉnh kỳ vọng bữa ăn của bạn.`,
+                en: `Need ${args[0]} eateries but only ${args[1]} are available. Please adjust your meal expectations.`
+            },
+            notEnoughPOIs: {
+                vi: `Cần ${args[0]} điểm đến nhưng chỉ có ${args[1]} có sẵn. Vui lòng thêm POI hoặc nới lỏng ràng buộc.`,
+                en: `Need ${args[0]} destinations but only ${args[1]} are available. Please add more POIs or relax your constraints.`
+            },
+            notEnoughEateries: {
+                vi: `Cần ${args[0]} nhà hàng nhưng chỉ có ${args[1]} có sẵn. Vui lòng thêm nhà hàng hoặc nới lỏng ràng buộc.`,
+                en: `Need ${args[0]} eateries but only ${args[1]} are available. Please add more eateries or relax your constraints.`
+            },
+            exceedsBudgetEvenCheapest: {
+                vi: `Lựa chọn hiện tại của bạn vẫn tốn ${args[0]} ngay cả sau khi điền các chỗ còn lại với tùy chọn rẻ nhất, vượt quá tổng ngân sách ${args[1]} của bạn. Xóa một số lựa chọn hoặc xóa tự động điền nếu bạn muốn xây dựng lại lịch trình rẻ nhất có thể (${args[2]}).`,
+                en: `Your current selections would still cost ${args[0]} even after filling the remaining slots with the cheapest options, which exceeds your total budget of ${args[1]}. Remove some selections or clear autofill if you want to rebuild the cheapest possible itinerary (${args[2]}).`
+            },
+            lowestCostExceedsBudget: {
+                vi: `Lịch trình chi phí thấp nhất mà chúng tôi có thể xây dựng tốn ${args[0]}, cao hơn tổng ngân sách ${args[1]} của bạn. Vui lòng tăng ngân sách hoặc giảm số điểm dừng bắt buộc.`,
+                en: `The lowest-cost itinerary we can build costs ${args[0]}, which is higher than your total budget of ${args[1]}. Please increase your budget or reduce the number of required stops.`
+            },
+            shareExceededPOI: {
+                vi: `Điểm đến đã tốn ${args[0]}, vượt ${args[1]}% phần ngân sách (${args[2]}). Xóa một số lựa chọn trước khi tự động điền.`,
+                en: `Destinations already cost ${args[0]}, above the ${args[1]}% budget share (${args[2]}). Remove some picks before autofill.`
+            },
+            shareExceededEatery: {
+                vi: `Bữa ăn đã tốn ${args[0]}, vượt ${args[1]}% phần ngân sách (${args[2]}). Xóa một số lựa chọn trước khi tự động điền.`,
+                en: `Meals already cost ${args[0]}, above the ${args[1]}% budget share (${args[2]}). Remove some picks before autofill.`
+            },
+            minCostExceedsSharePOI: {
+                vi: `Ngay cả khi chỉ thêm điểm đến rẻ nhất còn lại, danh mục sẽ tốn ${args[0]}, để lại quá ít ngân sách cho bữa ăn (chúng tôi dành khoảng ${args[1]} cho đồ ăn). Xóa một số điểm đến hoặc tăng ngân sách.`,
+                en: `Even if we only add the cheapest remaining destinations, the category would cost ${args[0]}, leaving too little budget to cover meals (we reserve about ${args[1]} for food). Remove some destinations or increase your budget.`
+            },
+            minCostExceedsShareEatery: {
+                vi: `Ngay cả khi chỉ thêm nhà hàng rẻ nhất còn lại, danh mục sẽ tốn ${args[0]}, để lại không đủ ngân sách cho điểm đến (chúng tôi dành khoảng ${args[1]} cho địa điểm tham quan). Xóa một số nhà hàng hoặc giải phóng thêm tiền.`,
+                en: `Even if we only add the cheapest remaining eateries, the category would cost ${args[0]}, leaving not enough budget for destinations (we reserve about ${args[1]} for sights). Remove some eateries or free up more funds.`
+            },
+            clearedAll: {
+                vi: `Đã xóa tất cả ${args[0]} đã chọn.`,
+                en: `Cleared all selected ${args[0]}.`
+            },
+            alreadyMeetTarget: {
+                vi: `Đã đáp ứng mục tiêu ${args[0]} lựa chọn của bạn.`,
+                en: `Already meeting your target of ${args[0]} selections.`
+            },
+            noItemsToAutofill: {
+                vi: 'Không có mục nào để tự động điền.',
+                en: 'No items available to autofill.'
+            },
+            noRoomInBudget: {
+                vi: `Không còn chỗ trống trong phần ngân sách ${args[0]}% ${args[1]} (${args[2]}). Xóa một số lựa chọn trước khi tự động điền.`,
+                en: `No room left inside the ${args[0]}% ${args[1]} budget share (${args[2]}). Remove some selections before autofill.`
+            },
+            cannotGenerateCheapest: {
+                vi: `Không thể tạo lịch trình: ngay cả bộ ${args[0]} ${args[1]} hợp túi tiền nhất cũng tốn ${args[2]}, vượt quá ngân sách dành riêng cho danh mục này (${args[3]}). Vui lòng điều chỉnh ngân sách hoặc ràng buộc chuyến đi.`,
+                en: `Cannot generate itinerary: even the most affordable set of ${args[0]} ${args[1]} costs ${args[2]}, which exceeds the budget reserved for this category (${args[3]}). Please adjust your budget or trip constraints.`
+            },
+            addedPartial: {
+                vi: `Đã thêm ${args[0]} ${args[1]}, nhưng ngay cả bộ ${args[2]} ${args[3]} rẻ nhất cũng tốn ${args[4]} vượt quá ngân sách ${args[5]} dành riêng cho ${args[6]}.`,
+                en: `Added ${args[0]} ${args[1]}, but even the cheapest set of ${args[2]} ${args[3]} costs ${args[4]} which exceeds the reserved ${args[5]} budget of ${args[6]}.`
+            },
+            addedPartialLimited: {
+                vi: `Đã thêm ${args[0]} ${args[1]}, nhưng chỉ có ${args[2]} ${args[3]} trong dữ liệu của bạn.`,
+                en: `Added ${args[0]} ${args[1]}, but only ${args[2]} ${args[3]} are available within your dataset.`
+            },
+            addedSuccess: {
+                vi: `Đã thêm ${args[0]} ${args[1]} trong khi giữ tiền dành cho phần còn lại của chuyến đi.`,
+                en: `Added ${args[0]} ${args[1]} while keeping funds aside for the rest of your trip.`
+            },
+            nothingToRemove: {
+                vi: `Không có ${args[0]} nào được chọn để xóa.`,
+                en: `No ${args[0]} selected to clear.`
+            }
+        };
+        
+        const msg = messages[key];
+        const text = msg ? msg[currentLang] : '';
+        
+        // Return a String object with metadata attached
+        const result = new String(text);
+        result.key = key;
+        result.args = rawArgs;
+        return result;
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load trip setup data, preferring server-provided snapshot when adopting
+        const serverTripSetupRaw = '{{ trip_setup_json|escapejs }}';
+        let serverTripSetup = {};
+        try {
+            serverTripSetup = serverTripSetupRaw ? JSON.parse(serverTripSetupRaw) : {};
+            console.log('Server Trip Setup:', serverTripSetup);
+        } catch (error) {
+            console.warn('Unable to parse server trip setup snapshot:', error);
+            serverTripSetup = {};
+        }
+
+        if (serverTripSetup && Object.keys(serverTripSetup).length > 0) {
+            tripSetup = serverTripSetup;
+            try {
+                localStorage.setItem('tripSetup', JSON.stringify(serverTripSetup));
+            } catch (storageError) {
+                console.warn('Unable to persist trip setup to localStorage:', storageError);
+            }
+        } else {
+            const setupData = localStorage.getItem('tripSetup');
+            if (setupData) {
+                try {
+                    tripSetup = JSON.parse(setupData);
+                } catch (error) {
+                    console.warn('Unable to parse trip setup from localStorage:', error);
+                    tripSetup = {};
+                }
+            }
+        }
+
+        updateTripSummary();
+
+        // Load pre-selected items from adopted itinerary
+        const preSelectedPoiIds = {{ selected_poi_ids_json|safe }};
+        const preSelectedEateryIds = {{ selected_eatery_ids_json|safe }};
+        
+        // Pre-select POIs
+        if (preSelectedPoiIds && preSelectedPoiIds.length > 0) {
+            preSelectedPoiIds.forEach(poiId => {
+                const card = document.querySelector(`[data-item-type="poi"][data-item-id="${poiId}"]`);
+                if (card) {
+                    const name = card.getAttribute('data-item-name');
+                    const price = parseFloat(card.getAttribute('data-item-price')) || 0;
+                    toggleItem('poi', poiId, name, price);
+                } else if (itemNames.poi[poiId]) {
+                    // Fallback if card not found (e.g. filtered out)
+                    const name = itemNames.poi[poiId].vi; // Default to VI name for logic
+                    // We need price, but it's not in itemNames. 
+                    // Assuming price is 0 or handled elsewhere if card is missing is risky but acceptable for now
+                    // Ideally we should pass full objects in context
+                    toggleItem('poi', poiId, name, 0); 
+                }
+            });
+        }
+
+        // Pre-select Eateries
+        if (preSelectedEateryIds && preSelectedEateryIds.length > 0) {
+            preSelectedEateryIds.forEach(eateryId => {
+                const card = document.querySelector(`[data-item-type="eatery"][data-item-id="${eateryId}"]`);
+                if (card) {
+                    const name = card.getAttribute('data-item-name');
+                    const price = parseFloat(card.getAttribute('data-item-price')) || 0;
+                    toggleItem('eatery', eateryId, name, price);
+                } else if (itemNames.eatery[eateryId]) {
+                     const name = itemNames.eatery[eateryId].vi;
+                     toggleItem('eatery', eateryId, name, 0);
+                }
+            });
+        }        
+        
+        // Initialize map
+        initializeMap();
+        
+        // Initial update of selected items list to ensure correct language
+        updateSelectedItemsList();
+    });
+
+    function formatVND(amount) {
+        return '₫' + Math.round(amount).toLocaleString('vi-VN');
+    }
+
+    function computeSelectedTotals() {
+        let totalCost = 0;
+        selectedItems.pois.forEach(poi => totalCost += poi.price || 0);
+        selectedItems.eateries.forEach(eatery => totalCost += eatery.price || 0);
+        const budget = Number(tripSetup.budget) || 10000000;
+        return {
+            totalCost,
+            budget,
+            remaining: budget - totalCost
+        };
+    }
+
+    function updateTripSummary() {
+        const days = tripSetup.days || 4;
+        const budget = tripSetup.budget || 10000000;
+        const maxPOIs = tripSetup.max_pois_per_day || 3;
+        
+        const dayLabel = getTranslatedMessage('ngày', days > 1 ? 'days' : 'day');
+        const placeLabel = getTranslatedMessage('địa điểm', maxPOIs > 1 ? 'places' : 'place');
+        
+        document.getElementById('tripDays').textContent = `${days} ${dayLabel}`;
+        document.getElementById('maxPOIsPerDay').textContent = `${maxPOIs} ${placeLabel}`;
+        document.getElementById('tripBudget').textContent = formatVND(budget);
+        document.getElementById('budgetRemaining').textContent = formatVND(budget);
+        document.getElementById('totalBudgetSidebar').textContent = formatVND(budget);
+        document.getElementById('remainingBudgetSidebar').textContent = formatVND(budget);
+        
+        // Handle start location translation if possible, or just use the label
+        const startLoc = (tripSetup.startLocation && tripSetup.startLocation.address_label) || 'Dalat Center';
+        // Simple check for "Dalat Center" to translate it
+        const startLocDisplay = startLoc === 'Dalat Center' ? getTranslatedMessage('Trung tâm Đà Lạt', 'Dalat Center') : startLoc;
+        document.getElementById('startPoint').textContent = startLocDisplay;
+    }
+
+    function switchTab(tabName, evt) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        if (evt && evt.target) {
+            evt.target.closest('.tab-button').classList.add('active');
+        } else if (event && event.target) {
+             event.target.closest('.tab-button').classList.add('active');
+        }
+
+        // Update tab panes
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.getElementById(tabName + '-tab').classList.add('active');
+    }
+
+    function filterPOIs() {
+        const searchInput = document.getElementById('poiSearchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('[data-item-type="poi"]');
+        
+        cards.forEach(card => {
+            const name = card.querySelector('.item-name').textContent.toLowerCase();
+            if (name.includes(searchInput)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterEateries() {
+        const searchInput = document.getElementById('eaterySearchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('#eateries-grid .item-card');
+        
+        cards.forEach(card => {
+            const name = card.querySelector('.item-name').textContent.toLowerCase();
+            const currentSlotFilter = document.querySelector('.filter-chip.active').dataset.slot;
+            const cardSlot = card.dataset.timeSlot || 'all';
+            
+            const matchesSearch = name.includes(searchInput);
+            const matchesSlot = currentSlotFilter === 'all' || cardSlot.includes(currentSlotFilter);
+            
+            if (matchesSearch && matchesSlot) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterByTimeSlot(slot) {
+        // Update active chip
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.classList.remove('active');
+            if (chip.dataset.slot === slot) {
+                chip.classList.add('active');
+            }
+        });
+        
+        // Filter eateries
+        filterEateries();
+    }
+
+    function getSelectedCost(listKey) {
+        return selectedItems[listKey].reduce((total, entry) => total + (entry.price || 0), 0);
+    }
+
+    function collectCandidates(type) {
+        const selector = type === 'poi' ? '[data-item-type="poi"]' : '[data-item-type="eatery"]';
+        const nodes = document.querySelectorAll(selector);
+        const listKey = type === 'poi' ? 'pois' : 'eateries';
+        const selectedIds = new Set(selectedItems[listKey].map(item => item.id));
+        const candidates = [];
+        let order = 0;
+
+        nodes.forEach(card => {
+            const id = parseInt(card.dataset.itemId, 10);
+            if (!id || selectedIds.has(id)) {
+                order += 1;
+                return;
+            }
+            const fallbackLabel = type === 'poi' ? 'Destination' : 'Eatery';
+            const nameEl = card.querySelector('.item-name');
+            const name = card.dataset.itemName || (nameEl ? nameEl.textContent : fallbackLabel);
+            const rawPrice = parseFloat(card.dataset.itemPrice);
+            const price = Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : 0;
+            const distanceAttr = card.dataset.distanceKm || card.getAttribute('data-distance-km');
+            const distance = distanceAttr ? parseFloat(distanceAttr) : null;
+            candidates.push({ id, name, price, order, distance });
+            order += 1;
+        });
+
+        candidates.sort((a, b) => {
+            const priceDiff = (b.price || 0) - (a.price || 0);
+            if (priceDiff !== 0) {
+                return priceDiff;
+            }
+            const distA = Number.isFinite(a.distance) ? a.distance : Infinity;
+            const distB = Number.isFinite(b.distance) ? b.distance : Infinity;
+            if (distA !== distB) {
+                return distA - distB;
+            }
+            return a.order - b.order;
+        });
+
+        return candidates;
+    }
+
+    function computeCheapestSubsetCost(candidates, needed) {
+        if (needed <= 0) {
+            return { cost: 0, count: 0 };
+        }
+        const cheapestFirst = [...candidates].sort((a, b) => (a.price || 0) - (b.price || 0));
+        let cost = 0;
+        let count = 0;
+        for (let i = 0; i < cheapestFirst.length && count < needed; i++) {
+            cost += cheapestFirst[i].price || 0;
+            count += 1;
+        }
+        return { cost, count };
+    }
+
+    function computeGlobalMinimumCost(selectedList, candidates, target) {
+        const pool = [];
+        selectedList.forEach(item => {
+            pool.push({ price: Number(item.price) || 0 });
+        });
+        candidates.forEach(item => {
+            pool.push({ price: Number(item.price) || 0 });
+        });
+
+        if (pool.length < target) {
+            return { cost: null, available: pool.length };
+        }
+
+        pool.sort((a, b) => (a.price || 0) - (b.price || 0));
+        let total = 0;
+        for (let i = 0; i < target; i++) {
+            total += pool[i].price || 0;
+        }
+        return { cost: total, available: pool.length };
+    }
+
+    function buildBudgetPlan() {
+        const totalBudget = Number(tripSetup.budget) || 10000000;
+        const poiTarget = getAutofillTarget('poi');
+        const eateryTarget = getAutofillTarget('eatery');
+        const poiSelectedCount = selectedItems.pois.length;
+        const eaterySelectedCount = selectedItems.eateries.length;
+        const poiNeeded = Math.max(0, poiTarget - poiSelectedCount);
+        const eateryNeeded = Math.max(0, eateryTarget - eaterySelectedCount);
+
+        const poiCandidates = collectCandidates('poi');
+        const eateryCandidates = collectCandidates('eatery');
+
+        const poiCheapest = computeCheapestSubsetCost(poiCandidates, poiNeeded);
+        const eateryCheapest = computeCheapestSubsetCost(eateryCandidates, eateryNeeded);
+
+        const poiSelectedCost = getSelectedCost('pois');
+        const eaterySelectedCost = getSelectedCost('eateries');
+
+        const poiShareBudget = Math.floor(totalBudget * 0.6);
+        const eateryShareBudget = totalBudget - poiShareBudget;
+
+        const poiGlobalMin = computeGlobalMinimumCost(selectedItems.pois, poiCandidates, poiTarget);
+        if (poiGlobalMin.cost === null) {
+            return {
+                error: translateError('needMorePOIs', poiTarget, poiGlobalMin.available)
+            };
+        }
+
+        const eateryGlobalMin = computeGlobalMinimumCost(selectedItems.eateries, eateryCandidates, eateryTarget);
+        if (eateryGlobalMin.cost === null) {
+            return {
+                error: translateError('needMoreEateries', eateryTarget, eateryGlobalMin.available)
+            };
+        }
+
+        const plan = {
+            error: null,
+            totalBudget,
+            poi: {
+                target: poiTarget,
+                needed: poiNeeded,
+                selectedCost: poiSelectedCost,
+                candidates: poiCandidates,
+                cheapestSetCost: poiCheapest.cost,
+                cheapestSetCount: poiCheapest.count,
+                globalMinCost: poiGlobalMin.cost,
+                shareBudget: poiShareBudget,
+                sharePercent: 60,
+            },
+            eatery: {
+                target: eateryTarget,
+                needed: eateryNeeded,
+                selectedCost: eaterySelectedCost,
+                candidates: eateryCandidates,
+                cheapestSetCost: eateryCheapest.cost,
+                cheapestSetCount: eateryCheapest.count,
+                globalMinCost: eateryGlobalMin.cost,
+                shareBudget: eateryShareBudget,
+                sharePercent: 40,
+            }
+        };
+
+        if (poiCheapest.count < poiNeeded) {
+            plan.error = translateError('notEnoughPOIs', poiNeeded, poiCheapest.count);
+            return plan;
+        }
+
+        if (eateryCheapest.count < eateryNeeded) {
+            plan.error = translateError('notEnoughEateries', eateryNeeded, eateryCheapest.count);
+            return plan;
+        }
+
+        const poiMinCost = poiSelectedCost + poiCheapest.cost;
+        const eateryMinCost = eaterySelectedCost + eateryCheapest.cost;
+        plan.poi.minRequiredCost = poiMinCost;
+        plan.eatery.minRequiredCost = eateryMinCost;
+        plan.minTotalCost = poiMinCost + eateryMinCost;
+        plan.globalMinCost = plan.poi.globalMinCost + plan.eatery.globalMinCost;
+
+        if (plan.minTotalCost > totalBudget) {
+            plan.error = translateError('exceedsBudgetEvenCheapest', formatVND(plan.minTotalCost), formatVND(totalBudget), formatVND(plan.globalMinCost));
+            return plan;
+        }
+
+        if (plan.globalMinCost > totalBudget) {
+            plan.error = translateError('lowestCostExceedsBudget', formatVND(plan.globalMinCost), formatVND(totalBudget));
+            return plan;
+        }
+
+        plan.poi.availableBudget = Math.max(0, plan.poi.shareBudget - poiSelectedCost);
+        plan.eatery.availableBudget = Math.max(0, plan.eatery.shareBudget - eaterySelectedCost);
+
+        plan.poi.shareExceeded = poiSelectedCost > plan.poi.shareBudget;
+        plan.eatery.shareExceeded = eaterySelectedCost > plan.eatery.shareBudget;
+
+        plan.poi.shareExceededMessage = plan.poi.shareExceeded
+            ? translateError('shareExceededPOI', formatVND(poiSelectedCost), plan.poi.sharePercent, formatVND(plan.poi.shareBudget))
+            : '';
+        plan.eatery.shareExceededMessage = plan.eatery.shareExceeded
+            ? translateError('shareExceededEatery', formatVND(eaterySelectedCost), plan.eatery.sharePercent, formatVND(plan.eatery.shareBudget))
+            : '';
+
+        plan.poi.minCostExceedsShare = poiMinCost > plan.poi.shareBudget;
+        plan.eatery.minCostExceedsShare = eateryMinCost > plan.eatery.shareBudget;
+
+        plan.poi.minCostWarning = plan.poi.minCostExceedsShare
+            ? translateError('minCostExceedsSharePOI', formatVND(poiMinCost), formatVND(plan.eatery.shareBudget))
+            : '';
+        plan.eatery.minCostWarning = plan.eatery.minCostExceedsShare
+            ? translateError('minCostExceedsShareEatery', formatVND(eateryMinCost), formatVND(plan.poi.shareBudget))
+            : '';
+
+        return plan;
+    }
+
+    function selectAffordablePois(candidates, needed, maxBudget) {
+        if (!candidates.length || needed <= 0) {
+            return { picks: [] };
+        }
+
+        const picks = [];
+        let spend = 0;
+
+        for (const candidate of candidates) {
+            if (picks.length >= needed) {
+                break;
+            }
+            const price = candidate.price || 0;
+            if (price > 0 && spend + price > maxBudget) {
+                continue;
+            }
+            picks.push(candidate);
+            spend += price;
+        }
+
+        return { picks, spend };
+    }
+
+    function getAutofillTarget(type) {
+        const days = Number(tripSetup.days) || 4;
+        const maxPOIs = Number(tripSetup.max_pois_per_day) || 3;
+        return type === 'poi' ? days * maxPOIs : days * 3;
+    }
+
+    function showAutofillStatus(type, message, isWarning = false) {
+        const statusEl = document.getElementById(type === 'poi' ? 'poi-autofill-status' : 'eatery-autofill-status');
+        if (!statusEl) {
+            return;
+        }
+
+        statusEl.textContent = message;
+        statusEl.classList.toggle('warning', Boolean(isWarning));
+        
+        // Store translation key and args if available
+        if (message && message.key) {
+            statusEl.dataset.msgKey = message.key;
+            if (message.args) {
+                statusEl.dataset.msgArgs = JSON.stringify(message.args);
+            }
+        } else {
+            delete statusEl.dataset.msgKey;
+            delete statusEl.dataset.msgArgs;
+        }
+    }
+
+    function autofillItems(type) {
+        const plan = buildBudgetPlan();
+        if (plan.error) {
+            showAutofillStatus(type, plan.error, true);
+            return;
+        }
+
+        const categoryPlan = plan[type];
+        const needed = categoryPlan.needed;
+        const target = categoryPlan.target;
+
+        if (categoryPlan.shareExceeded) {
+            showAutofillStatus(type, categoryPlan.shareExceededMessage || 'This category already exceeds its budget share. Remove some selections first.', true);
+            return;
+        }
+
+        if (categoryPlan.minCostExceedsShare) {
+            showAutofillStatus(type, categoryPlan.minCostWarning || 'Even the cheapest completion would exceed this category share. Adjust your plan.', true);
+            return;
+        }
+
+        if (needed <= 0) {
+            showAutofillStatus(type, translateError('alreadyMeetTarget', target));
+            return;
+        }
+
+        if (!categoryPlan.candidates.length) {
+            showAutofillStatus(type, translateError('noItemsToAutofill'), true);
+            return;
+        }
+
+        if (categoryPlan.availableBudget <= 0 && categoryPlan.cheapestSetCost > 0) {
+            const label = type === 'poi' ? {vi: 'điểm đến', en: 'destination'} : {vi: 'bữa ăn', en: 'meal'};
+            showAutofillStatus(
+                type,
+                translateError('noRoomInBudget', categoryPlan.sharePercent || (type === 'poi' ? 60 : 40), label, formatVND(categoryPlan.shareBudget)),
+                true
+            );
+            return;
+        }
+
+        let planResult;
+        if (type === 'eatery') {
+            planResult = selectAffordableEateries(categoryPlan.candidates, needed, categoryPlan.availableBudget);
+        } else {
+            planResult = selectAffordablePois(categoryPlan.candidates, needed, categoryPlan.availableBudget);
+        }
+
+        const picks = planResult.picks || [];
+        const budgetImpossible = categoryPlan.cheapestSetCount >= needed && categoryPlan.cheapestSetCost > categoryPlan.availableBudget && categoryPlan.cheapestSetCost > 0;
+
+        if (!picks.length) {
+            if (budgetImpossible) {
+                const label = type === 'poi' ? {vi: 'điểm đến', en: 'destination'} : {vi: 'nhà hàng', en: 'eatery'};
+                const pluralLabel = needed === 1 ? label : (type === 'poi' ? {vi: 'điểm đến', en: 'destinations'} : {vi: 'nhà hàng', en: 'eateries'});
+                showAutofillStatus(
+                    type,
+                    translateError('cannotGenerateCheapest', needed, pluralLabel, formatVND(categoryPlan.cheapestSetCost), formatVND(categoryPlan.availableBudget)),
+                    true
+                );
+            } else {
+                showAutofillStatus(type, getTranslatedMessage('Vui lòng xóa một số mục hoặc tăng ngân sách của bạn.', 'Please remove some items or increase your budget.'), true);
+            }
+            return;
+        }
+
+        picks.forEach(item => {
+            toggleItem(type, item.id, item.name, item.price);
+        });
+
+        if (picks.length < needed) {
+            const label = type === 'poi' ? {vi: 'điểm đến', en: 'destination'} : {vi: 'nhà hàng', en: 'eatery'};
+            const pluralLabel = type === 'poi' ? {vi: 'điểm đến', en: 'destinations'} : {vi: 'nhà hàng', en: 'eateries'};
+            if (budgetImpossible) {
+                showAutofillStatus(
+                    type,
+                    translateError('addedPartial', picks.length, picks.length === 1 ? label : pluralLabel, needed, pluralLabel, formatVND(categoryPlan.cheapestSetCost), formatVND(categoryPlan.availableBudget), label),
+                    true
+                );
+            } else {
+                showAutofillStatus(
+                    type,
+                    translateError('addedPartialLimited', picks.length, picks.length === 1 ? label : pluralLabel, categoryPlan.cheapestSetCount, pluralLabel),
+                    true
+                );
+            }
+        } else {
+            const label = type === 'poi' ? {vi: 'điểm đến', en: 'destination'} : {vi: 'nhà hàng', en: 'eatery'};
+            const pluralLabel = picks.length === 1 ? label : (type === 'poi' ? {vi: 'điểm đến', en: 'destinations'} : {vi: 'nhà hàng', en: 'eateries'});
+            showAutofillStatus(
+                type,
+                translateError('addedSuccess', picks.length, pluralLabel)
+            );
+        }
+    }
+
+    function clearSelections(type) {
+        const listKey = type === 'poi' ? 'pois' : 'eateries';
+        const current = selectedItems[listKey];
+        const label = type === 'poi' ? {vi: 'điểm đến', en: 'destinations'} : {vi: 'nhà hàng', en: 'eateries'};
+        if (!current.length) {
+            showAutofillStatus(type, translateError('nothingToRemove', label), true);
+            return;
+        }
+
+        const toRemove = current.slice();
+        toRemove.forEach(item => {
+            toggleItem(type, item.id, item.name, item.price);
+        });
+
+        showAutofillStatus(type, translateError('clearedAll', label));
+    }
+
+    function selectAffordableEateries(candidates, needed, remainingBudget) {
+        if (!candidates.length || needed <= 0) {
+            return { picks: [] };
+        }
+
+        const trimmed = [...candidates]
+            .sort((a, b) => {
+                const priceDiff = (a.price || 0) - (b.price || 0);
+                if (priceDiff !== 0) {
+                    return priceDiff;
+                }
+                const distA = Number.isFinite(a.distance) ? a.distance : Infinity;
+                const distB = Number.isFinite(b.distance) ? b.distance : Infinity;
+                if (distA !== distB) {
+                    return distA - distB;
+                }
+                return (a.order || 0) - (b.order || 0);
+            })
+            .slice(0, Math.max(needed * 3, 60));
+
+        const picks = [];
+        let spend = 0;
+
+        for (const candidate of trimmed) {
+            const price = candidate.price || 0;
+            if (price > 0 && spend + price > remainingBudget) {
+                continue;
+            }
+            picks.push(candidate);
+            spend += price;
+            if (picks.length >= needed) {
+                break;
+            }
+        }
+
+        return { picks, spend };
+    }
+
+    function toggleItem(type, id, name, price, evt) {
+        // Prevent event bubbling and default action
+        if (evt) {
+            if (typeof evt.stopPropagation === 'function') {
+                evt.stopPropagation();
+            }
+            if (typeof evt.preventDefault === 'function') {
+                evt.preventDefault();
+            }
+        }
+        
+        // Ensure id is a number
+        const numericId = Number(id);
+        if (!Number.isFinite(numericId)) {
+            console.error('Invalid item id:', id);
+            return;
+        }
+        
+        // Ensure price is a number
+        const numericPrice = Number(price) || 0;
+        
+        const itemList = selectedItems[type === 'poi' ? 'pois' : 'eateries'];
+        const existingIndex = itemList.findIndex(item => item.id === numericId);
+        const button = document.getElementById(`${type}-btn-${numericId}`);
+        const card = button ? button.closest('.item-card') : document.querySelector(`[data-item-type="${type}"][data-item-id="${numericId}"]`);
+
+        if (existingIndex > -1) {
+            // Remove item
+            itemList.splice(existingIndex, 1);
+            if (button) {
+                button.className = 'item-button btn-add';
+                const addText = getTranslatedMessage('Thêm vào chuyến đi', 'Add to Trip');
+                button.innerHTML = `<span class="btn-icon">+</span> <span data-vi="Thêm vào chuyến đi" data-en="Add to Trip">${addText}</span>`;
+            }
+            if (card) {
+                card.classList.remove('selected');
+            }
+        } else {
+            // Check limits before adding
+            const days = Number(tripSetup.days) || 4;
+            const maxPOIs = Number(tripSetup.max_pois_per_day) || 3;
+            const poiLimit = days * maxPOIs;
+            const eateryLimit = days * 3;
+            
+            if (type === 'poi' && itemList.length >= poiLimit) {
+                alert(getTranslatedMessage(
+                    `Bạn đã đạt giới hạn ${poiLimit} điểm tham quan cho chuyến đi ${days} ngày của bạn (tối đa ${maxPOIs} điểm/ngày). Vui lòng xóa một số để thêm mới hoặc tăng số ngày du lịch.`,
+                    `You've reached the limit of ${poiLimit} destinations for your ${days}-day trip (max ${maxPOIs} per day). Please remove some to add more or increase your trip duration.`
+                ));
+                return;
+            }
+            
+            if (type === 'eatery' && itemList.length >= eateryLimit) {
+                alert(getTranslatedMessage(
+                    `Bạn đã đạt giới hạn ${eateryLimit} nhà hàng cho chuyến đi ${days} ngày của bạn (tối đa 3 bữa/ngày). Vui lòng xóa một số để thêm mới hoặc tăng số ngày du lịch.`,
+                    `You've reached the limit of ${eateryLimit} eateries for your ${days}-day trip (max 3 meals per day). Please remove some to add more or increase your trip duration.`
+                ));
+                return;
+            }
+            
+            // Add item
+            itemList.push({ id: numericId, name: name, price: numericPrice });
+            if (button) {
+                button.className = 'item-button btn-remove';
+                const removeText = getTranslatedMessage('Xóa', 'Remove');
+                button.innerHTML = `<span class="btn-icon">−</span> <span data-vi="Xóa" data-en="Remove">${removeText}</span>`;
+            }
+            if (card) {
+                card.classList.add('selected');
+            }
+        }
+
+        updateSelectedItemsList();
+        updateGenerateButton();
+    }
+
+
+
+    function updateSelectedItemsList() {
+        const totals = computeSelectedTotals();
+        const container = document.getElementById('selectedItemsList');
+        const totalItems = selectedItems.pois.length + selectedItems.eateries.length;
+        const totalCost = totals.totalCost;
+        const remaining = totals.remaining;
+        const budget = totals.budget;
+        
+        // Update counters
+        const itemLabel = getTranslatedMessage('mục', 'items');
+        document.getElementById('selectedCount').textContent = `${totalItems} ${itemLabel}`;
+        document.getElementById('selectedCost').textContent = formatVND(totalCost);
+        document.getElementById('remainingBudgetSidebar').textContent = formatVND(remaining);
+        document.getElementById('budgetRemaining').textContent = formatVND(remaining);
+        
+        // Update styling based on budget
+        const budgetRemainingEl = document.getElementById('budgetRemaining');
+        const remainingRowEl = document.getElementById('remainingRow');
+        
+        if (remaining < 0) {
+            budgetRemainingEl.classList.remove('budget-remaining');
+            budgetRemainingEl.classList.add('budget-warning');
+            remainingRowEl.classList.add('warning');
+        } else {
+            budgetRemainingEl.classList.add('budget-remaining');
+            budgetRemainingEl.classList.remove('budget-warning');
+            remainingRowEl.classList.remove('warning');
+        }
+
+        if (totalItems === 0) {
+            const emptyMsg = getTranslatedMessage(
+                'Bắt đầu thêm điểm đến và nhà hàng để xem chuyến đi của bạn thành hình!',
+                'Start adding destinations and eateries to see your trip take shape!'
+            );
+            container.innerHTML = `<div class="empty-state" data-vi="Bắt đầu thêm điểm đến và nhà hàng để xem chuyến đi của bạn thành hình!" data-en="Start adding destinations and eateries to see your trip take shape!">${emptyMsg}</div>`;
+            return;
+        }
+
+        let html = '';
+        
+        // Add POIs
+        selectedItems.pois.forEach(poi => {
+            const typeLabel = getTranslatedMessage('Điểm đến', 'Destination');
+            const removeTitle = getTranslatedMessage('Xóa', 'Remove');
+            
+            // Get localized name
+            let displayName = poi.name;
+            if (itemNames.poi[poi.id]) {
+                const currentLang = localStorage.getItem('language') || 'vi';
+                displayName = currentLang === 'vi' ? itemNames.poi[poi.id].vi : itemNames.poi[poi.id].en;
+            }
+
+            html += `
+                <div class="selected-item">
+                    <div>
+                        <div class="selected-item-name">${displayName}</div>
+                        <div class="selected-item-price">${typeLabel} • ${formatVND(poi.price)}</div>
+                    </div>
+                    <button class="selected-item-remove" onclick="toggleItem('poi', ${poi.id}, '${poi.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', ${poi.price}, event)" title="${removeTitle}">
+                        ✕
+                    </button>
+                </div>
+            `;
+        });
+
+        // Add eateries
+        selectedItems.eateries.forEach(eatery => {
+            const typeLabel = getTranslatedMessage('Nhà hàng', 'Restaurant');
+            const removeTitle = getTranslatedMessage('Xóa', 'Remove');
+            
+            // Get localized name
+            let displayName = eatery.name;
+            if (itemNames.eatery[eatery.id]) {
+                const currentLang = localStorage.getItem('language') || 'vi';
+                displayName = currentLang === 'vi' ? itemNames.eatery[eatery.id].vi : itemNames.eatery[eatery.id].en;
+            }
+
+            html += `
+                <div class="selected-item">
+                    <div>
+                        <div class="selected-item-name">${displayName}</div>
+                        <div class="selected-item-price">${typeLabel} • ${formatVND(eatery.price)}</div>
+                    </div>
+                    <button class="selected-item-remove" onclick="toggleItem('eatery', ${eatery.id}, '${eatery.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', ${eatery.price}, event)" title="${removeTitle}">
+                        ✕
+                    </button>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function updateGenerateButton() {
+        const button = document.getElementById('generateBtn');
+        const totalItems = selectedItems.pois.length + selectedItems.eateries.length;
+        
+        button.disabled = totalItems === 0;
+    }
+
+    // Real-time Search with Prefix Tree
+    let searchTimeout;
+    function searchRealtime(source = 'poi') {
+        clearTimeout(searchTimeout);
+        
+        // Determine which search input and results div to use
+        const searchInputId = source === 'eatery' ? 'eaterySearchInput' : 'poiSearchInput';
+        const resultsDivId = source === 'eatery' ? 'eatery-search-results' : 'poi-search-results';
+        
+        const searchInput = document.getElementById(searchInputId);
+        const resultsDiv = document.getElementById(resultsDivId);
+        
+        if (!searchInput || !resultsDiv) return;
+        
+        const query = searchInput.value.trim();
+        
+        if (query.length === 0) {
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        
+        if (query.length < 2) {
+            resultsDiv.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem; font-style: italic;">Type at least 2 characters...</p>';
+            return;
+        }
+        
+        // Debounce for 300ms
+        searchTimeout = setTimeout(() => {
+            resultsDiv.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem;">🔍 Searching...</p>';
+            
+            fetch(`/api/search-suggestions/?q=${encodeURIComponent(query)}&limit=10`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        let html = '<div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; margin-top: 0.5rem; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 400px; overflow-y: auto;">';
+                        
+                        data.suggestions.forEach(item => {
+                            const itemType = item.type === 'POI' ? 'poi' : 'eatery';
+                            const itemList = itemType === 'poi' ? selectedItems.pois : selectedItems.eateries;
+                            const isSelected = itemList.some(i => i.id === item.id);
+                            const typeIcon = item.type === 'POI' ? '📍' : '🍽️';
+                            const typeColor = item.type === 'POI' ? '#059669' : '#dc2626';
+                            
+                            // Determine image URL
+                            const defaultImage = item.type === 'POI' 
+                                ? 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=80&fit=crop'
+                                : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=80&h=80&fit=crop';
+                            const imageUrl = item.image_url || defaultImage;
+                            
+                            html += `
+                                <div style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; display: flex; gap: 1rem; align-items: start; transition: background 0.2s;" 
+                                     onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                                    <img src="${imageUrl}" 
+                                         alt="${item.name}" 
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+                                            ${typeIcon} ${item.name}
+                                        </div>
+                                        <div style="font-size: 0.875rem; color: ${typeColor}; margin-bottom: 0.25rem;">
+                                            ${item.type === 'POI' ? translateTags(item.tags || 'Attraction') : getTranslatedMessage('Nhà hàng', 'Restaurant')}
+                                        </div>
+                                        ${item.address ? `<div style="font-size: 0.875rem; color: #6b7280;">📍 ${item.address}</div>` : ''}
+                                        ${item.time_tags ? `<div style="font-size: 0.875rem; color: #8b5cf6; margin-top: 0.25rem;">⏰ ${item.time_tags}</div>` : ''}
+                                        ${item.price ? `<div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">💰 ${formatVND(item.price)}</div>` : ''}
+                                    </div>
+                                    <button onclick="toggleItem('${itemType}', ${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price || 0}); searchRealtime('${source}');" 
+                                            style="padding: 0.5rem 1rem; background: ${isSelected ? '#ef4444' : '#13a4ec'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; transition: background 0.2s;"
+                                            onmouseover="this.style.background='${isSelected ? '#dc2626' : '#0ea5e9'}'" onmouseout="this.style.background='${isSelected ? '#ef4444' : '#13a4ec'}'">
+                                        ${isSelected ? '✓ Added' : '+ Add'}
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div>';
+                        resultsDiv.innerHTML = html;
+                    } else {
+                        resultsDiv.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem; font-style: italic;">No results found</p>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Search error:', err);
+                    resultsDiv.innerHTML = '<p style="color: #ef4444; font-size: 0.875rem;">❌ Error searching. Please try again.</p>';
+                });
+        }, 300);
+    }
+
+    function generateTrip() {
+        if (selectedItems.pois.length === 0 && selectedItems.eateries.length === 0) {
+            alert(getTranslatedMessage(
+                'Vui lòng thêm ít nhất một điểm đến hoặc nhà hàng vào chuyến đi của bạn!',
+                'Please add at least one destination or eatery to your trip!'
+            ));
+            return;
+        }
+
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "process_trip_selection" %}';
+        
+        // Add CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        // Add selected POIs
+        selectedItems.pois.forEach(poi => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected_pois';
+            input.value = poi.id;
+            form.appendChild(input);
+        });
+        
+        // Add trip data
+        const daysInput = document.createElement('input');
+        daysInput.type = 'hidden';
+        daysInput.name = 'days';
+        daysInput.value = tripSetup.days || 4;
+        form.appendChild(daysInput);
+        
+        const budgetInput = document.createElement('input');
+        budgetInput.type = 'hidden';
+        budgetInput.name = 'budget';
+        budgetInput.value = tripSetup.budget || 10000000;
+        form.appendChild(budgetInput);
+        
+        // Add location
+        if (tripSetup.startLocation) {
+            const locationInput = document.createElement('input');
+            locationInput.type = 'hidden';
+            locationInput.name = 'location';
+            locationInput.value = tripSetup.startLocation.name;
+            form.appendChild(locationInput);
+        }
+        
+        // Add selected eateries
+        selectedItems.eateries.forEach((eatery) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected_eateries';
+            input.value = eatery.id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function initializeMap() {
+    const container = document.getElementById('map');
+    if (!container) {
+        console.error('Map container #map not found.');
+        return;
+    }
+    
+    // Kiểm tra ngôn ngữ hiện tại để hiển thị đúng ngay lúc đầu
+    const currentLang = localStorage.getItem('language') || 'vi';
+
+    // LOADING STATE
+    container.innerHTML = `
+        <div style="height: 300px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 16px; color: #6b7280;">
+            <div style="text-align: center;">
+                <span style="font-size: 2rem;">🌤️</span><br>
+                <span data-vi="Đang tải thời tiết..." data-en="Loading weather...">
+                    ${currentLang === 'en' ? 'Loading weather...' : 'Đang tải thời tiết...'}
+                </span>
+            </div>
+        </div>`;
+
+    const city = (tripSetup.startLocation && (tripSetup.startLocation.name || tripSetup.startLocation.address_label)) || 'Dalat';
+    // API Key (Lưu ý bảo mật khi deploy thật)
+    const OWM_API_KEY = '1e718312093f85aa31cd5d27796e1cc9'; 
+    
+    // Sử dụng tọa độ Đà Lạt thay vì tên thành phố
+    const lat = 11.9404;
+    const lon = 108.4583;
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWM_API_KEY}&units=metric&lang=vi`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data || (data.cod && Number(data.cod) !== 200)) {
+                // ERROR STATE
+                container.innerHTML = `
+                    <div class="weather-error" style="padding: 20px; text-align: center; color: #ef4444;">
+                        <span data-vi="Không thể tải thông tin thời tiết cho" data-en="Unable to load weather data for">
+                            ${currentLang === 'en' ? 'Unable to load weather data for' : 'Không thể tải thông tin thời tiết cho'}
+                        </span> "${city}".
+                    </div>`;
+                return;
+            }
+
+            const weather = (data.weather && data.weather[0]) ? data.weather[0] : null;
+            const temp = Math.round(data.main.temp);
+            const feelsLike = Math.round(data.main.feels_like);
+            const humidity = data.main.humidity;
+            const windSpeed = Math.round(data.wind.speed * 3.6); // m/s -> km/h
+            const iconUrl = weather ? `https://openweathermap.org/img/wn/${weather.icon}@4x.png` : '';
+            
+            // Xử lý mô tả song ngữ
+            // API trả về 'description' là tiếng Việt (do lang=vi) và 'main' là tiếng Anh (mặc định)
+            const descVi = weather ? (weather.description.charAt(0).toUpperCase() + weather.description.slice(1)) : '';
+            const descEn = weather ? weather.main : '';
+
+            // Xác định màu nền (như cũ)
+            let bgClass = 'weather-widget';
+            if (weather) {
+                const main = weather.main.toLowerCase();
+                if (main.includes('clear')) bgClass += ' bg-clear';
+                else if (main.includes('cloud')) bgClass += ' bg-clouds';
+                else if (main.includes('rain')) bgClass += ' bg-rain';
+                else if (main.includes('drizzle')) bgClass += ' bg-drizzle';
+                else if (main.includes('thunder')) bgClass += ' bg-thunderstorm';
+                else if (main.includes('snow')) bgClass += ' bg-snow';
+                else if (main.includes('mist') || main.includes('fog')) bgClass += ' bg-mist';
+                else bgClass += ' bg-clouds';
+            }
+
+            // RENDER HTML VỚI DATA-VI / DATA-EN
+            container.innerHTML = `
+                <div class="${bgClass}">
+                    <div class="weather-header">
+                        <div>
+                            <div class="weather-city-name">${city}</div>
+                            <div class="weather-desc-text" 
+                                 data-vi="${descVi}" 
+                                 data-en="${descEn}">
+                                 ${currentLang === 'en' ? descEn : descVi}
+                            </div>
+                        </div>
+                        <div style="text-align: right; opacity: 0.8; font-size: 0.9rem;" 
+                             data-vi="Hôm nay" 
+                             data-en="Today">
+                             ${currentLang === 'en' ? 'Today' : 'Hôm nay'}
+                        </div>
+                    </div>
+
+                    <div class="weather-main-info">
+                        ${iconUrl ? `<img class="weather-icon-large" src="${iconUrl}" alt="${descEn}">` : ''}
+                        <div class="weather-temp-big">${temp}°</div>
+                    </div>
+
+                    <div class="weather-details-grid">
+                        <div class="weather-detail-item">
+                            <span class="detail-label" data-vi="Cảm giác" data-en="Feels like">
+                                ${currentLang === 'en' ? 'Feels like' : 'Cảm giác'}
+                            </span>
+                            <span class="detail-value">${feelsLike}°</span>
+                        </div>
+                        <div class="weather-detail-item">
+                            <span class="detail-label" data-vi="Độ ẩm" data-en="Humidity">
+                                ${currentLang === 'en' ? 'Humidity' : 'Độ ẩm'}
+                            </span>
+                            <span class="detail-value">${humidity}%</span>
+                        </div>
+                        <div class="weather-detail-item">
+                            <span class="detail-label" data-vi="Gió" data-en="Wind">
+                                ${currentLang === 'en' ? 'Wind' : 'Gió'}
+                            </span>
+                            <span class="detail-value">${windSpeed} km/h</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(err => {
+            console.error('Weather fetch error:', err);
+            container.innerHTML = `
+                <div class="weather-error" style="padding: 20px; text-align: center; color: #6b7280; background: #f9fafb; border-radius: 8px;">
+                    <span data-vi="Lỗi kết nối thời tiết." data-en="Weather connection error.">
+                        ${currentLang === 'en' ? 'Weather connection error.' : 'Lỗi kết nối thời tiết.'}
+                    </span>
+                </div>`;
+        });
+    }
+</script>
+{% endblock %}

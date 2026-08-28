@@ -1,20 +1,35 @@
 package com.example.finalproject.presentation.itinerary;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalproject.R;
 import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.ItineraryDay;
+import com.example.finalproject.domain.model.ItineraryEditor;
 import com.example.finalproject.domain.model.ItineraryStop;
+import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.presentation.SystemBarInsets;
+import com.example.finalproject.presentation.map.MapActivity;
+import com.example.finalproject.presentation.catalog.PlaceDetailActivity;
+import com.example.finalproject.presentation.selection.ReplacementActivity;
+import com.example.finalproject.infrastructure.remote.RemoteImageLoader;
+import com.example.finalproject.infrastructure.local.repository.RoomSavedTripRepository;
+import com.example.finalproject.domain.callback.RepositoryCallback;
+import android.widget.Toast;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -26,11 +41,33 @@ public class ItineraryActivity extends AppCompatActivity {
 
     private Itinerary itinerary;
     private LinearLayout stopsContainer;
+    private ItineraryDay selectedDay;
+    private int pendingDayNumber;
+    private int pendingStopIndex;
+    private ActivityResultLauncher<Intent> replacementLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
+        SystemBarInsets.apply(findViewById(R.id.itineraryRoot));
+        replacementLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+                Place place;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    place = result.getData().getSerializableExtra(ReplacementActivity.EXTRA_PLACE, Place.class);
+                } else {
+                    place = (Place) result.getData().getSerializableExtra(ReplacementActivity.EXTRA_PLACE);
+                }
+                if (place == null) return;
+                itinerary = ItineraryEditor.replace(itinerary, pendingDayNumber, pendingStopIndex, place);
+                updateBudget();
+                for (ItineraryDay day : itinerary.getDays()) {
+                    if (day.getDayNumber() == pendingDayNumber) { renderDay(day); break; }
+                }
+                Toast.makeText(this, "Đã thay bằng " + place.getName(), Toast.LENGTH_SHORT).show();
+            });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             itinerary = getIntent().getSerializableExtra(EXTRA_ITINERARY, Itinerary.class);
@@ -44,10 +81,29 @@ public class ItineraryActivity extends AppCompatActivity {
 
         stopsContainer = findViewById(R.id.stopsContainer);
         ((TextView) findViewById(R.id.itineraryTitle)).setText(itinerary.getTitle());
-        ((TextView) findViewById(R.id.estimatedCostText)).setText(money(itinerary.getEstimatedCostVnd()));
-        ((TextView) findViewById(R.id.remainingCostText)).setText(money(itinerary.getRemainingBudgetVnd()));
+        updateBudget();
         findViewById(R.id.offlineBadge).setVisibility(itinerary.isOfflineDemo() ? TextView.VISIBLE : TextView.GONE);
         findViewById(R.id.resultBackButton).setOnClickListener(v -> finish());
+        findViewById(R.id.saveTripButton).setOnClickListener(v -> {
+            v.setEnabled(false);
+            new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
+                @Override public void onSuccess(Long id) {
+                    v.setEnabled(true);
+                    ((com.google.android.material.button.MaterialButton) v).setText("Đã lưu");
+                    Toast.makeText(ItineraryActivity.this, "Đã lưu chuyến đi trên thiết bị.", Toast.LENGTH_SHORT).show();
+                }
+                @Override public void onError(Exception error) {
+                    v.setEnabled(true);
+                    Toast.makeText(ItineraryActivity.this, "Không thể lưu chuyến đi.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        findViewById(R.id.openMapButton).setOnClickListener(v -> {
+            if (selectedDay == null) return;
+            Intent intent = new Intent(this, MapActivity.class);
+            intent.putExtra(MapActivity.EXTRA_DAY, selectedDay);
+            startActivity(intent);
+        });
 
         ChipGroup chipGroup = findViewById(R.id.dayChipGroup);
         for (ItineraryDay day : itinerary.getDays()) {
@@ -64,6 +120,7 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     private void renderDay(ItineraryDay day) {
+        selectedDay = day;
         stopsContainer.removeAllViews();
         TextView heading = text("Lịch trình ngày " + day.getDayNumber(), 20, true, R.color.text_primary);
         heading.setPadding(0, dp(8), 0, dp(12));
@@ -112,9 +169,61 @@ public class ItineraryActivity extends AppCompatActivity {
                 distance.setPadding(0, dp(9), 0, 0);
                 content.addView(distance);
             }
-            card.addView(row);
+            if (stop.getType() != ItineraryStop.Type.ACCOMMODATION) {
+                LinearLayout actions = new LinearLayout(this);
+                actions.setOrientation(LinearLayout.HORIZONTAL);
+                actions.setPadding(0, dp(10), 0, 0);
+                MaterialButton details = new MaterialButton(this, null,
+                    com.google.android.material.R.attr.materialButtonOutlinedStyle);
+                details.setText("Chi tiết");
+                details.setTextSize(12);
+                details.setOnClickListener(v -> openDetails(stop));
+                MaterialButton replace = new MaterialButton(this);
+                replace.setText("Thay đổi");
+                replace.setTextSize(12);
+                final int selectedIndex = index;
+                replace.setOnClickListener(v -> openReplacement(day.getDayNumber(), selectedIndex, stop));
+                LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(0, dp(42), 1);
+                actionParams.rightMargin = dp(8);
+                actions.addView(details, actionParams);
+                actions.addView(replace, new LinearLayout.LayoutParams(0, dp(42), 1));
+                content.addView(actions);
+            }
+            LinearLayout cardContent = new LinearLayout(this);
+            cardContent.setOrientation(LinearLayout.VERTICAL);
+            if (stop.getType() != ItineraryStop.Type.ACCOMMODATION) {
+                ImageView image = new ImageView(this);
+                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                image.setContentDescription(stop.getName());
+                image.setImageResource(stop.getType() == ItineraryStop.Type.EATERY
+                    ? R.drawable.sample_eatery : R.drawable.sample_poi);
+                cardContent.addView(image, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, dp(112)));
+                RemoteImageLoader.load(stop.getImageUrl(), image);
+            }
+            cardContent.addView(row);
+            card.addView(cardContent);
             stopsContainer.addView(card);
         }
+    }
+
+    private void openReplacement(int dayNumber, int stopIndex, ItineraryStop stop) {
+        pendingDayNumber = dayNumber;
+        pendingStopIndex = stopIndex;
+        String type = stop.getType() == ItineraryStop.Type.EATERY ? "eatery" : "poi";
+        replacementLauncher.launch(ReplacementActivity.intent(this, type));
+    }
+
+    private void openDetails(ItineraryStop stop) {
+        Place place = new Place(stop.getId(), stop.getType().name(), stop.getName(), stop.getAddress(),
+            stop.getRating(), stop.getPriceVnd(), stop.getImageUrl(), stop.getLatitude(), stop.getLongitude(),
+            stop.getOpenHours(), stop.getTags(), stop.getHighlight(), stop.getMediaUrl());
+        startActivity(PlaceDetailActivity.intent(this, place));
+    }
+
+    private void updateBudget() {
+        ((TextView) findViewById(R.id.estimatedCostText)).setText(money(itinerary.getEstimatedCostVnd()));
+        ((TextView) findViewById(R.id.remainingCostText)).setText(money(itinerary.getRemainingBudgetVnd()));
     }
 
     private String marker(ItineraryStop stop) {

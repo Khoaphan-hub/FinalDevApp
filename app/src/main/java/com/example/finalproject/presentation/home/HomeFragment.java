@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.finalproject.R;
 import com.example.finalproject.presentation.planner.PlannerActivity;
+import com.example.finalproject.presentation.catalog.CatalogActivity;
 
 public class HomeFragment extends Fragment {
     @Nullable
@@ -28,7 +29,7 @@ public class HomeFragment extends Fragment {
             startActivity(new Intent(requireContext(), PlannerActivity.class))
         );
         view.findViewById(R.id.explorePlacesButton).setOnClickListener(v ->
-            Toast.makeText(requireContext(), "Danh sách địa điểm sẽ được nối với Django API.", Toast.LENGTH_SHORT).show()
+            startActivity(new Intent(requireContext(), CatalogActivity.class))
         );
     }
 }

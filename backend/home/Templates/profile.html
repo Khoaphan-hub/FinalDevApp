@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load currency_filters %}
+
+{% block title %}<span data-vi="Hồ sơ cá nhân - Journify" data-en="Profile - Journify">Hồ sơ cá nhân - Journify</span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    
+    .profile-page-container {
+        padding: 8rem 2rem 4rem;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .profile-layout {
+        display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start;
+    }
+    .profile-sidebar {
+        background: var(--glass-bg); backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-radius: 20px; padding: 1.5rem;
+        border: 0.5px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        position: sticky; top: 100px;
+    }
+    .user-summary {
+        text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    
+    /* CSS CHO ẢNH ĐẠI DIỆN */
+    .user-avatar-large {
+        width: 100px; height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        overflow: hidden; /* Cắt ảnh tròn */
+        box-shadow: 0 8px 20px rgba(0, 113, 227, 0.2);
+        background: linear-gradient(135deg, #0071E3, #00C6FF);
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+    }
+
+    .user-avatar-large img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .user-avatar-placeholder {
+        font-size: 2.5rem; color: white;
+    }
+
+    .user-name-display {
+        font-weight: 700; font-size: 1.1rem; color: var(--ios-dark);
+    }
+    
+    .menu-item {
+        padding: 0.8rem 1rem; border-radius: 12px; color: var(--ios-medium-gray);
+        font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .menu-item:hover { background: rgba(0,0,0,0.03); color: var(--ios-dark); }
+    .menu-item.active { background: rgba(0, 113, 227, 0.1); color: var(--ios-blue); font-weight: 600; }
+    
+    .profile-content-card {
+        background: var(--glass-bg); backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-radius: 24px; padding: 2.5rem;
+        border: 0.5px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        display: none; animation: fadeIn 0.3s ease-out;
+    }
+    .profile-content-card.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .section-title {
+        font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;
+        color: var(--ios-dark); border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 1rem;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .full-width { grid-column: 1 / -1; }
+    .field-group { margin-bottom: 1.2rem; }
+    .field-label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--ios-dark); }
+    .auth-form-input {
+        width: 100%; padding: 0.8rem 1rem; border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.8);
+        font-size: 1rem; transition: all 0.3s ease;
+    }
+    .auth-form-input:focus {
+        border-color: var(--ios-blue); background: white;
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1); outline: none;
+    }
+    .readonly-input { background: rgba(0,0,0,0.03); color: var(--ios-medium-gray); cursor: not-allowed; }
+    .btn-save {
+        background: var(--ios-blue); color: white; border: none; padding: 0.8rem 2rem;
+        border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;
+    }
+    .btn-save:hover { background: var(--ios-blue-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3); }
+    .alert { padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .alert-success { background: rgba(52, 199, 89, 0.15); color: #006400; border: 1px solid rgba(52, 199, 89, 0.3); }
+    .alert-error { background: rgba(255, 59, 48, 0.15); color: #d32f2f; border: 1px solid rgba(255, 59, 48, 0.3); }
+    
+    /* CSS CHO KHU VỰC UPLOAD ẢNH */
+    .avatar-upload-container {
+        display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
+    }
+    .upload-preview {
+        width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+        border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; }
+    .btn-upload {
+        border: 1px solid #ddd; color: #333; background-color: white;
+        padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn-upload:hover { background-color: #f8f9fa; }
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
+    }
+    .avatar-upload-modern {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        margin-bottom: 2rem;
+    }
+
+    /* Container bao bọc ảnh và lớp phủ */
+    .avatar-wrapper {
+        position: relative;
+        width: 120px; /* Kích thước ảnh lớn hơn chút */
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 113, 227, 0.25);
+        border: 3px solid white; /* Viền trắng làm nổi bật ảnh */
+        background: linear-gradient(135deg, #e0e0e0, #f5f5f5); /* Màu nền chờ khi chưa có ảnh */
+        cursor: pointer;
+    }
+    
+    /* Ảnh hiển thị */
+    .avatar-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    /* Placeholder khi chưa có ảnh (Gradient xanh) */
+    .avatar-placeholder-gradient {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0071E3, #00C6FF);
+        color: white;
+        font-size: 3rem;
+    }
+
+    /* Input file bị ẩn đi */
+    #avatar-input {
+        display: none;
+    }
+
+    /* Lớp phủ tối màu khi hover (Overlay) */
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Màu đen bán trong suốt */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        opacity: 0; /* Mặc định ẩn */
+        transition: all 0.3s ease;
+        backdrop-filter: blur(2px); /* Hiệu ứng mờ nhẹ hiện đại */
+    }
+
+    /* Icon máy ảnh */
+    .camera-icon {
+        font-size: 1.8rem;
+        margin-bottom: 4px;
+    }
+    
+    .overlay-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* HIỆU ỨNG HOVER CHÍNH */
+    /* Khi di chuột vào wrapper thì overlay hiện lên */
+    .avatar-wrapper:hover .avatar-overlay {
+        opacity: 1;
+    }
+    /* Zoom ảnh nhẹ khi hover */
+    .avatar-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    .avatar-help-text {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: var(--ios-medium-gray);
+        text-align: center;
+    }
+    .shared-itineraries-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+    .shared-itinerary-card {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 18px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    .shared-itinerary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .shared-itinerary-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--ios-dark);
+    }
+    .shared-itinerary-header-main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    .shared-itinerary-id {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ios-medium-gray);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+    .shared-itinerary-meta {
+        font-size: 0.9rem;
+        color: var(--ios-medium-gray);
+        line-height: 1.5;
+    }
+    .shared-itinerary-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+    .shared-itinerary-actions form {
+        margin: 0;
+    }
+    .shared-itinerary-link {
+        padding: 0.55rem 1rem;
+        border-radius: 10px;
+        background: rgba(0, 113, 227, 0.12);
+        color: var(--ios-blue);
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .shared-itinerary-link:hover {
+        background: rgba(0, 119, 237, 0.18);
+        transform: translateY(-1px);
+    }
+    .shared-itinerary-delete {
+        border: none;
+        border-radius: 10px;
+        padding: 0.55rem 1rem;
+        font-weight: 600;
+        background: rgba(220, 38, 38, 0.12);
+        color: #b91c1c;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .shared-itinerary-delete:hover {
+        background: rgba(220, 38, 38, 0.18);
+        transform: translateY(-1px);
+    }
+    .shared-itinerary-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        border-radius: 16px;
+        background: rgba(0,0,0,0.03);
+        color: var(--ios-medium-gray);
+    }
+    @media (max-width: 768px) {
+        .profile-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+        .profile-sidebar { position: static; }
+        .form-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="profile-layout">
+        <aside class="profile-sidebar">
+            <div class="user-summary">
+                <div class="user-avatar-large">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Avatar">
+                    {% else %}
+                        <span class="user-avatar-placeholder">
+                            {% if user.first_name %}{{ user.first_name|slice:":1" }}{% else %}👤{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="user-name-display">{{ user.username }}</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-item {% if active_tab == 'info' %}active{% endif %}" data-tab-target="info" onclick="switchTab('info')">
+                    <span>👤</span> <span data-vi="Thông tin tài khoản" data-en="Account Info">Thông tin tài khoản</span>
+                </div>
+                <div class="menu-item {% if active_tab == 'password' %}active{% endif %}" data-tab-target="password" onclick="switchTab('password')">
+                    <span>🔒</span> <span data-vi="Đổi mật khẩu" data-en="Change Password">Đổi mật khẩu</span>
+                </div>
+                <div class="menu-item {% if active_tab == 'saved' %}active{% endif %}" data-tab-target="saved" onclick="switchTab('saved')">
+                    <span>💾</span> <span data-vi="Lịch trình đã lưu" data-en="Saved Itineraries">Lịch trình đã lưu</span>
+                </div>
+                <div class="menu-item {% if active_tab == 'shared' %}active{% endif %}" data-tab-target="shared" onclick="switchTab('shared')">
+                    <span>📤</span> <span data-vi="Lịch trình đã chia sẻ" data-en="Shared Itineraries">Lịch trình đã chia sẻ</span>
+                </div>
+                <div style="height: 1px; background: rgba(0,0,0,0.06); margin: 0.5rem 0;"></div>
+                <a href="{% url 'logout' %}" class="menu-item" style="color: #d32f2f;">
+                    <span>🚪</span> <span data-vi="Đăng xuất" data-en="Logout">Đăng xuất</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="profile-content">
+            <div id="tab-info" class="profile-content-card {% if active_tab == 'info' %}active{% endif %}">
+                <h2 class="section-title" data-vi="Thông tin tài khoản" data-en="Account Information">Thông tin tài khoản</h2>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="avatar-upload-modern">
+                        <div class="avatar-wrapper">
+                            
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" id="img-preview" alt="Avatar">
+                            {% else %}
+                                <div id="placeholder-container" class="avatar-placeholder-gradient">
+                                    {% if user.first_name %}{{ user.first_name|slice:":1" }}{% else %}👤{% endif %}
+                                </div>
+                                <img src="" id="img-preview" style="display: none;">
+                            {% endif %}
+
+                            <input type="file" name="avatar" id="avatar-input" accept="image/*" onchange="previewImage(this)">
+
+                            <label for="avatar-input" class="avatar-overlay">
+                                <span class="camera-icon">📷</span>
+                                <span class="overlay-text" data-vi="Đổi ảnh" data-en="Change">Đổi ảnh</span>
+                            </label>
+                        </div>
+                        
+                        <div class="avatar-help-text" data-vi="Chạm để thay đổi ảnh đại diện" data-en="Tap to change avatar">
+                            Chạm để thay đổi ảnh đại diện
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="field-group full-width">
+                            <label class="field-label" data-vi="Tên đăng nhập" data-en="Username">Tên đăng nhập</label>
+                            <input type="text" class="auth-form-input readonly-input" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" data-vi="Email" data-en="Email">Email</label>
+                            {{ u_form.email }}
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" data-vi="Số điện thoại" data-en="Phone Number">Số điện thoại</label>
+                            {{ p_form.phone_number }}
+                        </div>
+                    </div>
+                    <button type="submit" name="update_info" class="btn-save" data-vi="Lưu thay đổi" data-en="Save Changes">Lưu thay đổi</button>
+                </form>
+            </div>
+
+            <div id="tab-password" class="profile-content-card {% if active_tab == 'password' %}active{% endif %}">
+                <h2 class="section-title" data-vi="Đổi mật khẩu" data-en="Change Password">Đổi mật khẩu</h2>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <p style="margin-bottom: 1.5rem; color: #666; font-size: 0.9rem;">
+                        <span data-vi="Vui lòng nhập mật khẩu cũ để xác thực." data-en="Please enter your old password to verify.">
+                            Vui lòng nhập mật khẩu cũ để xác thực.
+                        </span>
+                    </p>
+                    
+                    <div class="field-group">
+                        <label class="field-label" data-vi="Mật khẩu hiện tại" data-en="Current Password">Mật khẩu hiện tại</label>
+                        {{ pass_form.old_password }}
+                        
+                        {% if pass_form.old_password.errors %}
+                            <div class="auth-error" style="color: red; font-size: 0.85rem; margin-top: 5px;">
+                                {{ pass_form.old_password.errors.0 }}
+                            </div>
+                        {% endif %}
+                        
+                        <div style="text-align: right; margin-top: 5px;">
+                            <a href="{% url 'forgot_password' %}" style="font-size: 0.85rem; color: #0071E3; text-decoration: none;">
+                                <span data-vi="Quên mật khẩu cũ?" data-en="Forgot old password?">Quên mật khẩu cũ?</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label class="field-label" data-vi="Mật khẩu mới" data-en="New Password">Mật khẩu mới</label>
+                            {{ pass_form.new_password1 }} 
+                            {% if pass_form.new_password1.errors %}
+                                <div class="auth-error" style="color: red; font-size: 0.85rem; margin-top: 5px;">
+                                    {{ pass_form.new_password1.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" data-vi="Xác nhận mật khẩu mới" data-en="Confirm New Password">Xác nhận mật khẩu mới</label>
+                            {{ pass_form.new_password2 }}
+                            {% if pass_form.new_password2.errors %}
+                                <div class="auth-error" style="color: red; font-size: 0.85rem; margin-top: 5px;">
+                                    {{ pass_form.new_password2.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" name="change_password" class="btn-save" data-vi="Đổi mật khẩu" data-en="Change Password">Đổi mật khẩu</button>
+                </form>
+            </div>
+
+            <div id="tab-saved" class="profile-content-card {% if active_tab == 'saved' %}active{% endif %}">
+                <h2 class="section-title" data-vi="Lịch trình đã lưu" data-en="Saved itineraries">Lịch trình đã lưu</h2>
+                <p style="margin-bottom: 1.5rem; color: #6b7280;" data-vi="Bạn có thể lưu riêng tối đa {{ max_saved_itineraries }} lịch trình. Còn {{ remaining_saved_slots }} chỗ trống." data-en="You can privately store up to {{ max_saved_itineraries }} itineraries. {{ remaining_saved_slots }} slots remain.">
+                    Bạn có thể lưu riêng tối đa {{ max_saved_itineraries }} lịch trình. Còn {{ remaining_saved_slots }} chỗ trống.
+                </p>
+                {% if saved_itineraries %}
+                    <div class="shared-itineraries-grid">
+                        {% for itinerary in saved_itineraries %}
+                            <article class="shared-itinerary-card">
+                                <div class="shared-itinerary-header">
+                                    <div class="shared-itinerary-header-main">
+                                        <h3 class="shared-itinerary-title">{{ itinerary.title }}</h3>
+                                        <span class="shared-itinerary-id"><span data-vi="Mã #" data-en="ID #">Mã #</span>{{ itinerary.id }}</span>
+                                    </div>
+                                    <span class="shared-itinerary-meta"><span data-vi="Lưu ngày" data-en="Saved on">Lưu ngày</span> {{ itinerary.created_at|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="shared-itinerary-meta" data-vi="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} ngày • {{ itinerary.poi_count }} điểm tham quan • {{ itinerary.eatery_count }} quán ăn" data-html-vi="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} ngày • {{ itinerary.poi_count }} điểm tham quan • {{ itinerary.eatery_count }} quán ăn" data-html-en="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} days • {{ itinerary.poi_count }} POIs • {{ itinerary.eatery_count }} eateries">
+                                    🧭 Mood: {{ itinerary.mood|capfirst }}<br>
+                                    🗓️ {{ itinerary.trip_days }} <span data-vi="ngày" data-en="days">ngày</span> • 
+                                    {{ itinerary.poi_count }} <span data-vi="điểm tham quan" data-en="POIs">điểm tham quan</span> • 
+                                    {{ itinerary.eatery_count }} <span data-vi="quán ăn" data-en="eateries">quán ăn</span>
+                                </div>
+                                <div class="shared-itinerary-meta">
+                                    💰 <span data-vi="Ngân sách:" data-en="Budget:">Ngân sách:</span> {{ itinerary.budget_amount|vnd_format }}<br>
+                                    🔒 <span data-vi="Chỉ mình bạn nhìn thấy" data-en="Visible to you only">Chỉ mình bạn nhìn thấy</span>
+                                </div>
+                                <div class="shared-itinerary-actions">
+                                    <a class="shared-itinerary-link" href="{% url 'load-saved-itinerary' itinerary.id %}" data-vi="Mở lại lịch trình" data-en="Open itinerary">
+                                        Mở lại lịch trình
+                                    </a>
+                                    <form method="post" action="{% url 'delete-shared-itinerary' itinerary.id %}" onsubmit="return confirm('Bạn có chắc muốn xóa lịch trình này?');" data-confirm-vi="Bạn có chắc muốn xóa lịch trình này?" data-confirm-en="Are you sure you want to delete this itinerary?">
+                                        {% csrf_token %}
+                                        <button type="submit" class="shared-itinerary-delete" data-vi="Xóa" data-en="Delete">Xóa</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="shared-itinerary-empty" data-vi="Bạn chưa lưu lịch trình nào. Hãy tạo chuyến đi rồi bấm nút Lưu để giữ riêng." data-en="No saved itineraries yet. Generate a trip and hit Save to keep it private.">
+                        Bạn chưa lưu lịch trình nào. Hãy tạo chuyến đi rồi bấm nút Lưu để giữ riêng.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="tab-shared" class="profile-content-card {% if active_tab == 'shared' %}active{% endif %}">
+                <h2 class="section-title" data-vi="Lịch trình bạn đã chia sẻ" data-en="Your Shared Itineraries">Lịch trình bạn đã chia sẻ</h2>
+                <p style="margin-bottom: 1.5rem; color: #6b7280;" data-vi="Bạn có thể chia sẻ công khai tối đa {{ max_shared_itineraries }} lịch trình. Còn {{ remaining_shared_slots }} chỗ trống." data-en="You can publish up to {{ max_shared_itineraries }} itineraries. {{ remaining_shared_slots }} slots remain.">
+                    Bạn có thể chia sẻ công khai tối đa {{ max_shared_itineraries }} lịch trình. Còn {{ remaining_shared_slots }} chỗ trống.
+                </p>
+                {% if shared_itineraries %}
+                    <div class="shared-itineraries-grid">
+                        {% for itinerary in shared_itineraries %}
+                            <article class="shared-itinerary-card">
+                                <div class="shared-itinerary-header">
+                                    <div class="shared-itinerary-header-main">
+                                        <h3 class="shared-itinerary-title">{{ itinerary.title }}</h3>
+                                        <span class="shared-itinerary-id"><span data-vi="Mã #" data-en="ID #">Mã #</span>{{ itinerary.id }}</span>
+                                    </div>
+                                    <span class="shared-itinerary-meta"><span data-vi="Chia sẻ ngày" data-en="Shared on">Chia sẻ ngày</span> {{ itinerary.created_at|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="shared-itinerary-meta" data-vi="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} ngày • {{ itinerary.poi_count }} điểm tham quan • {{ itinerary.eatery_count }} quán ăn" data-html-vi="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} ngày • {{ itinerary.poi_count }} điểm tham quan • {{ itinerary.eatery_count }} quán ăn" data-html-en="🧭 Mood: {{ itinerary.mood|capfirst }}<br>🗓️ {{ itinerary.trip_days }} days • {{ itinerary.poi_count }} POIs • {{ itinerary.eatery_count }} eateries">
+                                    🧭 Mood: {{ itinerary.mood|capfirst }}<br>
+                                    🗓️ {{ itinerary.trip_days }} <span data-vi="ngày" data-en="days">ngày</span> • 
+                                    {{ itinerary.poi_count }} <span data-vi="điểm tham quan" data-en="POIs">điểm tham quan</span> • 
+                                    {{ itinerary.eatery_count }} <span data-vi="quán ăn" data-en="eateries">quán ăn</span>
+                                </div>
+                                <div class="shared-itinerary-meta">
+                                    ⭐ {% if itinerary.average_rating %}{{ itinerary.average_rating }} / 5{% else %}<span data-vi="Chưa có đánh giá" data-en="No ratings yet">Chưa có đánh giá</span>{% endif %} • 
+                                    {{ itinerary.rating_count }} <span data-vi="lượt đánh giá" data-en="reviews">lượt đánh giá</span><br>
+                                    🤝 <span data-vi="Đã được lựa chọn" data-en="Adopted">Đã được lựa chọn</span> {{ itinerary.adopted_count }} <span data-vi="lần" data-en="times">lần</span>
+                                </div>
+                                <div class="shared-itinerary-actions">
+                                    <a class="shared-itinerary-link" href="{% url 'load-saved-itinerary' itinerary.id %}"
+                                       data-vi="Mở lại lịch trình" data-en="Open itinerary">
+                                        Mở lại lịch trình
+                                    </a>
+                                    <a class="shared-itinerary-link" href="{% url 'shared-itineraries-gallery' %}?mood={{ itinerary.mood }}"
+                                       data-vi="Xem trên trang cộng đồng" data-en="View on Community">
+                                        Xem trên trang cộng đồng
+                                    </a>
+                                    <form method="post" action="{% url 'delete-shared-itinerary' itinerary.id %}" 
+                                          onsubmit="return confirm('Bạn có chắc muốn xóa lịch trình này khỏi cộng đồng?');"
+                                          data-confirm-vi="Bạn có chắc muốn xóa lịch trình này khỏi cộng đồng?"
+                                          data-confirm-en="Are you sure you want to remove this itinerary from the community?">
+                                        {% csrf_token %}
+                                        <button type="submit" class="shared-itinerary-delete" data-vi="Xóa chia sẻ" data-en="Unshare">Xóa chia sẻ</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="shared-itinerary-empty"
+                         data-vi="Bạn chưa chia sẻ lịch trình nào. Hãy tạo chuyến đi rồi bấm nút Chia sẻ để đăng cho cộng đồng."
+                         data-en="You haven't shared any itineraries yet. Generate a trip and press Share to publish it to the community.">
+                        Bạn chưa chia sẻ lịch trình nào. Hãy tạo chuyến đi rồi bấm nút Chia sẻ để đăng cho cộng đồng.
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Hàm chuyển Tab
+    function switchTab(tabName) {
+        document.querySelectorAll('.profile-content-card').forEach(el => el.classList.remove('active'));
+
+        const selectedContent = document.getElementById('tab-' + tabName);
+        if (selectedContent) selectedContent.classList.add('active');
+
+        document.querySelectorAll('.menu-item[data-tab-target]').forEach(el => {
+            el.classList.toggle('active', el.dataset.tabTarget === tabName);
+        });
+    }
+
+    // Hàm xem trước ảnh khi chọn
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                const imgPreview = document.getElementById('img-preview');
+                const placeholder = document.getElementById('placeholder-container');
+                
+                // Gán nguồn ảnh mới
+                imgPreview.src = e.target.result;
+                // Hiện thẻ img
+                imgPreview.style.display = 'block';
+                
+                // Nếu đang có placeholder thì ẩn nó đi
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+</script>
+{% endblock %}

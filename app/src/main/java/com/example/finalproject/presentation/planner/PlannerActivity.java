@@ -8,13 +8,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalproject.R;
-import com.example.finalproject.application.usecase.GenerateItineraryUseCase;
-import com.example.finalproject.domain.callback.RepositoryCallback;
-import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.Mood;
 import com.example.finalproject.domain.model.TripRequest;
-import com.example.finalproject.infrastructure.demo.DemoPlannerRepository;
-import com.example.finalproject.presentation.itinerary.ItineraryActivity;
+import com.example.finalproject.presentation.selection.PlaceSelectionActivity;
+import com.example.finalproject.presentation.SystemBarInsets;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -33,14 +30,12 @@ public class PlannerActivity extends AppCompatActivity {
     private SwitchMaterial defaultCenterSwitch;
     private TextView errorText;
     private View loadingPanel;
-    private GenerateItineraryUseCase generateUseCase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planner);
-        generateUseCase = new GenerateItineraryUseCase(new DemoPlannerRepository());
-
+        SystemBarInsets.apply(findViewById(R.id.plannerRoot));
         daysInput = findViewById(R.id.daysInput);
         placesInput = findViewById(R.id.placesInput);
         budgetInput = findViewById(R.id.budgetInput);
@@ -55,10 +50,10 @@ public class PlannerActivity extends AppCompatActivity {
             addressInput.setEnabled(!checked);
             if (checked) addressInput.setText("");
         });
-        findViewById(R.id.generateButton).setOnClickListener(v -> generate());
+        findViewById(R.id.generateButton).setOnClickListener(v -> continueToSelection());
     }
 
-    private void generate() {
+    private void continueToSelection() {
         errorText.setVisibility(View.GONE);
         Integer days = parseInteger(daysInput);
         Integer places = parseInteger(placesInput);
@@ -72,21 +67,9 @@ public class PlannerActivity extends AppCompatActivity {
         TripRequest request = new TripRequest(days, places, budget, moods,
             text(addressInput), defaultCenterSwitch.isChecked(),
             Collections.emptyList(), Collections.emptyList());
-
-        setLoading(true);
-        generateUseCase.execute(request, new RepositoryCallback<Itinerary>() {
-            @Override public void onSuccess(Itinerary itinerary) {
-                setLoading(false);
-                Intent intent = new Intent(PlannerActivity.this, ItineraryActivity.class);
-                intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, itinerary);
-                startActivity(intent);
-            }
-
-            @Override public void onError(Exception error) {
-                setLoading(false);
-                showError(error.getMessage() == null ? "Không thể tạo lịch trình." : error.getMessage());
-            }
-        });
+        Intent intent = new Intent(this, PlaceSelectionActivity.class);
+        intent.putExtra(PlaceSelectionActivity.EXTRA_REQUEST, request);
+        startActivity(intent);
     }
 
     private List<Mood> selectedMoods() {

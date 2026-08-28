@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Xác thực OTP{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-modal" style="position: relative; animation: modalSlideUp 0.5s ease-out; width: 100%; max-width: 420px; display: block;">
+        
+        <div style="font-size: 3.5rem; text-align: center; margin-bottom: 1rem; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));">
+            📩
+        </div>
+
+        <h2 class="auth-modal-title" style="margin-bottom: 0.5rem;" 
+            data-vi="Nhập mã xác nhận" 
+            data-en="Enter Verification Code">
+            Nhập mã xác nhận
+        </h2>
+
+        <p class="auth-modal-subtitle" style="margin-bottom: 2rem;">
+            <span data-vi="Mã 6 số đã được gửi tới:" 
+                  data-en="A 6-digit code has been sent to:">
+                  Mã 6 số đã được gửi tới:
+            </span>
+            <br>
+            <strong style="color: var(--ios-blue); font-size: 1.1rem; background: rgba(0,113,227,0.1); padding: 2px 8px; border-radius: 6px;">{{ contact_display }}</strong>
+        </p>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="auth-error" style="display: block; text-align: center; background: {% if message.tags == 'success' %}rgba(52, 199, 89, 0.1){% else %}rgba(255, 59, 48, 0.1){% endif %}; color: {% if message.tags == 'success' %}#34c759{% else %}#d32f2f{% endif %}; border-color: currentColor;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="auth-form-group">
+                <div style="position: relative;">
+                    {{ form.otp }}
+                    <style>
+                        #id_otp {
+                            font-size: 1.5rem;
+                            letter-spacing: 0.5em;
+                            text-align: center;
+                            font-weight: 700;
+                            padding-left: 0.5em; /* Cân bằng letter-spacing */
+                            color: var(--ios-blue);
+                        }
+                    </style>
+                </div>
+            </div>
+            
+            <button type="submit" class="auth-submit-btn" 
+                    data-vi="Xác nhận" 
+                    data-en="Confirm">
+                Xác nhận
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: rgba(0,0,0,0.5);">
+            <span data-vi="Chưa nhận được mã?" data-en="Didn't receive the code?">Chưa nhận được mã?</span> 
+            <a href="{% url 'forgot_password' %}" class="auth-switch-link" 
+               data-vi="Gửi lại" 
+               data-en="Resend">
+               Gửi lại
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,920 @@
+{% extends 'base.html' %}
+{% load currency_filters %}
+{% load static %}
+
+{% block title %}Trip Setup - Journify Đà Lạt{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    .main-content {
+        display: block;
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .hero-bg {
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                    url("{% static 'home/images/dalat_2.jpg' %}") center/cover;
+        background-position: center 40%;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        margin: -20px -20px 30px -20px;
+        border-radius: 12px;
+    }
+
+    .hero-bg h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .hero-bg p {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .step-number {
+        color: #13a4ec;
+        font-weight: 600;
+    }
+
+    .step-divider {
+        color: #ccc;
+        margin: 0 0.5rem;
+    }
+
+    .setup-wrapper {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .setup-wrapper h2 {
+        margin-top: 2rem;
+        color: #1f2937;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .step-section {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+
+    .step-section:hover {
+        border-color: #13a4ec;
+        box-shadow: 0 6px 20px rgba(19, 164, 236, 0.15);
+    }
+
+    .step-section h3 {
+        margin-top: 0;
+        color: #0369a1;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .step-section h3::before {
+        content: '';
+        width: 6px;
+        height: 2rem;
+        background: linear-gradient(135deg, #13a4ec 0%, #0ea5e9 100%);
+        border-radius: 3px;
+    }
+
+    label {
+        display: block;
+        margin: 0.75rem 0 0.5rem;
+        font-weight: 700;
+        color: #0369a1;
+        font-size: 1.05rem;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+        width: 100%;
+        padding: 0.65rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #cbd5f5;
+        font-size: 1rem;
+    }
+
+    .mood-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .mood-card {
+        border: 1px solid #cbd5f5;
+        border-radius: 10px;
+        padding: 0.85rem;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        cursor: pointer;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mood-card input[type="radio"] {
+        margin-right: 0.35rem;
+    }
+
+    .mood-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .mood-label {
+        font-weight: 600;
+        color: #111827;
+        display: flex;
+        align-items: center;
+    }
+
+    .mood-tags {
+        font-size: 0.9rem;
+        color: #4b5563;
+    }
+
+    .submit-row {
+        margin-top: 3rem;
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .submit-row button {
+        background: linear-gradient(135deg, #13a4ec 0%, #0ea5e9 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1.25rem 2.5rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(19, 164, 236, 0.3);
+        flex: 1;
+        min-width: 280px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-row button::before {
+        content: '\2192';
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        opacity: 0;
+        transition: all 0.3s;
+    }
+
+    .submit-row button:hover {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        box-shadow: 0 6px 16px rgba(19, 164, 236, 0.4);
+        transform: translateY(-2px);
+        padding-right: 3.5rem;
+    }
+
+    .submit-row button:hover::before {
+        opacity: 1;
+    }
+
+    .submit-row .secondary-button {
+        background: #ffffff;
+        color: #13a4ec;
+        border: 2px solid #13a4ec;
+        box-shadow: 0 2px 8px rgba(19, 164, 236, 0.1);
+    }
+
+    .submit-row .secondary-button:hover {
+        background: #f0f9ff;
+        box-shadow: 0 4px 12px rgba(19, 164, 236, 0.2);
+        border-color: #0ea5e9;
+        color: #0ea5e9;
+    }
+
+    .form-errors {
+        margin-bottom: 1rem;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: #b91c1c;
+    }
+
+    .start-preview {
+        margin-top: 1rem;
+        font-size: 0.95rem;
+        color: #374151;
+        background: #f3f4f6;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+    }
+
+    .location-inputs-row {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .location-input-group {
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        z-index: 1;
+    }
+
+    .location-input-group:hover {
+        opacity: 0.8;
+    }
+
+    .location-input-group.place-name {
+        flex: 0 0 35%;
+    }
+
+    .location-input-group.address {
+        flex: 1;
+    }
+
+    .location-divider {
+        text-align: left;
+        color: #999;
+        font-weight: bold;
+        white-space: nowrap;
+        margin-top: 2.0rem;
+        flex-shrink: 0;
+        padding: 0 0.5rem;
+    }
+
+    /* Slider styles */
+    .slider-container {
+        max-width: 400px;
+        margin: 1rem 0;
+    }
+
+    .slider-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    input[type="range"] {
+        flex: 1;
+        height: 6px;
+        border-radius: 5px;
+        background: #e5e7eb;
+        outline: none;
+        -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #13a4ec 0%, #0ea5e9 100%);
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(19, 164, 236, 0.4);
+        border: 3px solid white;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #13a4ec 0%, #0ea5e9 100%);
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 3px 8px rgba(19, 164, 236, 0.4);
+    }
+
+    .slider-value {
+        min-width: 60px;
+        text-align: center;
+        font-weight: 700;
+        color: #13a4ec;
+        font-size: 1.5rem;
+        background: #f0f9ff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+    }
+
+    /* Updated mood card styles */
+    .mood-card {
+        border: 3px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 1.25rem;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .mood-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .mood-card:hover {
+        border-color: #13a4ec;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(19, 164, 236, 0.15);
+    }
+
+    /* Individual mood card colors */
+    .mood-card input[value="Relaxed"]:checked + .mood-content {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Active"]:checked + .mood-content {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Romantic"]:checked + .mood-content {
+        background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Foodie"]:checked + .mood-content {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Culture"]:checked + .mood-content {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Social"]:checked + .mood-content {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Shopping"]:checked + .mood-content {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Healing"]:checked + .mood-content {
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[value="Bizarre"]:checked + .mood-content {
+        background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: -0.5rem;
+    }
+
+    .mood-card input[type="radio"]:checked + .mood-content .mood-label {
+        color: white;
+    }
+
+    .mood-card input[type="radio"]:checked + .mood-content .mood-tags {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .mood-content {
+        transition: all 0.3s ease;
+    }
+
+    .mood-label {
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        font-size: 1.05rem;
+    }
+
+    .mood-tags {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    /* Default location option */
+    .default-location-option {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .default-location-option:hover {
+        background: #e0f2fe;
+        border-color: #13a4ec;
+    }
+
+    .default-location-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .default-location-option.active {
+        background: linear-gradient(135deg, #13a4ec 0%, #0ea5e9 100%);
+        border-color: #13a4ec;
+    }
+
+    .default-location-option.active label {
+        color: white;
+    }
+
+    .default-location-option label {
+        cursor: pointer;
+        margin: 0;
+        font-weight: 600;
+        color: #374151;
+        flex: 1;
+        font-size: 1rem;
+    }
+
+    .location-inputs-row {
+        margin-top: 1rem;
+        transition: all 0.3s;
+    }
+
+    .location-inputs-row:not(.enabled) {
+        opacity: 0.5;
+    }
+
+    .location-inputs-row.enabled {
+        opacity: 1;
+    }
+    
+    .location-inputs-row:not(.enabled) .location-input-group {
+        cursor: pointer;
+    }
+
+    .location-input-group input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-bg">
+    <div>
+        <h1 data-vi="Lập kế hoạch chuyến đi hoàn hảo đến Đà Lạt" data-en="Plan Your Perfect Trip to Dalat">Lập kế hoạch chuyến đi hoàn hảo đến Đà Lạt</h1>
+        <p data-vi="Tạo lịch trình cá nhân hóa trong vài phút. Hãy bắt đầu cuộc phiêu lưu của bạn!" data-en="Create a personalized itinerary in minutes. Let's start your adventure!">Tạo lịch trình cá nhân hóa trong vài phút. Hãy bắt đầu cuộc phiêu lưu của bạn!</p>
+    </div>
+</div>
+
+<!-- Step Indicator -->
+<div class="step-indicator">
+    <div class="step-item">
+        <span class="step-number" data-vi="1. Ràng buộc" data-en="1. Constraints">1. Ràng buộc</span>
+    </div>
+    <span class="step-divider">/</span>
+    <div class="step-item">
+        <span class="step-number" data-vi="2. Điểm xuất phát" data-en="2. Start Point">2. Điểm xuất phát</span>
+    </div>
+    <span class="step-divider">/</span>
+    <div class="step-item">
+        <span style="color: #9ca3af;" data-vi="3. Điểm đến" data-en="3. Destinations">3. Điểm đến</span>
+    </div>
+    <span class="step-divider">/</span>
+    <div class="step-item">
+        <span style="color: #9ca3af;" data-vi="4. Nhà hàng" data-en="4. Eateries">4. Nhà hàng</span>
+    </div>
+</div>
+
+<div class="setup-wrapper">
+    <h2 data-vi="Thiết lập chi tiết chuyến đi" data-en="Setup Your Trip Details">Thiết lập chi tiết chuyến đi</h2>
+    <p data-vi="Hoàn thành Bước 1 & 2 để mở khóa công cụ chọn điểm đến. Bạn có thể điều chỉnh bất kỳ lúc nào." data-en="Complete Steps 1 & 2 to unlock the destination picker. You can adjust these anytime.">Hoàn thành Bước 1 & 2 để mở khóa công cụ chọn điểm đến. Bạn có thể điều chỉnh bất kỳ lúc nào.</p>
+
+    {% if form_errors %}
+        <div class="form-errors">
+            <ul>
+                {% for error in form_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="POST" data-strip-currency-on-submit>
+        {% csrf_token %}
+        <div class="step-section">
+            <h3 data-vi="Bước 1: Nhập ràng buộc của bạn" data-en="Step 1: Enter Your Constraints">Bước 1: Nhập ràng buộc của bạn</h3>
+            <label for="days_travel" data-vi="Số ngày du lịch" data-en="Number of travel days">Số ngày du lịch</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="range" min="1" max="7" id="days_travel" name="days_travel" value="{{ form_values.days_travel|default:4 }}" required>
+                    <span class="slider-value" id="days_value">{{ form_values.days_travel|default:4 }}</span>
+                </div>
+            </div>
+
+            <label for="max_pois_per_day" data-vi="Số điểm tham quan tối đa mỗi ngày" data-en="Max attractions per day">Số điểm tham quan tối đa mỗi ngày</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="range" min="1" max="6" id="max_pois_per_day" name="max_pois_per_day" value="{{ form_values.max_pois_per_day|default:3 }}" required>
+                    <span class="slider-value" id="pois_value">{{ form_values.max_pois_per_day|default:3 }}</span>
+                </div>
+            </div>
+
+            <label for="budget" data-vi="Ngân sách chuyến đi (VND)" data-en="Trip budget (VND)">Ngân sách chuyến đi (VND)</label>
+            <input
+                type="text"
+                inputmode="numeric"
+                id="budget"
+                name="budget"
+                value="{{ form_values.budget }}"
+                data-currency-input
+                required
+            >
+
+            <label data-vi="Chọn tâm trạng du lịch của bạn" data-en="Choose your travel mood">Chọn tâm trạng du lịch của bạn</label>
+            <p style="margin-top:0;color:#6b7280;font-size:0.9rem;" data-vi="Chúng tôi sẽ ưu tiên các điểm tham quan phù hợp với phong cách này trước." data-en="We'll prioritize POIs that match this vibe before anything else.">Chúng tôi sẽ ưu tiên các điểm tham quan phù hợp với phong cách này trước.</p>
+            <div class="mood-grid">
+                {% for mood in available_moods %}
+                    <label class="mood-card">
+                        <input type="radio" name="travel_mood" value="{{ mood.name }}"{% if form_values.travel_mood == mood.name %} checked{% endif %}{% if forloop.first %} required{% endif %}>
+                        <div class="mood-content">
+                            <div class="mood-label" data-vi="{{ mood.name }}">
+                                {{ mood.name }}
+                            </div>
+                            <div class="mood-tags" data-original-tags="{{ mood.tags|join:',' }}">
+                                {{ mood.tags|join:', ' }}
+                            </div>
+                        </div>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="step-section">
+            <h3 data-vi="Bước 2: Chọn điểm xuất phát" data-en="Step 2: Choose a Starting Point">Bước 2: Chọn điểm xuất phát</h3>
+            <p style="margin-top:0" data-vi="Chúng tôi sẽ sắp xếp các điểm tham quan và nhà hàng dựa trên vị trí này khi bạn chuyển sang Bước 3." data-en="We will sort POIs and eateries based on this location once you move to Step 3.">Chúng tôi sẽ sắp xếp các điểm tham quan và nhà hàng dựa trên vị trí này khi bạn chuyển sang Bước 3.</p>
+            
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;" data-vi="Nhập tên địa điểm HOẶC địa chỉ đầy đủ:" data-en="Enter either a place name OR a full address:">Nhập tên địa điểm (vd: "Hồ Xuân Hương") HOẶC địa chỉ đầy đủ:</p>
+            
+            <div class="location-inputs-row" id="custom-location-inputs">
+                <input type="radio" name="location_type" id="use_place" value="place" style="position: absolute; opacity: 0; width: 0; height: 0;">
+                <input type="radio" name="location_type" id="use_address" value="address" style="position: absolute; opacity: 0; width: 0; height: 0;">
+                
+                <div class="location-input-group place-name" id="place-box">
+                    <label for="place_name" data-vi="Tên địa điểm" data-en="Place Name">Tên địa điểm</label>
+                    <input type="text" id="place_name" name="place_name" value="{{ form_values.place_name }}" 
+                           data-placeholder-vi="vd: Hồ Xuân Hương" 
+                           data-placeholder-en="e.g.: Xuan Huong Lake" 
+                           placeholder="vd: Hồ Xuân Hương">
+                </div>
+                
+                <div class="location-divider" data-vi="HOẶC" data-en="OR">HOẶC</div>
+                
+                <div class="location-input-group address" id="address-box">
+                    <label for="user_address" data-vi="Địa chỉ đầy đủ" data-en="Full Address">Địa chỉ đầy đủ</label>
+                    <input type="text" id="user_address" name="user_address" value="{{ form_values.user_address }}" 
+                           data-placeholder-vi="vd: Khách sạn Du Parc, Đà Lạt" 
+                           data-placeholder-en="e.g.: Du Parc Hotel, Da Lat" 
+                           placeholder="vd: Khách sạn Du Parc, Đà Lạt">
+                </div>
+            </div>
+            
+            <div class="default-location-option">
+                <input type="radio" name="location_type" id="use_default" value="default" checked>
+                <label for="use_default">
+                    <strong data-vi="📍 Sử dụng trung tâm Đà Lạt" data-en="📍 Use Dalat Center">📍 Sử dụng trung tâm Đà Lạt</strong> <span data-vi="(Điểm xuất phát mặc định)" data-en="(Default starting point)">(Điểm xuất phát mặc định)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="submit-row">
+            <button type="submit" name="generate_now" value="1" data-vi="Tạo lịch trình ngay lập tức" data-en="Immediately Generate Itinerary">
+                Tạo lịch trình ngay lập tức
+            </button>
+            <button type="submit" class="secondary-button" data-vi="Chọn điểm yêu thích của bạn" data-en="Choose Your Favorite Spots">
+                Chọn điểm yêu thích của bạn
+            </button>
+        </div>
+    </form>
+
+    {% if start_location %}
+        <div class="start-preview">
+            <strong data-vi="Điểm xuất phát đã lưu:" data-en="Saved starting point:">Điểm xuất phát đã lưu:</strong>
+            {{ start_location.address_label }}
+            {% if start_location.fallback_used %}
+                <span data-vi="(sử dụng Chợ Đà Lạt dự phòng)" data-en="(using Đà Lạt Market fallback)">(sử dụng Chợ Đà Lạt dự phòng)</span>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'home/js/currency_inputs.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Save trip setup to localStorage on form submit
+        const form = document.querySelector('form[method="POST"]');
+        form.addEventListener('submit', function(e) {
+            const days = parseInt(document.getElementById('days_travel').value);
+            const maxPOIs = parseInt(document.getElementById('max_pois_per_day').value);
+            const budget = document.getElementById('budget').value.replace(/[₫,]/g, '').trim();
+            const placeName = document.getElementById('place_name').value.trim();
+            const address = document.getElementById('user_address').value.trim();
+            const mood = document.querySelector('input[name="travel_mood"]:checked')?.value || '';
+            
+            // Use bilingual default location
+            const defaultLocation = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 'Dalat Center' : 'Trung tâm Đà Lạt';
+            const locationLabel = placeName || address || defaultLocation;
+            
+            const tripSetup = {
+                days: days,
+                max_pois_per_day: maxPOIs,
+                budget: parseFloat(budget) || 10000000,
+                mood: mood,
+                startLocation: {
+                    address_label: locationLabel,
+                    lat: null,  // Will be filled by backend
+                    lon: null
+                }
+            };
+            
+            localStorage.setItem('tripSetup', JSON.stringify(tripSetup));
+        });
+        
+        // Slider updates
+        const daysSlider = document.getElementById('days_travel');
+        const daysValue = document.getElementById('days_value');
+        const poisSlider = document.getElementById('max_pois_per_day');
+        const poisValue = document.getElementById('pois_value');
+        
+        if (daysSlider && daysValue) {
+            daysSlider.addEventListener('input', function() {
+                daysValue.textContent = this.value;
+            });
+        }
+        
+        if (poisSlider && poisValue) {
+            poisSlider.addEventListener('input', function() {
+                poisValue.textContent = this.value;
+            });
+        }
+
+        // Location type management
+        const defaultOption = document.querySelector('.default-location-option');
+        const defaultRadio = document.getElementById('use_default');
+        const placeRadio = document.getElementById('use_place');
+        const addressRadio = document.getElementById('use_address');
+        const placeNameInput = document.getElementById('place_name');
+        const addressInput = document.getElementById('user_address');
+        const customInputsRow = document.getElementById('custom-location-inputs');
+        
+        function updateLocationInputs() {
+            if (defaultRadio.checked) {
+                defaultOption.classList.add('active');
+                customInputsRow.classList.remove('enabled');
+                placeNameInput.value = '';
+                addressInput.value = '';
+            } else {
+                defaultOption.classList.remove('active');
+                customInputsRow.classList.add('enabled');
+            }
+            // Never disable any inputs - always keep them clickable
+            placeNameInput.disabled = false;
+            addressInput.disabled = false;
+            placeNameInput.style.backgroundColor = '';
+            addressInput.style.backgroundColor = '';
+            placeNameInput.style.cursor = '';
+            addressInput.style.cursor = '';
+        }
+        
+        // Click on default option card to select it
+        defaultOption.addEventListener('click', function() {
+            defaultRadio.checked = true;
+            updateLocationInputs();
+        });
+        
+        // Click on place name box to enable and focus it
+        const placeBox = document.getElementById('place-box');
+        placeBox.addEventListener('click', function(e) {
+            placeRadio.checked = true;
+            // Enable both inputs first
+            placeNameInput.disabled = false;
+            addressInput.disabled = false;
+            // Clear all styles
+            placeNameInput.style.backgroundColor = '';
+            placeNameInput.style.cursor = '';
+            addressInput.style.backgroundColor = '';
+            addressInput.style.cursor = '';
+            updateLocationInputs();
+            // Focus after everything is cleared
+            setTimeout(() => placeNameInput.focus(), 10);
+        });
+        
+        // Click on address box to enable and focus it
+        const addressBox = document.getElementById('address-box');
+        if (addressBox) {
+            addressBox.addEventListener('click', function(e) {
+                addressRadio.checked = true;
+                // Enable both inputs first
+                placeNameInput.disabled = false;
+                addressInput.disabled = false;
+                // Clear all styles
+                placeNameInput.style.backgroundColor = '';
+                placeNameInput.style.cursor = '';
+                addressInput.style.backgroundColor = '';
+                addressInput.style.cursor = '';
+                updateLocationInputs();
+                // Focus after everything is cleared
+                setTimeout(() => addressInput.focus(), 10);
+            });
+        } else {
+            console.error('Address box not found!');
+        }
+        
+        // When user types in place name, deselect default and select place
+        placeNameInput.addEventListener('focus', function() {
+            placeRadio.checked = true;
+            updateLocationInputs();
+        });
+        
+        placeNameInput.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                placeRadio.checked = true;
+                addressInput.value = ''; // Clear address when typing place name
+            }
+            updateLocationInputs();
+        });
+        
+        // When user types in address, deselect default and select address
+        addressInput.addEventListener('focus', function() {
+            addressRadio.checked = true;
+            updateLocationInputs();
+        });
+        
+        addressInput.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                addressRadio.checked = true;
+                placeNameInput.value = ''; // Clear place name when typing address
+            }
+            updateLocationInputs();
+        });
+        
+        // Initialize state
+        if (placeNameInput.value.trim() !== '') {
+            placeRadio.checked = true;
+        } else if (addressInput.value.trim() !== '') {
+            addressRadio.checked = true;
+        }
+        updateLocationInputs();
+
+        // === MOOD LABELS AND TAGS TRANSLATION ===
+        // Dictionaries for English -> Vietnamese translation (since backend sends English)
+        const moodNameTranslations = {
+            'Relaxed': 'Thư giãn',
+            'Active': 'Năng động',
+            'Romantic': 'Lãng mạn',
+            'Foodie': 'Ẩm thực',
+            'Culture': 'Văn hóa',
+            'Social': 'Xã hội',
+            'Shopping': 'Mua sắm',
+            'Healing': 'Chữa lành',
+            'Bizarre': 'Độc lạ'
+        };
+        
+        const moodTagTranslations = {
+            'Pure nature': 'Thiên nhiên thuần khiết',
+            '50% nature': '50% thiên nhiên',
+            'Healing': 'Chữa lành',
+            'Spiritual': 'Tâm linh',
+            'Sporty': 'Thể thao',
+            'Cafe': 'Cà phê',
+            'Eating': 'Ăn uống',
+            '50% human': '50% nhân tạo',
+            'History': 'Lịch sử',
+            'Manmade': 'Nhân tạo',
+            'Bizarre': 'Độc lạ'
+        };
+
+        function translateMoodLabelsAndTags() {
+            const currentLang = localStorage.getItem('language') || 'vi';
+
+            // Translate mood labels
+            const moodLabelElements = document.querySelectorAll('.mood-label');
+            moodLabelElements.forEach(el => {
+                // The text content is initially English (from backend)
+                // We use data-vi to store the English key if needed, or just read textContent
+                const originalText = el.getAttribute('data-vi') || el.textContent.trim();
+                
+                if (currentLang === 'vi') {
+                    // Translate EN -> VI
+                    el.textContent = moodNameTranslations[originalText] || originalText;
+                } else {
+                    // Keep EN
+                    el.textContent = originalText;
+                }
+            });
+            
+            // Translate mood tags
+            const moodTagElements = document.querySelectorAll('.mood-tags');
+            moodTagElements.forEach(el => {
+                const originalTags = el.getAttribute('data-original-tags');
+                if (!originalTags) return;
+                
+                const tags = originalTags.split(',').map(tag => tag.trim());
+                const translatedTags = tags.map(tag => {
+                    if (currentLang === 'vi') {
+                        return moodTagTranslations[tag] || tag;
+                    }
+                    return tag;
+                });
+                
+                el.textContent = translatedTags.join(', ');
+            });
+        }
+
+        // Listen for language change events
+        window.addEventListener('languageChanged', translateMoodLabelsAndTags);
+        
+        // Initial translation
+        translateMoodLabelsAndTags();
+    });
+</script>
+{% endblock %}

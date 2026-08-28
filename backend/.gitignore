@@ -1,0 +1,53 @@
+# Virtual Environment
+venv/
+venvlinux/
+r.sh
+*.pyc
+
+# Database
+db.sqlite3
+dalat_routes.db
+
+# Caches
+__pycache__/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+test.*
+# Local Python virtualenv
+Khoa/
+
+# IDE/editor settings and indexes
+.vscode/
+.vs/
+*.code-workspace
+
+# Python bytecode and caches (expanded)
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.cache/
+
+# Virtual environment folders (variants)
+.venv/
+env/
+ENV/
+
+# Django/static artifacts (optional; uncomment if you collect locally)
+# staticfiles/
+# media/
+
+# Environment/secret files
+.env
+.env.*
+
+# Build/dist artifacts
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
