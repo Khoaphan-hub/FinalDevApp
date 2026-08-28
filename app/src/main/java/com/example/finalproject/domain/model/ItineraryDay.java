@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class ItineraryDay implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final int dayNumber;
     private final List<ItineraryStop> stops;
 

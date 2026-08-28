@@ -13,6 +13,12 @@
             <TextView android:id="@+id/savedTripTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
             <TextView android:id="@+id/savedTripMeta" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
         </LinearLayout>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="@color/primary" android:textSize="30sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/savedTripDelete"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Xoá"
+            android:textColor="@color/alert_red" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

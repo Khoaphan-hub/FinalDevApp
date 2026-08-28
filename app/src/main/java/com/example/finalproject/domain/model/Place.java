@@ -3,6 +3,7 @@ package com.example.finalproject.domain.model;
 import java.io.Serializable;
 
 public final class Place implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final int id;
     private final String type;
     private final String name;

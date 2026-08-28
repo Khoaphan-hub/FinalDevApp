@@ -9,4 +9,5 @@ import java.util.List;
 public interface SavedTripRepository {
     void save(Itinerary itinerary, RepositoryCallback<Long> callback);
     void loadAll(RepositoryCallback<List<SavedTrip>> callback);
+    void delete(long id, RepositoryCallback<Void> callback);
 }

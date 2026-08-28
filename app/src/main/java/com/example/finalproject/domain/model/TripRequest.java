@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class TripRequest implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final int days;
     private final int dailyPoiLimit;
     private final long budgetVnd;

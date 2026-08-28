@@ -12,4 +12,5 @@ import java.util.List;
 public interface SavedTripDao {
     @Insert long insert(SavedTripEntity entity);
     @Query("SELECT * FROM saved_trips ORDER BY savedAt DESC") List<SavedTripEntity> loadAll();
+    @Query("DELETE FROM saved_trips WHERE id = :id") void delete(long id);
 }

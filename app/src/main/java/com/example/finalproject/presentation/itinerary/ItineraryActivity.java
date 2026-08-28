@@ -21,6 +21,7 @@ import com.example.finalproject.domain.model.ItineraryEditor;
 import com.example.finalproject.domain.model.ItineraryStop;
 import com.example.finalproject.domain.model.Place;
 import com.example.finalproject.presentation.SystemBarInsets;
+import com.example.finalproject.presentation.MainActivity;
 import com.example.finalproject.presentation.map.MapActivity;
 import com.example.finalproject.presentation.catalog.PlaceDetailActivity;
 import com.example.finalproject.presentation.selection.ReplacementActivity;
@@ -88,9 +89,12 @@ public class ItineraryActivity extends AppCompatActivity {
             v.setEnabled(false);
             new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
                 @Override public void onSuccess(Long id) {
-                    v.setEnabled(true);
-                    ((com.google.android.material.button.MaterialButton) v).setText("Đã lưu");
-                    Toast.makeText(ItineraryActivity.this, "Đã lưu chuyến đi trên thiết bị.", Toast.LENGTH_SHORT).show();
+                    Intent home = new Intent(ItineraryActivity.this, MainActivity.class);
+                    home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    home.putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_TRIPS);
+                    home.putExtra(MainActivity.EXTRA_MESSAGE, "Đã lưu chuyến đi trên thiết bị.");
+                    startActivity(home);
+                    finish();
                 }
                 @Override public void onError(Exception error) {
                     v.setEnabled(true);
@@ -104,6 +108,7 @@ public class ItineraryActivity extends AppCompatActivity {
             intent.putExtra(MapActivity.EXTRA_DAY, selectedDay);
             startActivity(intent);
         });
+        findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
 
         ChipGroup chipGroup = findViewById(R.id.dayChipGroup);
         for (ItineraryDay day : itinerary.getDays()) {
@@ -224,6 +229,26 @@ public class ItineraryActivity extends AppCompatActivity {
     private void updateBudget() {
         ((TextView) findViewById(R.id.estimatedCostText)).setText(money(itinerary.getEstimatedCostVnd()));
         ((TextView) findViewById(R.id.remainingCostText)).setText(money(itinerary.getRemainingBudgetVnd()));
+    }
+
+    private void shareItinerary() {
+        StringBuilder message = new StringBuilder(itinerary.getTitle())
+            .append("\nChi phí dự kiến: ").append(money(itinerary.getEstimatedCostVnd())).append("\n");
+        for (ItineraryDay day : itinerary.getDays()) {
+            message.append("\nNgày ").append(day.getDayNumber()).append(":\n");
+            for (ItineraryStop stop : day.getStops()) {
+                if (stop.getType() != ItineraryStop.Type.ACCOMMODATION) {
+                    message.append("• ").append(stop.getName());
+                    if (stop.getMealSlot() != null) message.append(" (").append(stop.getMealSlot()).append(")");
+                    message.append('\n');
+                }
+            }
+        }
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_SUBJECT, itinerary.getTitle());
+        share.putExtra(Intent.EXTRA_TEXT, message.toString());
+        startActivity(Intent.createChooser(share, "Chia sẻ chuyến đi qua"));
     }
 
     private String marker(ItineraryStop stop) {

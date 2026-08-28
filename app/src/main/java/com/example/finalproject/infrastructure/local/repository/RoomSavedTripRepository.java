@@ -46,9 +46,24 @@ public final class RoomSavedTripRepository implements SavedTripRepository {
             try {
                 List<SavedTrip> results = new ArrayList<>();
                 for (SavedTripEntity entity : database.savedTripDao().loadAll()) {
-                    results.add(new SavedTrip(entity.id, deserialize(entity.itineraryPayload), entity.savedAt));
+                    try {
+                        results.add(new SavedTrip(entity.id, deserialize(entity.itineraryPayload), entity.savedAt));
+                    } catch (Exception incompatibleSavedTrip) {
+                        // Keep loading newer valid entries if an older serialized model is incompatible.
+                    }
                 }
                 main.post(() -> callback.onSuccess(results));
+            } catch (Exception error) {
+                main.post(() -> callback.onError(error));
+            }
+        });
+    }
+
+    @Override public void delete(long id, RepositoryCallback<Void> callback) {
+        executor.execute(() -> {
+            try {
+                database.savedTripDao().delete(id);
+                main.post(() -> callback.onSuccess(null));
             } catch (Exception error) {
                 main.post(() -> callback.onError(error));
             }

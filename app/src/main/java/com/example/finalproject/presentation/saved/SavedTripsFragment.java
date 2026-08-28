@@ -35,14 +35,40 @@ public class SavedTripsFragment extends Fragment {
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         RecyclerView recycler = view.findViewById(R.id.savedTripsRecycler);
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new SavedTripAdapter(trip -> {
-            Intent intent = new Intent(requireContext(), ItineraryActivity.class);
-            intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, trip.getItinerary());
-            startActivity(intent);
+        adapter = new SavedTripAdapter(new SavedTripAdapter.Listener() {
+            @Override public void onOpen(SavedTrip trip) {
+                Intent intent = new Intent(requireContext(), ItineraryActivity.class);
+                intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, trip.getItinerary());
+                startActivity(intent);
+            }
+
+            @Override public void onDelete(SavedTrip trip) {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Xoá chuyến đi?")
+                    .setMessage("Lịch trình này sẽ bị xoá khỏi thiết bị.")
+                    .setNegativeButton("Giữ lại", null)
+                    .setPositiveButton("Xoá", (dialog, which) -> deleteTrip(trip))
+                    .show();
+            }
         });
         recycler.setAdapter(adapter);
         progress = view.findViewById(R.id.savedTripsProgress);
         empty = view.findViewById(R.id.savedTripsEmpty);
+    }
+
+    private void deleteTrip(SavedTrip trip) {
+        progress.setVisibility(View.VISIBLE);
+        new RoomSavedTripRepository(requireContext()).delete(trip.getId(), new RepositoryCallback<Void>() {
+            @Override public void onSuccess(Void ignored) {
+                Toast.makeText(requireContext(), "Đã xoá chuyến đi.", Toast.LENGTH_SHORT).show();
+                load();
+            }
+
+            @Override public void onError(Exception error) {
+                progress.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), "Không thể xoá chuyến đi.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override public void onResume() {

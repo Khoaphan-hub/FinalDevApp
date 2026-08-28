@@ -3,6 +3,7 @@ package com.example.finalproject.domain.model;
 import java.io.Serializable;
 
 public final class ItineraryStop implements Serializable {
+    private static final long serialVersionUID = 1L;
     public enum Type { ACCOMMODATION, POI, EATERY }
 
     private final int id;

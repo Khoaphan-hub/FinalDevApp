@@ -278,6 +278,16 @@ M5 and M6 are now complete. The copied Django backend exposes stateless mobile c
 
 Next: M7 hardening and submission work. Add a small set of domain tests, document backend/device setup, produce a release APK, and prepare report/video folders. Cloud deployment or configurable LAN server address is still required if the APK must work on a physical phone without the development computer.
 
+### Saved-trip completion milestone — 29 August 2026
+
+- Saving now waits for Room to confirm insertion, clears the planner/result stack, returns to `MainActivity`, and automatically opens the `Chuyến đi` tab.
+- The saved-trips fragment is recreated/refreshed on arrival, so the new card appears immediately without manually navigating back or changing tabs.
+- Serializable itinerary models now use stable `serialVersionUID` values. The Room reader skips incompatible payloads created by older development builds instead of failing the entire list.
+- Saved-trip cards now include `Xoá` with a Material confirmation dialog and refresh after deletion.
+- Itinerary detail now exposes Android's native share sheet with a readable text summary of budget, days and stops.
+- Emulator verification completed: a new three-day trip was generated, saved, and shown immediately in the selected Trips tab; the delete confirmation rendered; and the native share sheet displayed the generated itinerary text.
+- `testDebugUnitTest` and `assembleDebug` remain successful.
+
 ### Separation milestone
 
 A clean standalone Android Studio project was created at `MobileDevFinalProj/JournifyAndroid`. It contains only Journify application/domain/infrastructure/presentation classes and the required resources/build wrapper. Old An Tâm source was deliberately excluded.

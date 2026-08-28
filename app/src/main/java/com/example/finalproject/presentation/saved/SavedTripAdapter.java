@@ -17,7 +17,10 @@ import java.util.Date;
 import java.util.List;
 
 final class SavedTripAdapter extends RecyclerView.Adapter<SavedTripAdapter.Holder> {
-    interface Listener { void onOpen(SavedTrip trip); }
+    interface Listener {
+        void onOpen(SavedTrip trip);
+        void onDelete(SavedTrip trip);
+    }
     private final List<SavedTrip> trips = new ArrayList<>();
     private final Listener listener;
 
@@ -39,6 +42,7 @@ final class SavedTripAdapter extends RecyclerView.Adapter<SavedTripAdapter.Holde
         String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(trip.getSavedAt()));
         holder.meta.setText(trip.getItinerary().getDays().size() + " ngày  •  Lưu " + date);
         holder.itemView.setOnClickListener(v -> listener.onOpen(trip));
+        holder.delete.setOnClickListener(v -> listener.onDelete(trip));
     }
 
     @Override public int getItemCount() { return trips.size(); }
@@ -46,10 +50,12 @@ final class SavedTripAdapter extends RecyclerView.Adapter<SavedTripAdapter.Holde
     static final class Holder extends RecyclerView.ViewHolder {
         final TextView title;
         final TextView meta;
+        final View delete;
         Holder(View view) {
             super(view);
             title = view.findViewById(R.id.savedTripTitle);
             meta = view.findViewById(R.id.savedTripMeta);
+            delete = view.findViewById(R.id.savedTripDelete);
         }
     }
 }
