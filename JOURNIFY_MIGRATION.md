@@ -270,6 +270,10 @@ A clean standalone Android Studio project was created at `MobileDevFinalProj/Jou
 
 Independent verification: running `assembleDebug` from the `JournifyAndroid` folder completed successfully on 28 August 2026. Its APK is `JournifyAndroid/app/build/outputs/apk/debug/app-debug.apk`.
 
+### Old-project cleanup milestone
+
+The parent `MobileDevFinalProj` content was cleaned on 28 August 2026. All old An Tâm source, build/configuration folders, IDE metadata, documents, and the old Git repository were deleted. The container now holds only `JournifyAndroid`. A new Git repository with an initial Journify baseline commit exists inside this project.
+
 ## Constraints and cautions
 
 - Do not edit unrelated `.idea` changes; they existed before migration work.
