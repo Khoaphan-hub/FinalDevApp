@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#1F5D50</color>
+    <color name="primary_dark">#153F37</color>
+    <color name="primary_soft">#DDEBE5</color>
+    <color name="accent">#F28C68</color>
+    <color name="accent_soft">#FCE8DF</color>
+    
+    <color name="safe_green">#58CC02</color>
+    <color name="alert_red">#FF4B4B</color>
+    <color name="pending_yellow">#FFC800</color>
+    
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    
+    <!-- Softer dark text -->
+    <color name="text_primary">#1E2D29</color>
+    <color name="text_secondary">#687A74</color>
+    
+    <!-- Clean white backgrounds -->
+    <color name="background">#F8F5EE</color>
+    <color name="card_background">#FFFFFF</color>
+    
+    <!-- Light gray for input fields -->
+    <color name="input_background">#FFFFFF</color>
+    <color name="input_border">#D7E0DC</color>
+    <color name="surface_variant">#EEF3F0</color>
+    <color name="divider">#E5E9E6</color>
+</resources>

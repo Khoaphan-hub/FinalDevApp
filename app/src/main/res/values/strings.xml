@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Journify</string>
+    <string name="home">Khám phá</string>
+    <string name="trips">Chuyến đi</string>
+    <string name="profile">Hồ sơ</string>
+</resources>
