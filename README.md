@@ -5,7 +5,7 @@ Journify is a native Android journey planner for Đà Lạt. The Android client 
 ## Main flow
 
 1. Enter trip length, places per day, budget, mood and starting point.
-2. Optionally choose some attractions and eateries; Django fills any missing slots.
+2. Search the catalog with accent-insensitive Trie suggestions, optionally choose attractions and eateries, and let Django fill any missing slots.
 3. Generate an optimized multi-day itinerary.
 4. View place details, TikTok/Google Maps review links and the route map.
 5. Replace individual stops, then save the edited trip locally with Room.

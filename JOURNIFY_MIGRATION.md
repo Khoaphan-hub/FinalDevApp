@@ -251,6 +251,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M5 — Add Django mobile generation/catalog API adapter and connect Android.**
 - [x] **M6 — Add Room persistence plus loading/empty/error/offline states.**
 - [x] **M6.5 — Add partial place selection, rich place details/review links, and itinerary replacement.**
+- [x] **M6.6 — Restore Trie-powered live search in the Android place-selection flow.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -287,6 +288,15 @@ Next: M7 hardening and submission work. Add a small set of domain tests, documen
 - Itinerary detail now exposes Android's native share sheet with a readable text summary of budget, days and stops.
 - Emulator verification completed: a new three-day trip was generated, saved, and shown immediately in the selected Trips tab; the delete confirmation rendered; and the native share sheet displayed the generated itinerary text.
 - `testDebugUnitTest` and `assembleDebug` remain successful.
+
+### Trie place-search milestone — 29 August 2026
+
+- The Android place-selection screen now includes live, debounced search while users choose POIs and eateries before itinerary generation.
+- Django reuses the original accent-insensitive `PrefixTree`: full place names and individual name tokens are indexed, so an unaccented prefix such as `xuan` finds `Hồ Xuân Hương Đà Lạt`.
+- A stateless mobile endpoint at `/api/mobile/search-suggestions/` filters suggestions by POI/eatery type and returns the same rich place payload used by selection cards.
+- Search results cannot overwrite a newer query when the user types or switches tabs quickly. Selected place IDs remain checked when filtering, clearing search, or changing between POI and eatery tabs.
+- Empty and connection-error search states are rendered inside the selection screen, while clearing the query restores the cached full catalog without another request.
+- Verification completed with Django system checks, two PrefixTree tests, live HTTP queries, Android unit tests/build, and emulator interaction. On `emulator-5554`, `xuan` returned Hồ Xuân Hương; selecting it, switching to eateries, and returning to POIs preserved the `1/9` count and checked state.
 
 ### Separation milestone
 

@@ -15,6 +15,22 @@
             <com.google.android.material.chip.Chip android:id="@+id/selectionPoiChip" style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="Điểm tham quan" />
             <com.google.android.material.chip.Chip android:id="@+id/selectionEateryChip" style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ăn uống" />
         </com.google.android.material.chip.ChipGroup>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="20dp"
+            android:hint="Tìm nhanh theo tên địa điểm"
+            app:endIconMode="clear_text">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/selectionSearchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/selectionRecyclerView" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingStart="20dp" android:paddingTop="8dp" android:paddingEnd="20dp" android:paddingBottom="12dp" />
             <ProgressBar android:id="@+id/selectionProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />

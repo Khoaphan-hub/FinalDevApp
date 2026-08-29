@@ -32,11 +32,32 @@ public final class RemoteCatalogRepository implements CatalogRepository {
 
     @Override
     public void load(String type, String query, RepositoryCallback<List<Place>> callback) {
+        String encoded;
+        try {
+            encoded = URLEncoder.encode(query == null ? "" : query, StandardCharsets.UTF_8.name());
+        } catch (Exception error) {
+            callback.onError(error);
+            return;
+        }
+        request("api/mobile/catalog/?type=" + type + "&query=" + encoded + "&limit=80", callback);
+    }
+
+    public void suggest(String type, String query, RepositoryCallback<List<Place>> callback) {
+        String encoded;
+        try {
+            encoded = URLEncoder.encode(query == null ? "" : query, StandardCharsets.UTF_8.name());
+        } catch (Exception error) {
+            callback.onError(error);
+            return;
+        }
+        request("api/mobile/search-suggestions/?type=" + type + "&q=" + encoded + "&limit=25", callback);
+    }
+
+    private void request(String path, RepositoryCallback<List<Place>> callback) {
         executor.execute(() -> {
             HttpURLConnection connection = null;
             try {
-                String encoded = URLEncoder.encode(query == null ? "" : query, StandardCharsets.UTF_8.name());
-                URL url = new URL(baseUrl + "api/mobile/catalog/?type=" + type + "&query=" + encoded + "&limit=80");
+                URL url = new URL(baseUrl + path);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(6000);
                 connection.setReadTimeout(12000);

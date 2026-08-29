@@ -59,11 +59,18 @@ class PrefixTree:
             node = node.children.setdefault(char, TrieNode())
         node.payloads.append(payload)
 
-    def suggest(self, prefix: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Return payloads that match the given prefix."""
+    def suggest(
+        self,
+        prefix: str,
+        limit: int = 10,
+        item_type: str | None = None,
+    ) -> List[Dict[str, Any]]:
+        """Return payloads that match the prefix and optional place type."""
         key = normalize_term(prefix)
         if not key:
             return []
+
+        normalized_type = item_type.upper() if item_type else None
 
         node = self.root
         for char in key:
@@ -80,6 +87,8 @@ class PrefixTree:
                 return
 
             for payload in current.payloads:
+                if normalized_type and str(payload.get("type", "")).upper() != normalized_type:
+                    continue
                 identifier = (payload.get("type"), payload.get("id"))
                 if identifier in seen:
                     continue

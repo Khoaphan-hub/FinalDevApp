@@ -3,6 +3,10 @@ package com.example.finalproject.presentation.selection;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +21,6 @@ import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.Place;
 import com.example.finalproject.domain.model.TripRequest;
-import com.example.finalproject.domain.repository.CatalogRepository;
 import com.example.finalproject.infrastructure.demo.DemoPlannerRepository;
 import com.example.finalproject.infrastructure.remote.RemoteCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
@@ -27,6 +30,7 @@ import com.example.finalproject.presentation.catalog.PlaceAdapter;
 import com.example.finalproject.presentation.catalog.PlaceDetailActivity;
 import com.example.finalproject.presentation.itinerary.ItineraryActivity;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,15 +40,19 @@ public class PlaceSelectionActivity extends AppCompatActivity {
 
     private TripRequest request;
     private PlaceAdapter adapter;
-    private CatalogRepository catalogRepository;
+    private RemoteCatalogRepository catalogRepository;
     private GenerateItineraryUseCase generateUseCase;
     private View progress;
     private View loadingOverlay;
     private TextView selectionSummary;
     private TextView stateMessage;
     private View statePanel;
+    private TextInputEditText searchInput;
     private List<Place> cachedPois = Collections.emptyList();
     private List<Place> cachedEateries = Collections.emptyList();
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable pendingSearch;
+    private int requestVersion;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +69,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
         selectionSummary = findViewById(R.id.selectionSummary);
         stateMessage = findViewById(R.id.selectionStateMessage);
         statePanel = findViewById(R.id.selectionStatePanel);
+        searchInput = findViewById(R.id.selectionSearchInput);
 
         RecyclerView recycler = findViewById(R.id.selectionRecyclerView);
         recycler.setLayoutManager(new LinearLayoutManager(this));
@@ -92,13 +101,30 @@ public class PlaceSelectionActivity extends AppCompatActivity {
         });
         findViewById(R.id.selectionPoiChip).setOnClickListener(v -> showOrLoad("poi"));
         findViewById(R.id.selectionEateryChip).setOnClickListener(v -> showOrLoad("eatery"));
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence value, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence value, int start, int before, int count) { }
+            @Override public void afterTextChanged(Editable value) { scheduleSearch(); }
+        });
         updateSummary();
         loadCurrent(false);
     }
 
     private void showOrLoad(String type) {
+        String query = currentQuery();
+        if (!query.isEmpty()) {
+            search(type, query);
+            return;
+        }
         List<Place> cached = "poi".equals(type) ? cachedPois : cachedEateries;
-        if (cached.isEmpty()) load(type); else adapter.submit(cached);
+        if (cached.isEmpty()) {
+            load(type);
+        } else {
+            requestVersion++;
+            progress.setVisibility(View.GONE);
+            statePanel.setVisibility(View.GONE);
+            adapter.submit(cached);
+        }
     }
 
     private void loadCurrent(boolean force) {
@@ -110,10 +136,12 @@ public class PlaceSelectionActivity extends AppCompatActivity {
     }
 
     private void load(String type) {
+        int version = ++requestVersion;
         progress.setVisibility(View.VISIBLE);
         statePanel.setVisibility(View.GONE);
         catalogRepository.load(type, "", new RepositoryCallback<List<Place>>() {
             @Override public void onSuccess(List<Place> places) {
+                if (!isCurrent(version, type, "")) return;
                 progress.setVisibility(View.GONE);
                 if ("poi".equals(type)) cachedPois = places; else cachedEateries = places;
                 adapter.submit(places);
@@ -124,11 +152,64 @@ public class PlaceSelectionActivity extends AppCompatActivity {
             }
 
             @Override public void onError(Exception error) {
+                if (!isCurrent(version, type, "")) return;
                 progress.setVisibility(View.GONE);
+                adapter.submit(Collections.emptyList());
                 stateMessage.setText("Không tải được danh sách từ Django. Bật backend rồi thử lại, hoặc chọn tự động tạo.");
                 statePanel.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    private void scheduleSearch() {
+        requestVersion++;
+        if (pendingSearch != null) searchHandler.removeCallbacks(pendingSearch);
+        String query = currentQuery();
+        String type = currentType();
+        if (query.isEmpty()) {
+            showOrLoad(type);
+            return;
+        }
+        pendingSearch = () -> search(type, query);
+        searchHandler.postDelayed(pendingSearch, 280);
+    }
+
+    private void search(String type, String query) {
+        int version = ++requestVersion;
+        progress.setVisibility(View.VISIBLE);
+        statePanel.setVisibility(View.GONE);
+        catalogRepository.suggest(type, query, new RepositoryCallback<List<Place>>() {
+            @Override public void onSuccess(List<Place> places) {
+                if (!isCurrent(version, type, query)) return;
+                progress.setVisibility(View.GONE);
+                adapter.submit(places);
+                if (places.isEmpty()) {
+                    stateMessage.setText("Không có gợi ý cho “" + query + "”. Hãy thử tên hoặc từ khóa khác.");
+                    statePanel.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override public void onError(Exception error) {
+                if (!isCurrent(version, type, query)) return;
+                progress.setVisibility(View.GONE);
+                adapter.submit(Collections.emptyList());
+                stateMessage.setText("Không thể tìm kiếm lúc này. Kiểm tra kết nối Django rồi thử lại.");
+                statePanel.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private boolean isCurrent(int version, String type, String query) {
+        return version == requestVersion && type.equals(currentType()) && query.equals(currentQuery())
+            && !isFinishing() && !isDestroyed();
+    }
+
+    private String currentType() {
+        return ((Chip) findViewById(R.id.selectionEateryChip)).isChecked() ? "eatery" : "poi";
+    }
+
+    private String currentQuery() {
+        return searchInput.getText() == null ? "" : searchInput.getText().toString().trim();
     }
 
     private void generate() {
@@ -175,5 +256,11 @@ public class PlaceSelectionActivity extends AppCompatActivity {
             return getIntent().getSerializableExtra(EXTRA_REQUEST, TripRequest.class);
         }
         return (TripRequest) getIntent().getSerializableExtra(EXTRA_REQUEST);
+    }
+
+    @Override protected void onDestroy() {
+        requestVersion++;
+        if (pendingSearch != null) searchHandler.removeCallbacks(pendingSearch);
+        super.onDestroy();
     }
 }

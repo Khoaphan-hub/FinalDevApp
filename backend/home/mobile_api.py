@@ -9,6 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from .algorithm import generate_itinerary
 from .constants import DEFAULT_FALLBACK_COORDS, DEFAULT_FALLBACK_LABEL, TRAVEL_MOOD_TAGS
 from .models import Eatery, Poi
+from .search import get_search_tree
 from .trip_planner import _auto_fill_selections, _build_trip_state, normalize_tag_value
 
 
@@ -79,6 +80,36 @@ def mobile_catalog(request):
         )
 
     items = [_serialize_catalog_item(request, item, item_type) for item in queryset[:limit]]
+    return JsonResponse({'success': True, 'data': {'items': items, 'count': len(items)}})
+
+
+@require_GET
+def mobile_search_suggestions(request):
+    item_type = request.GET.get('type', 'poi').lower()
+    query = request.GET.get('q', '').strip()
+    try:
+        limit = min(max(int(request.GET.get('limit', 20)), 1), 25)
+    except ValueError:
+        limit = 20
+
+    if item_type not in ('poi', 'eatery'):
+        return _error("type must be 'poi' or 'eatery'", field_errors={'type': 'Unsupported catalog type.'})
+    if not query:
+        return JsonResponse({'success': True, 'data': {'items': [], 'count': 0}})
+
+    suggestion_payloads = get_search_tree().suggest(
+        query,
+        limit=limit,
+        item_type=item_type.upper(),
+    )
+    model = Poi if item_type == 'poi' else Eatery
+    ordered_ids = [payload['id'] for payload in suggestion_payloads]
+    items_by_id = model.objects.in_bulk(ordered_ids)
+    items = [
+        _serialize_catalog_item(request, items_by_id[item_id], item_type)
+        for item_id in ordered_ids
+        if item_id in items_by_id
+    ]
     return JsonResponse({'success': True, 'data': {'items': items, 'count': len(items)}})
 
 
