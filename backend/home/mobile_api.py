@@ -9,6 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from .algorithm import generate_itinerary
 from .constants import DEFAULT_FALLBACK_COORDS, DEFAULT_FALLBACK_LABEL, TRAVEL_MOOD_TAGS
 from .models import Eatery, Poi
+from .mobile_share import build_resume_snapshot, build_resume_url, create_resume_token, qr_png_base64
 from .search import get_search_tree
 from .trip_planner import _auto_fill_selections, _build_trip_state, normalize_tag_value
 
@@ -111,6 +112,32 @@ def mobile_search_suggestions(request):
         if item_id in items_by_id
     ]
     return JsonResponse({'success': True, 'data': {'items': items, 'count': len(items)}})
+
+
+@csrf_exempt
+@require_POST
+def mobile_create_itinerary_share(request):
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+        snapshot = build_resume_snapshot(payload)
+        resume = create_resume_token(snapshot)
+        share_url = build_resume_url(request, resume.token)
+        qr_base64 = qr_png_base64(share_url)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return _error('Request body must be valid JSON.')
+    except ValueError as error:
+        return _error(str(error))
+    except ImportError:
+        return _error('QR generator is unavailable on this server.', status=503)
+
+    return JsonResponse({
+        'success': True,
+        'data': {
+            'share_url': share_url,
+            'qr_base64': qr_base64,
+            'expires_at': resume.expires_at.isoformat(),
+        },
+    })
 
 
 @csrf_exempt

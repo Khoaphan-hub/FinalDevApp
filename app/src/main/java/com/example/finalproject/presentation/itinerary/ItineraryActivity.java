@@ -2,6 +2,10 @@ package com.example.finalproject.presentation.itinerary;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.example.finalproject.R;
 import com.example.finalproject.domain.model.Itinerary;
@@ -26,6 +31,10 @@ import com.example.finalproject.presentation.map.MapActivity;
 import com.example.finalproject.presentation.catalog.PlaceDetailActivity;
 import com.example.finalproject.presentation.selection.ReplacementActivity;
 import com.example.finalproject.infrastructure.remote.RemoteImageLoader;
+import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
+import com.example.finalproject.infrastructure.remote.RemoteItineraryShareRepository;
+import com.example.finalproject.infrastructure.local.export.ItineraryPdfExporter;
+import com.example.finalproject.domain.model.ItineraryShareData;
 import com.example.finalproject.infrastructure.local.repository.RoomSavedTripRepository;
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import android.widget.Toast;
@@ -36,6 +45,9 @@ import com.google.android.material.chip.ChipGroup;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ItineraryActivity extends AppCompatActivity {
     public static final String EXTRA_ITINERARY = "itinerary";
@@ -46,6 +58,7 @@ public class ItineraryActivity extends AppCompatActivity {
     private int pendingDayNumber;
     private int pendingStopIndex;
     private ActivityResultLauncher<Intent> replacementLauncher;
+    private final ExecutorService pdfExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +122,7 @@ public class ItineraryActivity extends AppCompatActivity {
             startActivity(intent);
         });
         findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
+        findViewById(R.id.exportPdfButton).setOnClickListener(v -> exportPdf());
 
         ChipGroup chipGroup = findViewById(R.id.dayChipGroup);
         for (ItineraryDay day : itinerary.getDays()) {
@@ -249,6 +263,35 @@ public class ItineraryActivity extends AppCompatActivity {
         share.putExtra(Intent.EXTRA_SUBJECT, itinerary.getTitle());
         share.putExtra(Intent.EXTRA_TEXT, message.toString());
         startActivity(Intent.createChooser(share, "Chia sẻ chuyến đi qua"));
+    }
+
+    private void exportPdf() {
+        MaterialButton button = findViewById(R.id.exportPdfButton);
+        button.setEnabled(false); button.setText("Đang tạo PDF…");
+        new RemoteItineraryShareRepository(RemotePlannerRepository.DEFAULT_BASE_URL).create(itinerary,
+            new RepositoryCallback<ItineraryShareData>() {
+                @Override public void onSuccess(ItineraryShareData data) {
+                    pdfExecutor.execute(() -> {
+                        try {
+                            byte[] bytes = Base64.decode(data.getQrBase64(), Base64.DEFAULT);
+                            Bitmap qr = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            File file = new ItineraryPdfExporter().export(ItineraryActivity.this, itinerary, qr, data.getShareUrl());
+                            runOnUiThread(() -> { resetPdfButton(button); sharePdf(file); });
+                        } catch (Exception e) { runOnUiThread(() -> showPdfError(button, e)); }
+                    });
+                }
+                @Override public void onError(Exception e) { showPdfError(button, e); }
+            });
+    }
+
+    private void resetPdfButton(MaterialButton button) { button.setEnabled(true); button.setText("Xuất PDF có mã QR"); }
+    private void showPdfError(MaterialButton button, Exception e) { resetPdfButton(button); Toast.makeText(this, "Không thể tạo PDF. Hãy kiểm tra backend.", Toast.LENGTH_LONG).show(); }
+    private void sharePdf(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+        Intent share = new Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri)
+            .putExtra(Intent.EXTRA_SUBJECT, itinerary.getTitle()).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        share.setClipData(android.content.ClipData.newRawUri("Journify PDF", uri));
+        startActivity(Intent.createChooser(share, "Lưu hoặc chia sẻ PDF"));
     }
 
     private String marker(ItineraryStop stop) {

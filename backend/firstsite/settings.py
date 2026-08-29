@@ -25,6 +25,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'journify-local-development-onl
 
 # Google Gemini AI API Key for geocoding
 GEMINI_API_KEY_1 = os.environ.get('GEMINI_API_KEY_1', '')
+JOURNIFY_PUBLIC_BASE_URL = os.environ.get('JOURNIFY_PUBLIC_BASE_URL', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

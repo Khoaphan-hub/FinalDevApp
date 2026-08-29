@@ -8,3 +8,4 @@ scipy==1.16.3
 geopy==2.4.1
 Pillow>=9.0.0
 rapidfuzz
+qrcode>=7.4.2

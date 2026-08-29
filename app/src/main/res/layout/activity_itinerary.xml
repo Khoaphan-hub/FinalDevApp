@@ -49,6 +49,13 @@
         app:strokeColor="@color/primary" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/exportPdfButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent" android:layout_height="50dp"
+        android:layout_marginStart="20dp" android:layout_marginTop="8dp" android:layout_marginEnd="20dp"
+        android:text="Xuất PDF có mã QR" android:textColor="@color/primary" app:cornerRadius="16dp" app:strokeColor="@color/primary" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/shareTripButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"

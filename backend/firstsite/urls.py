@@ -23,7 +23,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from home import views
-from home.mobile_api import mobile_catalog, mobile_generate_itinerary, mobile_search_suggestions
+from home.mobile_api import (
+    mobile_catalog,
+    mobile_create_itinerary_share,
+    mobile_generate_itinerary,
+    mobile_search_suggestions,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -57,6 +62,7 @@ urlpatterns = [
     path('api/itinerary-qr/', generate_qr_code_api, name='qr-code-api'),
     path('api/mobile/catalog/', mobile_catalog, name='mobile-catalog'),
     path('api/mobile/search-suggestions/', mobile_search_suggestions, name='mobile-search-suggestions'),
+    path('api/mobile/itineraries/share/', mobile_create_itinerary_share, name='mobile-itinerary-share'),
     path('api/mobile/itineraries/generate/', mobile_generate_itinerary, name='mobile-generate-itinerary'),
 ]
 

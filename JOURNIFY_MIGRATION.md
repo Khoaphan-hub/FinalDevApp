@@ -252,6 +252,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M6 — Add Room persistence plus loading/empty/error/offline states.**
 - [x] **M6.5 — Add partial place selection, rich place details/review links, and itinerary replacement.**
 - [x] **M6.6 — Restore Trie-powered live search in the Android place-selection flow.**
+- [x] **M6.7 — Add native PDF export with resumable QR and Đà Lạt weather.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -297,6 +298,18 @@ Next: M7 hardening and submission work. Add a small set of domain tests, documen
 - Search results cannot overwrite a newer query when the user types or switches tabs quickly. Selected place IDs remain checked when filtering, clearing search, or changing between POI and eatery tabs.
 - Empty and connection-error search states are rendered inside the selection screen, while clearing the query restores the cached full catalog without another request.
 - Verification completed with Django system checks, two PrefixTree tests, live HTTP queries, Android unit tests/build, and emulator interaction. On `emulator-5554`, `xuan` returned Hồ Xuân Hương; selecting it, switching to eateries, and returning to POIs preserved the `1/9` count and checked state.
+
+### PDF, QR resume and weather milestone — 29 August 2026
+
+- The result screen now exports an A4 PDF natively on Android, preserving Vietnamese text and presenting budget, every day/stop, distance and meal-slot information.
+- Before export, Android asks Django for a unique 30-day resume token. The PDF embeds the returned QR; scanning it loads the same itinerary snapshot through the existing web resume flow.
+- Django exposes `POST /api/mobile/itineraries/share/`, reuses `ItineraryResumeToken`, and supports `JOURNIFY_PUBLIC_BASE_URL` so deployed QR links point at a real HTTPS backend.
+- The app shares PDFs safely through Android `FileProvider`; files stay in app cache rather than requesting broad storage permission.
+- Home now displays live Open-Meteo conditions for Đà Lạt (temperature, feels-like, humidity, wind) and a three-day min/max/rain forecast, with loading, failure and retry states.
+- Verification: Django check and four tests passed; the live share endpoint returned a PNG QR and a valid resume redirect; Open-Meteo returned current data and three forecast days; Android unit tests and debug build passed. On `emulator-5554`, the weather card loaded, the final PDF button created a 161,316-byte three-page A4 PDF, and Android opened a one-file PDF share sheet.
+- A rendered PDF copy was visually inspected with Poppler. The emulator-only QR correctly contains the backend resume URL; for a phone demo, deploy Django and set `JOURNIFY_PUBLIC_BASE_URL` first.
+
+Next: deploy the backend, replace the debug base URL for a physical-phone build, then finish M7 release/report/demo packaging.
 
 ### Separation milestone
 

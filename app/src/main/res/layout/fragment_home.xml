@@ -32,6 +32,25 @@
             android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/weatherCard"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp"
+            app:cardBackgroundColor="@color/card_background" app:cardCornerRadius="22dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:id="@+id/weatherIcon" android:layout_width="52dp" android:layout_height="wrap_content" android:text="🌤️" android:textSize="34sp" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="THỜI TIẾT ĐÀ LẠT" android:textColor="@color/primary" android:textSize="11sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/weatherTemp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đang cập nhật…" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/weatherCondition" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_secondary" android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <TextView android:id="@+id/weatherDetails" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
+                <TextView android:id="@+id/weatherForecast" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:lineSpacingExtra="3dp" android:textColor="@color/text_primary" android:textSize="13sp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/weatherRetryButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Thử lại" android:textColor="@color/primary" android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="170dp"
             android:layout_marginTop="18dp"
