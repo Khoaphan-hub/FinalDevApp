@@ -254,6 +254,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M6.6 — Restore Trie-powered live search in the Android place-selection flow.**
 - [x] **M6.7 — Add native PDF export with resumable QR and Đà Lạt weather.**
 - [x] **M6.8 — Add persistent Vietnamese/English UI and Trie search to the Home catalog.**
+- [x] **M6.9 — Support direct Android Studio testing on emulator and physical phone.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -329,6 +330,14 @@ Next: M7 release/report/demo packaging and deployment of Django to a public HTTP
 - The current language is shown with a solid Journify-green segment while the alternative remains visible, making both the active mode and the switching action immediately understandable.
 - Added a language/globe icon, a rounded outlined container, larger touch targets, and screen-reader descriptions for both choices.
 - Verified both English and Vietnamese states on `emulator-5554`; the control fits beside the Journify title without overlap and switching still recreates the UI with the selected locale.
+
+### Physical-phone development milestone — 31 August 2026
+
+- The Android network configuration now distinguishes an emulator from a real phone. Emulators continue to use `10.0.2.2:8000`, while the current physical-device development address is `192.168.1.10:8000`.
+- This keeps both test paths available without editing the base URL every time the developer changes the selected Android Studio device.
+- USB debugging was authorized on a Samsung Galaxy S23 (`SM-S911B`), Android Studio/ADB installed and opened Journify directly, and the phone joined the same `192.168.1.0/24` Wi-Fi network as the backend computer.
+- Real-device verification succeeded: the catalog loaded Django data and remote images, and the selection screen's live Trie search returned matching hill locations for `đồi`.
+- The physical LAN address remains development-only and may change after reconnecting Wi-Fi. Release builds still require a deployed HTTPS backend.
 
 ### Separation milestone
 

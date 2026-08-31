@@ -27,7 +27,9 @@ python -m venv .venv
 .\.venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000 --noreload
 ```
 
-The debug Android build uses `http://10.0.2.2:8000/`, which maps the Android emulator to this computer. A physical phone requires the computer's LAN address or a deployed HTTPS backend; update `RemotePlannerRepository.DEFAULT_BASE_URL` before that build.
+The development build selects its backend automatically: the Android emulator uses `http://10.0.2.2:8000/`, while a physical phone uses the current development computer address `http://192.168.1.10:8000/`. For direct phone testing, connect the phone with USB debugging, keep the phone and computer on the same Wi-Fi, run Django on `0.0.0.0:8000`, select the phone in Android Studio, and press Run. If the computer receives a different LAN address, update `PHYSICAL_PHONE_BASE_URL` in `RemotePlannerRepository`.
+
+The LAN address is only a development convenience. A distributed APK must use a deployed HTTPS backend rather than a private `192.168.x.x` address.
 
 PDF QR links use the incoming backend address by default. For a submission/deployed backend, set `JOURNIFY_PUBLIC_BASE_URL` to its public HTTPS origin before starting Django, for example `https://journify.example.com`. A QR containing `10.0.2.2` works only inside the Android emulator and cannot be opened by another phone.
 

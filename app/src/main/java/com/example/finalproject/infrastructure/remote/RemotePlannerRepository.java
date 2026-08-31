@@ -2,6 +2,7 @@ package com.example.finalproject.infrastructure.remote;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Build;
 
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.Itinerary;
@@ -23,17 +24,33 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class RemotePlannerRepository implements PlannerRepository {
-    public static final String DEFAULT_BASE_URL = "http://10.0.2.2:8000/";
+    private static final String EMULATOR_BASE_URL = "http://10.0.2.2:8000/";
+    private static final String PHYSICAL_PHONE_BASE_URL = "http://192.168.1.10:8000/";
+    public static final String DEFAULT_BASE_URL = isEmulator()
+        ? EMULATOR_BASE_URL : PHYSICAL_PHONE_BASE_URL;
     private final String baseUrl;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public RemotePlannerRepository(String baseUrl) {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    }
+
+    private static boolean isEmulator() {
+        String fingerprint = Build.FINGERPRINT.toLowerCase(Locale.US);
+        String model = Build.MODEL.toLowerCase(Locale.US);
+        String product = Build.PRODUCT.toLowerCase(Locale.US);
+        return fingerprint.startsWith("generic")
+            || fingerprint.contains("emulator")
+            || model.contains("emulator")
+            || model.contains("google_sdk")
+            || product.contains("sdk_gphone")
+            || product.equals("google_sdk");
     }
 
     @Override
