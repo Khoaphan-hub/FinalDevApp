@@ -323,6 +323,13 @@ Next: deploy the backend, replace the debug base URL for a physical-phone build,
 
 Next: M7 release/report/demo packaging and deployment of Django to a public HTTPS host for use by physical phones.
 
+### Language switch visual refinement — 31 August 2026
+
+- Replaced the small single-language toolbar action with a persistent segmented `VN / EN` control.
+- The current language is shown with a solid Journify-green segment while the alternative remains visible, making both the active mode and the switching action immediately understandable.
+- Added a language/globe icon, a rounded outlined container, larger touch targets, and screen-reader descriptions for both choices.
+- Verified both English and Vietnamese states on `emulator-5554`; the control fits beside the Journify title without overlap and switching still recreates the UI with the selected locale.
+
 ### Separation milestone
 
 A clean standalone Android Studio project was created at `MobileDevFinalProj/JournifyAndroid`. It contains only Journify application/domain/infrastructure/presentation classes and the required resources/build wrapper. Old An Tâm source was deliberately excluded.

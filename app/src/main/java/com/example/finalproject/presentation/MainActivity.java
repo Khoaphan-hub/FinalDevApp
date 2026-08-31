@@ -13,6 +13,7 @@ import com.example.finalproject.R;
 import com.example.finalproject.presentation.home.HomeFragment;
 import com.example.finalproject.presentation.saved.SavedTripsFragment;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Locale;
 
@@ -31,12 +32,7 @@ public class MainActivity extends AppCompatActivity {
         SystemBarInsets.apply(findViewById(R.id.mainRoot));
 
         topAppBar = findViewById(R.id.topAppBar);
-        topAppBar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() != R.id.action_language) return false;
-            String target = "en".equals(Locale.getDefault().getLanguage()) ? "vi" : "en";
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(target));
-            return true;
-        });
+        setupLanguageSwitch();
 
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> showDestination(item.getItemId()));
@@ -44,6 +40,18 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             navigateFromIntent(getIntent());
         }
+    }
+
+    private void setupLanguageSwitch() {
+        MaterialButtonToggleGroup languageToggle = findViewById(R.id.languageToggleGroup);
+        boolean english = "en".equals(Locale.getDefault().getLanguage());
+        languageToggle.check(english ? R.id.languageEnglishButton : R.id.languageVietnameseButton);
+        languageToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (!isChecked) return;
+            String target = checkedId == R.id.languageEnglishButton ? "en" : "vi";
+            if (target.equals(Locale.getDefault().getLanguage())) return;
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(target));
+        });
     }
 
     @Override protected void onNewIntent(Intent intent) {
