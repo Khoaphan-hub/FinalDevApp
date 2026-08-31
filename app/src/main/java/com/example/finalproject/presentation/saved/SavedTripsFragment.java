@@ -44,10 +44,10 @@ public class SavedTripsFragment extends Fragment {
 
             @Override public void onDelete(SavedTrip trip) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Xoá chuyến đi?")
-                    .setMessage("Lịch trình này sẽ bị xoá khỏi thiết bị.")
-                    .setNegativeButton("Giữ lại", null)
-                    .setPositiveButton("Xoá", (dialog, which) -> deleteTrip(trip))
+                    .setTitle(R.string.delete_trip_title)
+                    .setMessage(R.string.delete_trip_message)
+                    .setNegativeButton(R.string.keep, null)
+                    .setPositiveButton(R.string.delete, (dialog, which) -> deleteTrip(trip))
                     .show();
             }
         });
@@ -60,13 +60,13 @@ public class SavedTripsFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         new RoomSavedTripRepository(requireContext()).delete(trip.getId(), new RepositoryCallback<Void>() {
             @Override public void onSuccess(Void ignored) {
-                Toast.makeText(requireContext(), "Đã xoá chuyến đi.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.trip_deleted, Toast.LENGTH_SHORT).show();
                 load();
             }
 
             @Override public void onError(Exception error) {
                 progress.setVisibility(View.GONE);
-                Toast.makeText(requireContext(), "Không thể xoá chuyến đi.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.trip_delete_error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -88,7 +88,7 @@ public class SavedTripsFragment extends Fragment {
             @Override public void onError(Exception error) {
                 progress.setVisibility(View.GONE);
                 empty.setVisibility(View.VISIBLE);
-                Toast.makeText(requireContext(), "Không thể đọc chuyến đi đã lưu.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.saved_read_error, Toast.LENGTH_SHORT).show();
             }
         });
     }

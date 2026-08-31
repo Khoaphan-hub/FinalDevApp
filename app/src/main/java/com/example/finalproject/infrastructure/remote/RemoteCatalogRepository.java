@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Locale;
 
 public final class RemoteCatalogRepository implements CatalogRepository {
     private final String baseUrl;
@@ -69,8 +70,11 @@ public final class RemoteCatalogRepository implements CatalogRepository {
                 List<Place> places = new ArrayList<>();
                 for (int i = 0; i < items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
+                    boolean english = "en".equals(Locale.getDefault().getLanguage());
+                    String name = localized(item, english ? "name_en" : "name", "name");
+                    String address = localized(item, english ? "address_en" : "address", "address");
                     places.add(new Place(item.optInt("id"), item.optString("type"),
-                        item.optString("name"), item.optString("address"), item.optDouble("rating"),
+                        name, address, item.optDouble("rating"),
                         Math.round(item.optDouble("price")), nullable(item, "image_url"),
                         item.optDouble("latitude"), item.optDouble("longitude"),
                         nullable(item, "open_hours"), nullable(item, "tags"),
@@ -98,5 +102,10 @@ public final class RemoteCatalogRepository implements CatalogRepository {
 
     private String nullable(JSONObject object, String key) {
         return object.isNull(key) ? null : object.optString(key, null);
+    }
+
+    private String localized(JSONObject object, String preferred, String fallback) {
+        String value = nullable(object, preferred);
+        return value == null || value.trim().isEmpty() ? object.optString(fallback) : value;
     }
 }

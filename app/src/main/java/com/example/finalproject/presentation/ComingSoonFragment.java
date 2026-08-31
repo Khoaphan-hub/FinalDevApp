@@ -39,7 +39,7 @@ public class ComingSoonFragment extends Fragment {
             arguments == null ? "Journify" : arguments.getString(ARG_TITLE, "Journify")
         );
         ((TextView) view.findViewById(R.id.pageMessage)).setText(
-            arguments == null ? "Tính năng đang được hoàn thiện." : arguments.getString(ARG_MESSAGE, "")
+            arguments == null ? getString(R.string.coming_soon) : arguments.getString(ARG_MESSAGE, "")
         );
     }
 }

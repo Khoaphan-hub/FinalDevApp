@@ -11,25 +11,25 @@
         <TextView android:id="@+id/resultBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
             <TextView android:id="@+id/itineraryTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
-            <TextView android:id="@+id/offlineBadge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="BẢN XEM TRƯỚC • OFFLINE" android:textColor="@color/accent" android:textSize="11sp" android:textStyle="bold" />
+            <TextView android:id="@+id/offlineBadge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/offline_preview" android:textColor="@color/accent" android:textSize="11sp" android:textStyle="bold" />
         </LinearLayout>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveTripButton"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="Lưu"
+            android:text="@string/save"
             android:textColor="@color/primary" />
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" app:cardBackgroundColor="@color/primary" app:cardCornerRadius="22dp" app:cardElevation="0dp">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="18dp">
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CHI PHÍ DỰ KIẾN" android:textColor="@color/primary_soft" android:textSize="11sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/estimated_cost" android:textColor="@color/primary_soft" android:textSize="11sp" />
                 <TextView android:id="@+id/estimatedCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CÒN LẠI" android:textColor="@color/primary_soft" android:textSize="11sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/remaining" android:textColor="@color/primary_soft" android:textSize="11sp" />
                 <TextView android:id="@+id/remainingCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -43,7 +43,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
-        android:text="Xem tuyến đường trên bản đồ"
+        android:text="@string/view_route_map"
         android:textColor="@color/primary"
         app:cornerRadius="16dp"
         app:strokeColor="@color/primary" />
@@ -53,7 +53,7 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="match_parent" android:layout_height="50dp"
         android:layout_marginStart="20dp" android:layout_marginTop="8dp" android:layout_marginEnd="20dp"
-        android:text="Xuất PDF có mã QR" android:textColor="@color/primary" app:cornerRadius="16dp" app:strokeColor="@color/primary" />
+        android:text="@string/export_pdf_qr" android:textColor="@color/primary" app:cornerRadius="16dp" app:strokeColor="@color/primary" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/shareTripButton"
@@ -62,7 +62,7 @@
         android:layout_height="48dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Chia sẻ lịch trình"
+        android:text="@string/share_itinerary"
         android:textColor="@color/primary" />
 
     <com.google.android.material.chip.ChipGroup android:id="@+id/dayChipGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="12dp" android:layout_marginEnd="20dp" app:chipSpacingHorizontal="8dp" app:singleSelection="true" app:selectionRequired="true" />

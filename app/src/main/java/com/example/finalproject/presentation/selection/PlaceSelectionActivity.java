@@ -84,7 +84,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
                 int current = adapter.selectedCount(place.getType().toLowerCase());
                 if (selected && current >= max) {
                     Toast.makeText(PlaceSelectionActivity.this,
-                        "Bạn đã chọn đủ " + max + " địa điểm loại này.", Toast.LENGTH_SHORT).show();
+                        getString(R.string.selection_limit, max), Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 recycler.post(PlaceSelectionActivity.this::updateSummary);
@@ -146,7 +146,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
                 if ("poi".equals(type)) cachedPois = places; else cachedEateries = places;
                 adapter.submit(places);
                 if (places.isEmpty()) {
-                    stateMessage.setText("Chưa có dữ liệu. Bạn vẫn có thể để Journify tự tạo.");
+                    stateMessage.setText(R.string.selection_empty);
                     statePanel.setVisibility(View.VISIBLE);
                 }
             }
@@ -155,7 +155,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
                 if (!isCurrent(version, type, "")) return;
                 progress.setVisibility(View.GONE);
                 adapter.submit(Collections.emptyList());
-                stateMessage.setText("Không tải được danh sách từ Django. Bật backend rồi thử lại, hoặc chọn tự động tạo.");
+                stateMessage.setText(R.string.selection_load_error);
                 statePanel.setVisibility(View.VISIBLE);
             }
         });
@@ -184,7 +184,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
                 adapter.submit(places);
                 if (places.isEmpty()) {
-                    stateMessage.setText("Không có gợi ý cho “" + query + "”. Hãy thử tên hoặc từ khóa khác.");
+                    stateMessage.setText(getString(R.string.selection_no_suggestion, query));
                     statePanel.setVisibility(View.VISIBLE);
                 }
             }
@@ -193,7 +193,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
                 if (!isCurrent(version, type, query)) return;
                 progress.setVisibility(View.GONE);
                 adapter.submit(Collections.emptyList());
-                stateMessage.setText("Không thể tìm kiếm lúc này. Kiểm tra kết nối Django rồi thử lại.");
+                stateMessage.setText(R.string.selection_search_error);
                 statePanel.setVisibility(View.VISIBLE);
             }
         });
@@ -232,7 +232,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
             @Override public void onError(Exception error) {
                 setGenerating(false);
                 Toast.makeText(PlaceSelectionActivity.this,
-                    error.getMessage() == null ? "Không thể tạo lịch trình." : error.getMessage(), Toast.LENGTH_LONG).show();
+                    error.getMessage() == null ? getString(R.string.generation_error) : error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -240,9 +240,8 @@ public class PlaceSelectionActivity extends AppCompatActivity {
     private void updateSummary() {
         int poiMax = request.getDays() * request.getDailyPoiLimit();
         int eateryMax = request.getDays() * 3;
-        selectionSummary.setText("Đã chọn " + adapter.selectedCount("poi") + "/" + poiMax
-            + " điểm tham quan • " + adapter.selectedCount("eatery") + "/" + eateryMax
-            + " quán ăn\nJournify sẽ tự điền những chỗ còn thiếu.");
+        selectionSummary.setText(getString(R.string.selection_summary, adapter.selectedCount("poi"), poiMax,
+            adapter.selectedCount("eatery"), eateryMax));
     }
 
     private void setGenerating(boolean generating) {

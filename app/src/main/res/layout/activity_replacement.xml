@@ -10,8 +10,8 @@
         <TextView android:id="@+id/replacementBack" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
         <TextView android:id="@+id/replacementTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textColor="@color/text_primary" android:textSize="25sp" android:textStyle="bold" />
     </LinearLayout>
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:text="Chạm vào một địa điểm để thay thế. Lịch trình và khoảng cách sẽ được cập nhật." android:textColor="@color/text_secondary" android:textSize="14sp" />
-    <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="12dp" android:layout_marginEnd="20dp" android:hint="Tìm tên hoặc địa chỉ" app:endIconMode="clear_text">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:text="@string/replacement_help" android:textColor="@color/text_secondary" android:textSize="14sp" />
+    <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="12dp" android:layout_marginEnd="20dp" android:hint="@string/catalog_search_hint" app:endIconMode="clear_text">
         <com.google.android.material.textfield.TextInputEditText android:id="@+id/replacementSearch" android:layout_width="match_parent" android:layout_height="wrap_content" android:imeOptions="actionSearch" android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
     <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
@@ -19,7 +19,7 @@
         <ProgressBar android:id="@+id/replacementProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />
         <LinearLayout android:id="@+id/replacementStatePanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="30dp" android:visibility="gone">
             <TextView android:id="@+id/replacementState" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="@color/text_secondary" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/replacementRetry" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Thử lại" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/replacementRetry" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/retry" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

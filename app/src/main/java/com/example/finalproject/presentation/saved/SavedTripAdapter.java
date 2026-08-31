@@ -40,7 +40,8 @@ final class SavedTripAdapter extends RecyclerView.Adapter<SavedTripAdapter.Holde
         SavedTrip trip = trips.get(position);
         holder.title.setText(trip.getItinerary().getTitle());
         String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(trip.getSavedAt()));
-        holder.meta.setText(trip.getItinerary().getDays().size() + " ngày  •  Lưu " + date);
+        holder.meta.setText(holder.itemView.getContext().getString(R.string.saved_meta,
+            trip.getItinerary().getDays().size(), date));
         holder.itemView.setOnClickListener(v -> listener.onOpen(trip));
         holder.delete.setOnClickListener(v -> listener.onDelete(trip));
     }

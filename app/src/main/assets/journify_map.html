@@ -14,9 +14,11 @@
 <script>
 const map=L.map('map',{zoomControl:true}).setView([11.9404,108.4583],13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
-async function renderRoute(stops){
+async function renderRoute(stops,language='vi'){
+  const text=language==='en'?{none:'No coordinates to display',fallback:'Showing fallback straight lines',loading:'Loading route…'}:{none:'Không có tọa độ để hiển thị',fallback:'Đang hiển thị đường nối dự phòng',loading:'Đang tải tuyến đường…'};
+  document.getElementById('status').textContent=text.loading;
   const valid=stops.filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon));
-  if(!valid.length){document.getElementById('status').textContent='Không có tọa độ để hiển thị';return;}
+  if(!valid.length){document.getElementById('status').textContent=text.none;return;}
   const bounds=[];
   valid.forEach((s,i)=>{
     const icon=L.divIcon({className:'',html:`<div class="number">${i+1}</div>`,iconSize:[34,34],iconAnchor:[17,17]});
@@ -31,10 +33,10 @@ async function renderRoute(stops){
     if(!json.routes||!json.routes.length) throw new Error('no route');
     const line=L.geoJSON(json.routes[0].geometry,{style:{color:'#f28c68',weight:6,opacity:.9}}).addTo(map);
     map.fitBounds(line.getBounds(),{padding:[28,28]});
-    document.getElementById('status').textContent=`${(json.routes[0].distance/1000).toFixed(1)} km • ${Math.round(json.routes[0].duration/60)} phút`;
+    document.getElementById('status').textContent=`${(json.routes[0].distance/1000).toFixed(1)} km • ${Math.round(json.routes[0].duration/60)} ${language==='en'?'min':'phút'}`;
   }catch(error){
     L.polyline(bounds,{color:'#f28c68',weight:5,dashArray:'8 8'}).addTo(map);
-    document.getElementById('status').textContent='Đang hiển thị đường nối dự phòng';
+    document.getElementById('status').textContent=text.fallback;
   }
 }
 </script></body></html>

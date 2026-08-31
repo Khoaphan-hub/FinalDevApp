@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.finalproject.R;
@@ -12,6 +14,7 @@ import com.example.finalproject.presentation.home.HomeFragment;
 import com.example.finalproject.presentation.saved.SavedTripsFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_DESTINATION = "main_destination";
@@ -28,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
         SystemBarInsets.apply(findViewById(R.id.mainRoot));
 
         topAppBar = findViewById(R.id.topAppBar);
+        topAppBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() != R.id.action_language) return false;
+            String target = "en".equals(Locale.getDefault().getLanguage()) ? "vi" : "en";
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(target));
+            return true;
+        });
 
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> showDestination(item.getItemId()));
@@ -62,13 +71,13 @@ public class MainActivity extends AppCompatActivity {
             topAppBar.setTitle("Journify");
         } else if (itemId == R.id.nav_trips) {
             selectedFragment = new SavedTripsFragment();
-            topAppBar.setTitle("Chuyến đi");
+            topAppBar.setTitle(R.string.trips);
         } else if (itemId == R.id.nav_profile) {
             selectedFragment = ComingSoonFragment.newInstance(
-                "Hồ sơ du lịch",
-                "Đăng nhập và đồng bộ tài khoản sẽ được kết nối với Django ở mốc API."
+                getString(R.string.profile_title),
+                getString(R.string.profile_message)
             );
-            topAppBar.setTitle("Hồ sơ");
+            topAppBar.setTitle(R.string.profile);
         } else return false;
         getSupportFragmentManager().beginTransaction()
             .replace(R.id.fragment_container, selectedFragment).commit();

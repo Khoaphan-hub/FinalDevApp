@@ -45,13 +45,15 @@ def get_search_tree():
 
     for poi in Poi.objects.all():
         payload = _serialize_poi_for_search(poi)
-        for variant in term_variants(poi.name):
-            tree.insert(variant, payload)
+        for name in (poi.name, poi.name_en):
+            for variant in term_variants(name):
+                tree.insert(variant, payload)
 
     for eatery in Eatery.objects.all():
         payload = _serialize_eatery_for_search(eatery)
-        for variant in term_variants(eatery.name):
-            tree.insert(variant, payload)
+        for name in (eatery.name, eatery.name_en):
+            for variant in term_variants(name):
+                tree.insert(variant, payload)
 
     return tree
 

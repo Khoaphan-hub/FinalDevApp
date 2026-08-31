@@ -253,6 +253,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M6.5 — Add partial place selection, rich place details/review links, and itinerary replacement.**
 - [x] **M6.6 — Restore Trie-powered live search in the Android place-selection flow.**
 - [x] **M6.7 — Add native PDF export with resumable QR and Đà Lạt weather.**
+- [x] **M6.8 — Add persistent Vietnamese/English UI and Trie search to the Home catalog.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -310,6 +311,17 @@ Next: M7 hardening and submission work. Add a small set of domain tests, documen
 - A rendered PDF copy was visually inspected with Poppler. The emulator-only QR correctly contains the backend resume URL; for a phone demo, deploy Django and set `JOURNIFY_PUBLIC_BASE_URL` first.
 
 Next: deploy the backend, replace the debug base URL for a physical-phone build, then finish M7 release/report/demo packaging.
+
+### Bilingual UI and Home catalog Trie milestone — 31 August 2026
+
+- The `Xem địa điểm`/`Explore places` catalog now performs the same debounced, accent-insensitive Trie search as the place-selection step. Results update while typing, clearing the query restores the cached catalog, and request versioning prevents an older response from replacing a newer query or tab.
+- Django's Trie now indexes both `name` and `name_en`, including individual tokens. Vietnamese `xuan` finds Hồ Xuân Hương and English `flower` finds the matching flower attractions without pressing Search.
+- A persistent `EN`/`VI` action is available in the main top bar. Android AppCompat stores the chosen locale and restores it across activity/app restarts.
+- Home, weather, catalog, planner, selection, details, itinerary, saved trips, replacement, map, PDF export, validation messages and offline demo data have Vietnamese and English resources.
+- English mode sends `language=en` to Django and prefers `name_en`/`address_en` in API responses. This keeps the translated itinerary and location data aligned with the original web backend rather than translating text on the device.
+- Verification completed with five Django tests and system checks, Android unit tests and debug build, and emulator interaction. On `emulator-5554`, switching to English survived a force-stop/relaunch; live `xuan` and `flower` searches returned the expected Vietnamese and English results.
+
+Next: M7 release/report/demo packaging and deployment of Django to a public HTTPS host for use by physical phones.
 
 ### Separation milestone
 

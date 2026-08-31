@@ -70,7 +70,7 @@ public final class RemotePlannerRepository implements PlannerRepository {
 
     private JSONObject requestJson(TripRequest request) throws Exception {
         JSONObject json = new JSONObject();
-        json.put("language", "vi");
+        json.put("language", "en".equals(java.util.Locale.getDefault().getLanguage()) ? "en" : "vi");
         json.put("days", request.getDays());
         json.put("daily_poi_limit", request.getDailyPoiLimit());
         json.put("budget", request.getBudgetVnd());

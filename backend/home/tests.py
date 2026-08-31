@@ -23,6 +23,12 @@ class PrefixTreeTests(SimpleTestCase):
         results = self.tree.suggest('ban', item_type='eatery')
         self.assertEqual([item['id'] for item in results], [2])
 
+    def test_suggest_supports_english_name_variants(self):
+        english = {'id': 3, 'type': 'POI', 'name': 'Da Lat Flower Park'}
+        for variant in term_variants(english['name']):
+            self.tree.insert(variant, english)
+        self.assertEqual([item['id'] for item in self.tree.suggest('flower')], [3])
+
 
 class MobileResumeSnapshotTests(SimpleTestCase):
     def test_android_itinerary_is_converted_to_web_resume_shape(self):

@@ -3,8 +3,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 public class WeatherCodeMapperTest {
     @Test public void mapsImportantWmoWeatherGroups(){
-        assertEquals("Trời quang",WeatherCodeMapper.label(0));
-        assertEquals("Có mưa",WeatherCodeMapper.label(61));
-        assertEquals("Có giông",WeatherCodeMapper.label(95));
+        assertEquals(com.example.finalproject.R.string.weather_clear,WeatherCodeMapper.labelRes(0));
+        assertEquals(com.example.finalproject.R.string.weather_rain,WeatherCodeMapper.labelRes(61));
+        assertEquals(com.example.finalproject.R.string.weather_storm,WeatherCodeMapper.labelRes(95));
     }
 }

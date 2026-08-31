@@ -59,7 +59,7 @@ public class PlannerActivity extends AppCompatActivity {
         Integer places = parseInteger(placesInput);
         Long budget = parseLong(budgetInput);
         if (days == null || places == null || budget == null) {
-            showError("Hãy nhập đầy đủ số ngày, số địa điểm và ngân sách.");
+            showError(getString(R.string.planner_required_error));
             return;
         }
 

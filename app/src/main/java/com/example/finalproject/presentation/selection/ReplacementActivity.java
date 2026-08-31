@@ -46,7 +46,7 @@ public class ReplacementActivity extends AppCompatActivity {
         if (!"eatery".equals(type)) type = "poi";
 
         ((TextView) findViewById(R.id.replacementTitle)).setText(
-            "eatery".equals(type) ? "Đổi quán ăn" : "Đổi điểm tham quan");
+            "eatery".equals(type) ? R.string.replacement_eatery : R.string.replacement_poi);
         progress = findViewById(R.id.replacementProgress);
         state = findViewById(R.id.replacementState);
         statePanel = findViewById(R.id.replacementStatePanel);
@@ -79,12 +79,12 @@ public class ReplacementActivity extends AppCompatActivity {
                 @Override public void onSuccess(List<Place> places) {
                     progress.setVisibility(View.GONE);
                     adapter.submit(places);
-                    if (places.isEmpty()) showState("Không tìm thấy lựa chọn phù hợp.");
+                    if (places.isEmpty()) showState(getString(R.string.replacement_no_results));
                 }
                 @Override public void onError(Exception error) {
                     progress.setVisibility(View.GONE);
                     adapter.submit(Collections.emptyList());
-                    showState("Không thể tải danh sách. Hãy kiểm tra Django và thử lại.");
+                    showState(getString(R.string.replacement_error));
                 }
             });
     }

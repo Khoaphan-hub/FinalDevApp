@@ -18,7 +18,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="Xoá"
+            android:text="@string/delete"
             android:textColor="@color/alert_red" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

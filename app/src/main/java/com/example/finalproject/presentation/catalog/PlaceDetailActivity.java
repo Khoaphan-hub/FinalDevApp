@@ -39,25 +39,25 @@ public class PlaceDetailActivity extends AppCompatActivity {
         ImageView image = findViewById(R.id.placeDetailImage);
         image.setImageResource("EATERY".equals(place.getType()) ? R.drawable.sample_eatery : R.drawable.sample_poi);
         RemoteImageLoader.load(place.getImageUrl(), image);
-        set(R.id.placeDetailType, "EATERY".equals(place.getType()) ? "ĂN UỐNG" : "ĐIỂM THAM QUAN");
+        set(R.id.placeDetailType, getString("EATERY".equals(place.getType()) ? R.string.detail_eatery : R.string.detail_poi));
         set(R.id.placeDetailName, place.getName());
         set(R.id.placeDetailAddress, place.getAddress());
         set(R.id.placeDetailRating, place.getRating() > 0
-            ? String.format(Locale.getDefault(), "★ %.1f", place.getRating()) : "Chưa có đánh giá");
+            ? String.format(Locale.getDefault(), "★ %.1f", place.getRating()) : getString(R.string.no_rating));
         set(R.id.placeDetailPrice, place.getPriceVnd() > 0
-            ? NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(place.getPriceVnd()) + " ₫/người"
-            : "Miễn phí hoặc chưa có giá");
-        bindOptional(R.id.placeDetailHours, "Giờ mở cửa: ", place.getOpenHours());
-        bindOptional(R.id.placeDetailTags, "Phù hợp: ", place.getTags());
-        bindOptional(R.id.placeDetailHighlight, "Điểm nổi bật\n", place.getHighlight());
+            ? getString(R.string.price_per_person, NumberFormat.getNumberInstance(Locale.getDefault()).format(place.getPriceVnd()))
+            : getString(R.string.price_unknown));
+        bindOptional(R.id.placeDetailHours, getString(R.string.opening_hours), place.getOpenHours());
+        bindOptional(R.id.placeDetailTags, getString(R.string.suitable_for), place.getTags());
+        bindOptional(R.id.placeDetailHighlight, getString(R.string.highlight), place.getHighlight());
 
         MaterialButton mediaButton = findViewById(R.id.placeMediaButton);
         if (isBlank(place.getMediaUrl())) mediaButton.setVisibility(View.GONE);
         else {
             String url = place.getMediaUrl();
-            mediaButton.setText(url.contains("tiktok.com") ? "Xem TikTok review"
+            mediaButton.setText(url.contains("tiktok.com") ? getString(R.string.view_tiktok_review)
                 : url.contains("google.com/maps") || url.contains("maps.app.goo.gl")
-                ? "Xem đánh giá trên Google Maps" : "Mở link đánh giá");
+                ? getString(R.string.view_google_review) : getString(R.string.open_review_link));
             mediaButton.setOnClickListener(v -> openUrl(url));
         }
         findViewById(R.id.placeDirectionsButton).setOnClickListener(v -> {
@@ -84,6 +84,6 @@ public class PlaceDetailActivity extends AppCompatActivity {
     private void openUrl(String url) { openIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
     private void openIntent(Intent intent) {
         try { startActivity(intent); }
-        catch (Exception error) { Toast.makeText(this, "Thiết bị chưa có ứng dụng phù hợp để mở.", Toast.LENGTH_SHORT).show(); }
+        catch (Exception error) { Toast.makeText(this, R.string.no_compatible_app, Toast.LENGTH_SHORT).show(); }
     }
 }

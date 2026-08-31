@@ -80,7 +80,7 @@ public class ItineraryActivity extends AppCompatActivity {
                 for (ItineraryDay day : itinerary.getDays()) {
                     if (day.getDayNumber() == pendingDayNumber) { renderDay(day); break; }
                 }
-                Toast.makeText(this, "Đã thay bằng " + place.getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.replaced_with, place.getName()), Toast.LENGTH_SHORT).show();
             });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -105,13 +105,13 @@ public class ItineraryActivity extends AppCompatActivity {
                     Intent home = new Intent(ItineraryActivity.this, MainActivity.class);
                     home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     home.putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_TRIPS);
-                    home.putExtra(MainActivity.EXTRA_MESSAGE, "Đã lưu chuyến đi trên thiết bị.");
+                    home.putExtra(MainActivity.EXTRA_MESSAGE, getString(R.string.trip_saved_message));
                     startActivity(home);
                     finish();
                 }
                 @Override public void onError(Exception error) {
                     v.setEnabled(true);
-                    Toast.makeText(ItineraryActivity.this, "Không thể lưu chuyến đi.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ItineraryActivity.this, R.string.trip_save_error, Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -128,7 +128,7 @@ public class ItineraryActivity extends AppCompatActivity {
         for (ItineraryDay day : itinerary.getDays()) {
             Chip chip = new Chip(this);
             chip.setId(android.view.View.generateViewId());
-            chip.setText("Ngày " + day.getDayNumber());
+            chip.setText(getString(R.string.day_label, day.getDayNumber()));
             chip.setCheckable(true);
             chip.setTag(day);
             chip.setOnClickListener(v -> renderDay((ItineraryDay) v.getTag()));
@@ -141,7 +141,7 @@ public class ItineraryActivity extends AppCompatActivity {
     private void renderDay(ItineraryDay day) {
         selectedDay = day;
         stopsContainer.removeAllViews();
-        TextView heading = text("Lịch trình ngày " + day.getDayNumber(), 20, true, R.color.text_primary);
+        TextView heading = text(getString(R.string.day_itinerary, day.getDayNumber()), 20, true, R.color.text_primary);
         heading.setPadding(0, dp(8), 0, dp(12));
         stopsContainer.addView(heading);
 
@@ -183,7 +183,7 @@ public class ItineraryActivity extends AppCompatActivity {
             address.setPadding(0, dp(4), 0, 0);
             content.addView(address);
             if (stop.getTravelToNextKm() > 0) {
-                TextView distance = text(String.format(Locale.getDefault(), "Tiếp theo • %.1f km", stop.getTravelToNextKm()),
+                TextView distance = text(getString(R.string.next_distance, stop.getTravelToNextKm()),
                     12, true, R.color.primary);
                 distance.setPadding(0, dp(9), 0, 0);
                 content.addView(distance);
@@ -194,11 +194,11 @@ public class ItineraryActivity extends AppCompatActivity {
                 actions.setPadding(0, dp(10), 0, 0);
                 MaterialButton details = new MaterialButton(this, null,
                     com.google.android.material.R.attr.materialButtonOutlinedStyle);
-                details.setText("Chi tiết");
+                details.setText(R.string.details);
                 details.setTextSize(12);
                 details.setOnClickListener(v -> openDetails(stop));
                 MaterialButton replace = new MaterialButton(this);
-                replace.setText("Thay đổi");
+                replace.setText(R.string.replace);
                 replace.setTextSize(12);
                 final int selectedIndex = index;
                 replace.setOnClickListener(v -> openReplacement(day.getDayNumber(), selectedIndex, stop));
@@ -247,9 +247,9 @@ public class ItineraryActivity extends AppCompatActivity {
 
     private void shareItinerary() {
         StringBuilder message = new StringBuilder(itinerary.getTitle())
-            .append("\nChi phí dự kiến: ").append(money(itinerary.getEstimatedCostVnd())).append("\n");
+            .append('\n').append(getString(R.string.share_cost_line, money(itinerary.getEstimatedCostVnd()))).append('\n');
         for (ItineraryDay day : itinerary.getDays()) {
-            message.append("\nNgày ").append(day.getDayNumber()).append(":\n");
+            message.append('\n').append(getString(R.string.day_label, day.getDayNumber())).append(":\n");
             for (ItineraryStop stop : day.getStops()) {
                 if (stop.getType() != ItineraryStop.Type.ACCOMMODATION) {
                     message.append("• ").append(stop.getName());
@@ -262,12 +262,12 @@ public class ItineraryActivity extends AppCompatActivity {
         share.setType("text/plain");
         share.putExtra(Intent.EXTRA_SUBJECT, itinerary.getTitle());
         share.putExtra(Intent.EXTRA_TEXT, message.toString());
-        startActivity(Intent.createChooser(share, "Chia sẻ chuyến đi qua"));
+        startActivity(Intent.createChooser(share, getString(R.string.share_via)));
     }
 
     private void exportPdf() {
         MaterialButton button = findViewById(R.id.exportPdfButton);
-        button.setEnabled(false); button.setText("Đang tạo PDF…");
+        button.setEnabled(false); button.setText(R.string.creating_pdf);
         new RemoteItineraryShareRepository(RemotePlannerRepository.DEFAULT_BASE_URL).create(itinerary,
             new RepositoryCallback<ItineraryShareData>() {
                 @Override public void onSuccess(ItineraryShareData data) {
@@ -284,14 +284,14 @@ public class ItineraryActivity extends AppCompatActivity {
             });
     }
 
-    private void resetPdfButton(MaterialButton button) { button.setEnabled(true); button.setText("Xuất PDF có mã QR"); }
-    private void showPdfError(MaterialButton button, Exception e) { resetPdfButton(button); Toast.makeText(this, "Không thể tạo PDF. Hãy kiểm tra backend.", Toast.LENGTH_LONG).show(); }
+    private void resetPdfButton(MaterialButton button) { button.setEnabled(true); button.setText(R.string.export_pdf_qr); }
+    private void showPdfError(MaterialButton button, Exception e) { resetPdfButton(button); Toast.makeText(this, R.string.pdf_error, Toast.LENGTH_LONG).show(); }
     private void sharePdf(File file) {
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
         Intent share = new Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri)
             .putExtra(Intent.EXTRA_SUBJECT, itinerary.getTitle()).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         share.setClipData(android.content.ClipData.newRawUri("Journify PDF", uri));
-        startActivity(Intent.createChooser(share, "Lưu hoặc chia sẻ PDF"));
+        startActivity(Intent.createChooser(share, getString(R.string.share_pdf)));
     }
 
     private String marker(ItineraryStop stop) {
@@ -301,9 +301,9 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     private String typeLabel(ItineraryStop stop) {
-        if (stop.getType() == ItineraryStop.Type.ACCOMMODATION) return "ĐIỂM XUẤT PHÁT";
-        if (stop.getType() == ItineraryStop.Type.EATERY) return "ĐIỂM ĂN UỐNG";
-        return "ĐỊA ĐIỂM THAM QUAN";
+        if (stop.getType() == ItineraryStop.Type.ACCOMMODATION) return getString(R.string.starting_location_type);
+        if (stop.getType() == ItineraryStop.Type.EATERY) return getString(R.string.eatery_stop_type);
+        return getString(R.string.poi_stop_type);
     }
 
     private TextView text(String value, int size, boolean bold, int colorResource) {
@@ -316,7 +316,7 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     private String money(long value) {
-        return NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(Math.max(0, value)) + " ₫";
+        return NumberFormat.getNumberInstance(Locale.getDefault()).format(Math.max(0, value)) + " ₫";
     }
 
     private int dp(int value) {

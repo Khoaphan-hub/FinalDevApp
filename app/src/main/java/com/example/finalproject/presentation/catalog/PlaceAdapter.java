@@ -49,8 +49,8 @@ public final class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.Holder
         Place place = places.get(position);
         holder.name.setText(place.getName());
         holder.address.setText(place.getAddress());
-        String rating = place.getRating() > 0 ? String.format(Locale.getDefault(), "★ %.1f", place.getRating()) : "Chưa có đánh giá";
-        String price = place.getPriceVnd() > 0 ? "  •  " + NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(place.getPriceVnd()) + " ₫" : "  •  Miễn phí";
+        String rating = place.getRating() > 0 ? String.format(Locale.getDefault(), "★ %.1f", place.getRating()) : holder.itemView.getContext().getString(R.string.no_rating);
+        String price = place.getPriceVnd() > 0 ? "  •  " + NumberFormat.getNumberInstance(Locale.getDefault()).format(place.getPriceVnd()) + " ₫" : "  •  " + holder.itemView.getContext().getString(R.string.free);
         holder.meta.setText(rating + price);
         holder.image.setTag(null);
         holder.image.setImageResource("EATERY".equals(place.getType()) ? R.drawable.sample_eatery : R.drawable.sample_poi);

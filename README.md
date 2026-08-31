@@ -12,6 +12,10 @@ Journify is a native Android journey planner for Đà Lạt. The Android client 
 6. Reopen or delete saved trips, share text, or export a polished PDF containing a 30-day QR resume link.
 7. See current Đà Lạt weather and a three-day forecast on the home screen.
 
+The Home catalog and the place-selection step both search live as the user types. Django's Trie indexes Vietnamese and English place names, so queries such as `xuan` and `flower` work without pressing a search button.
+
+Use the `EN`/`VI` action in the top bar to switch languages. The choice is stored by Android and restored after the app restarts. In English mode, the app requests an English itinerary from Django and prefers the English name/address fields from the catalog; it does not rely on automatic on-device translation.
+
 ## Run the Django backend
 
 From `backend` on Windows PowerShell:

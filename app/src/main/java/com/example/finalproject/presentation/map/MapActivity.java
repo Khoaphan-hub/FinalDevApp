@@ -35,7 +35,7 @@ public class MapActivity extends AppCompatActivity {
             day = (ItineraryDay) getIntent().getSerializableExtra(EXTRA_DAY);
         }
         if (day == null) { finish(); return; }
-        ((TextView) findViewById(R.id.mapTitle)).setText("Tuyến đường ngày " + day.getDayNumber());
+        ((TextView) findViewById(R.id.mapTitle)).setText(getString(R.string.route_day, day.getDayNumber()));
 
         JSONArray stops = new JSONArray();
         for (ItineraryStop stop : day.getStops()) {
@@ -54,7 +54,8 @@ public class MapActivity extends AppCompatActivity {
         webView.getSettings().setDomStorageEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("renderRoute(" + stops + ")", null);
+                String language = "en".equals(java.util.Locale.getDefault().getLanguage()) ? "en" : "vi";
+                view.evaluateJavascript("renderRoute(" + stops + ",'" + language + "')", null);
             }
         });
         webView.loadUrl("file:///android_asset/journify_map.html");

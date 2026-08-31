@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Bạn muốn đi như thế nào?"
+                android:text="@string/planner_title"
                 android:textColor="@color/text_primary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Cho Journify vài thông tin, phần đường đi để chúng mình lo."
+                android:text="@string/planner_subtitle"
                 android:textColor="@color/text_secondary"
                 android:textSize="15sp" />
 
@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:hint="Số ngày">
+                    android:hint="@string/days_hint">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/daysInput"
                         android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:hint="Điểm/ngày">
+                    android:hint="@string/places_per_day_hint">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/placesInput"
                         android:layout_width="match_parent"
@@ -82,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Ngân sách tổng (VNĐ)"
+                android:hint="@string/budget_hint"
                 app:suffixText="₫">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/budgetInput"
@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Tâm trạng chuyến đi"
+                android:text="@string/trip_mood"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -109,19 +109,19 @@
                 app:chipSpacingHorizontal="8dp"
                 app:chipSpacingVertical="8dp"
                 app:singleSelection="false">
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:tag="RELAXED" android:text="🌿 Thư giãn" />
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="FOODIE" android:text="🍜 Ẩm thực" />
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="ROMANTIC" android:text="💕 Lãng mạn" />
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="ACTIVE" android:text="🥾 Năng động" />
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="CULTURE" android:text="🏛 Văn hoá" />
-                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="HEALING" android:text="☁ Chữa lành" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:tag="RELAXED" android:text="@string/mood_relaxed" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="FOODIE" android:text="@string/mood_foodie" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="ROMANTIC" android:text="@string/mood_romantic" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="ACTIVE" android:text="@string/mood_active" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="CULTURE" android:text="@string/mood_culture" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="HEALING" android:text="@string/mood_healing" />
             </com.google.android.material.chip.ChipGroup>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:text="Điểm bắt đầu"
+                android:text="@string/starting_point"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -132,14 +132,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:checked="true"
-                android:text="Dùng Chợ Đà Lạt làm trung tâm"
+                android:text="@string/use_dalat_market"
                 android:textColor="@color/text_primary" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Hoặc nhập khách sạn/địa chỉ">
+                android:hint="@string/address_hint">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/addressInput"
                     android:layout_width="match_parent"
@@ -162,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="20dp"
-                android:text="Tiếp tục chọn địa điểm"
+                android:text="@string/continue_select_places"
                 app:cornerRadius="18dp" />
         </LinearLayout>
     </ScrollView>
@@ -178,6 +178,6 @@
         android:orientation="vertical"
         android:visibility="gone">
         <ProgressBar android:layout_width="48dp" android:layout_height="48dp" android:indeterminateTint="@color/primary" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Đang tối ưu chuyến đi…" android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/optimizing_trip" android:textColor="@color/text_primary" android:textSize="16sp" android:textStyle="bold" />
     </LinearLayout>
 </FrameLayout>

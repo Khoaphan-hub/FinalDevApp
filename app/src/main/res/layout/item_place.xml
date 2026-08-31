@@ -8,7 +8,7 @@
     app:cardCornerRadius="20dp"
     app:cardElevation="0dp">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="10dp">
-        <ImageView android:id="@+id/placeImage" android:layout_width="104dp" android:layout_height="104dp" android:contentDescription="Ảnh địa điểm" android:scaleType="centerCrop" android:src="@drawable/sample_poi" />
+        <ImageView android:id="@+id/placeImage" android:layout_width="104dp" android:layout_height="104dp" android:contentDescription="@string/place_image" android:scaleType="centerCrop" android:src="@drawable/sample_poi" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginStart="14dp" android:layout_weight="1" android:orientation="vertical" android:paddingEnd="6dp">
             <TextView android:id="@+id/placeName" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
             <TextView android:id="@+id/placeAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:ellipsize="end" android:maxLines="2" android:textColor="@color/text_secondary" android:textSize="13sp" />
@@ -18,7 +18,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Thêm vào chuyến đi"
+                android:text="@string/add_to_trip"
                 android:textColor="@color/text_primary"
                 android:visibility="gone" />
         </LinearLayout>
