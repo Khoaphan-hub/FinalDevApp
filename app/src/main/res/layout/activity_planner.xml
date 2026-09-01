@@ -151,6 +151,17 @@
                     android:inputType="textPostalAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/useCurrentLocationButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/use_current_location"
+                app:cornerRadius="14dp"
+                app:icon="@drawable/ic_location_20"
+                app:iconGravity="textStart" />
+
             <TextView
                 android:id="@+id/plannerErrorText"
                 android:layout_width="match_parent"

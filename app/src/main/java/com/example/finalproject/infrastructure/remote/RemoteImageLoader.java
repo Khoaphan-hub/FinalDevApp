@@ -16,18 +16,31 @@ import java.util.concurrent.Executors;
 public final class RemoteImageLoader {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
-    private static final LruCache<String, Bitmap> CACHE = new LruCache<>(24);
+    /**
+     * An eighth of the heap, measured in kilobytes. LruCache counts entries by default, so a
+     * plain "24 images" limit lets two dozen large photos hold far more memory than intended.
+     */
+    private static final int CACHE_SIZE_KB = (int) (Runtime.getRuntime().maxMemory() / 1024 / 8);
+    private static final LruCache<String, Bitmap> CACHE = new LruCache<String, Bitmap>(CACHE_SIZE_KB) {
+        @Override protected int sizeOf(String key, Bitmap value) {
+            // Never 0: an entry reported as weightless would never be evicted.
+            return Math.max(1, value.getByteCount() / 1024);
+        }
+    };
 
     private RemoteImageLoader() { }
 
     public static void load(String url, ImageView target) {
+        // Stamp the view with the URL it is bound to RIGHT NOW, before any early return.
+        // RecyclerView reuses ImageViews, so a view still carrying the previous row's tag
+        // would accept that row's download and paint the wrong photo over the new row.
+        target.setTag(url);
         if (url == null || url.trim().isEmpty()) return;
         Bitmap cached = CACHE.get(url);
         if (cached != null) {
             target.setImageBitmap(cached);
             return;
         }
-        target.setTag(url);
         EXECUTOR.execute(() -> {
             HttpURLConnection connection = null;
             try {
