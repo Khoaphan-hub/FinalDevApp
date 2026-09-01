@@ -43,12 +43,7 @@ public final class ItineraryEditor {
     }
 
     private static double haversine(ItineraryStop a, ItineraryStop b) {
-        double earthRadiusKm = 6371.0;
-        double lat = Math.toRadians(b.getLatitude() - a.getLatitude());
-        double lon = Math.toRadians(b.getLongitude() - a.getLongitude());
-        double value = Math.sin(lat / 2) * Math.sin(lat / 2)
-            + Math.cos(Math.toRadians(a.getLatitude())) * Math.cos(Math.toRadians(b.getLatitude()))
-            * Math.sin(lon / 2) * Math.sin(lon / 2);
-        return earthRadiusKm * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+        return GeoDistance.kilometresBetween(a.getLatitude(), a.getLongitude(),
+            b.getLatitude(), b.getLongitude());
     }
 }
