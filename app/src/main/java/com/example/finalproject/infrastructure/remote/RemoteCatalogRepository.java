@@ -43,6 +43,7 @@ public final class RemoteCatalogRepository implements CatalogRepository {
         request("api/mobile/catalog/?type=" + type + "&query=" + encoded + "&limit=80", callback);
     }
 
+    @Override
     public void suggest(String type, String query, RepositoryCallback<List<Place>> callback) {
         String encoded;
         try {
@@ -74,9 +75,9 @@ public final class RemoteCatalogRepository implements CatalogRepository {
                     String name = localized(item, english ? "name_en" : "name", "name");
                     String address = localized(item, english ? "address_en" : "address", "address");
                     places.add(new Place(item.optInt("id"), item.optString("type"),
-                        name, address, item.optDouble("rating"),
-                        Math.round(item.optDouble("price")), nullable(item, "image_url"),
-                        item.optDouble("latitude"), item.optDouble("longitude"),
+                        name, address, item.optDouble("rating", 0),
+                        Math.round(item.optDouble("price", 0)), nullable(item, "image_url"),
+                        item.optDouble("latitude", 0), item.optDouble("longitude", 0),
                         nullable(item, "open_hours"), nullable(item, "tags"),
                         nullable(item, "highlight"), nullable(item, "media_url")));
                 }

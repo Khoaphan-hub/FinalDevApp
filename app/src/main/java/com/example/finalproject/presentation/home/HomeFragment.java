@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.finalproject.R;
 import com.example.finalproject.presentation.planner.PlannerActivity;
 import com.example.finalproject.presentation.catalog.CatalogActivity;
-import com.example.finalproject.infrastructure.remote.RemoteWeatherRepository;
+import com.example.finalproject.infrastructure.local.repository.CachingWeatherRepository;
 import com.example.finalproject.domain.model.WeatherSnapshot;
 import com.example.finalproject.domain.model.WeatherCodeMapper;
 import com.example.finalproject.domain.callback.RepositoryCallback;
@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
     private void loadWeather(View view) {
         view.findViewById(R.id.weatherRetryButton).setVisibility(View.GONE);
         text(view, R.id.weatherTemp).setText(R.string.weather_loading);
-        new RemoteWeatherRepository().load(new RepositoryCallback<WeatherSnapshot>() {
+        new CachingWeatherRepository(requireContext()).load(new RepositoryCallback<WeatherSnapshot>() {
             @Override public void onSuccess(WeatherSnapshot snapshot) {
                 // The request outlives the fragment when the user navigates away mid-flight.
                 if (!isAdded()) return;
@@ -57,6 +57,9 @@ public class HomeFragment extends Fragment {
                 if (!isAdded()) return;
                 showWeatherError(view);
             }
+        }, cachedAt -> {
+            if (isAdded()) Toast.makeText(requireContext(),
+                R.string.offline_weather_notice, Toast.LENGTH_SHORT).show();
         });
     }
 
