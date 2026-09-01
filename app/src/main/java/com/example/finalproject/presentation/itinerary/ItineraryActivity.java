@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -53,6 +54,13 @@ import java.util.concurrent.Executors;
 public class ItineraryActivity extends AppCompatActivity {
     public static final String EXTRA_ITINERARY = "itinerary";
 
+    // The itinerary is edited in place (Replace), so on a configuration change it must come back
+    // from the saved state. Re-reading the intent would silently undo every replacement.
+    private static final String STATE_ITINERARY = "state_itinerary";
+    private static final String STATE_PENDING_DAY = "state_pending_day";
+    private static final String STATE_PENDING_STOP = "state_pending_stop";
+    private static final String STATE_SELECTED_DAY = "state_selected_day";
+
     private Itinerary itinerary;
     private LinearLayout stopsContainer;
     private ItineraryDay selectedDay;
@@ -84,14 +92,16 @@ public class ItineraryActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.replaced_with, place.getName()), Toast.LENGTH_SHORT).show();
             });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            itinerary = getIntent().getSerializableExtra(EXTRA_ITINERARY, Itinerary.class);
-        } else {
-            itinerary = (Itinerary) getIntent().getSerializableExtra(EXTRA_ITINERARY);
-        }
+        itinerary = restoreItinerary(savedInstanceState);
         if (itinerary == null || itinerary.getDays().isEmpty()) {
             finish();
             return;
+        }
+        int selectedDayNumber = itinerary.getDays().get(0).getDayNumber();
+        if (savedInstanceState != null) {
+            pendingDayNumber = savedInstanceState.getInt(STATE_PENDING_DAY);
+            pendingStopIndex = savedInstanceState.getInt(STATE_PENDING_STOP);
+            selectedDayNumber = savedInstanceState.getInt(STATE_SELECTED_DAY, selectedDayNumber);
         }
 
         stopsContainer = findViewById(R.id.stopsContainer);
@@ -126,6 +136,8 @@ public class ItineraryActivity extends AppCompatActivity {
         findViewById(R.id.exportPdfButton).setOnClickListener(v -> exportPdf());
 
         ChipGroup chipGroup = findViewById(R.id.dayChipGroup);
+        Chip chipToCheck = null;
+        ItineraryDay dayToRender = itinerary.getDays().get(0);
         for (ItineraryDay day : itinerary.getDays()) {
             Chip chip = new Chip(this);
             chip.setId(android.view.View.generateViewId());
@@ -134,9 +146,38 @@ public class ItineraryActivity extends AppCompatActivity {
             chip.setTag(day);
             chip.setOnClickListener(v -> renderDay((ItineraryDay) v.getTag()));
             chipGroup.addView(chip);
+            if (chipToCheck == null || day.getDayNumber() == selectedDayNumber) {
+                chipToCheck = chip;
+                dayToRender = day;
+            }
         }
-        ((Chip) chipGroup.getChildAt(0)).setChecked(true);
-        renderDay(itinerary.getDays().get(0));
+        chipToCheck.setChecked(true);
+        renderDay(dayToRender);
+    }
+
+    private Itinerary restoreItinerary(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            Itinerary saved;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                saved = savedInstanceState.getSerializable(STATE_ITINERARY, Itinerary.class);
+            } else {
+                saved = (Itinerary) savedInstanceState.getSerializable(STATE_ITINERARY);
+            }
+            if (saved != null) return saved;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return getIntent().getSerializableExtra(EXTRA_ITINERARY, Itinerary.class);
+        }
+        return (Itinerary) getIntent().getSerializableExtra(EXTRA_ITINERARY);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(STATE_ITINERARY, itinerary);
+        outState.putInt(STATE_PENDING_DAY, pendingDayNumber);
+        outState.putInt(STATE_PENDING_STOP, pendingStopIndex);
+        if (selectedDay != null) outState.putInt(STATE_SELECTED_DAY, selectedDay.getDayNumber());
     }
 
     private void renderDay(ItineraryDay day) {
