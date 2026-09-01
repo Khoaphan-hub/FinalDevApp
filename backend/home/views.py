@@ -970,6 +970,9 @@ def resume_itinerary_via_token(request, token):
     return redirect('plan-itinerary')
 
 
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
 def login_api(request):
     """
     API endpoint for login (returns JSON for AJAX requests)
@@ -1001,6 +1004,7 @@ def login_api(request):
     return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
 
 
+@csrf_exempt
 def register_api(request):
     """
     API endpoint for registration (returns JSON for AJAX requests)
