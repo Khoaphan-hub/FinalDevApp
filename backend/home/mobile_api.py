@@ -306,3 +306,42 @@ def mobile_generate_itinerary(request):
             'notices': fill['auto_fill_messages'],
         },
     })
+
+@csrf_exempt
+def mobile_profile(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Not authenticated"}, status=401)
+    
+    from .models import Profile
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    
+    if request.method == "GET":
+        avatar_url = ""
+        if profile.avatar:
+            avatar_url = request.build_absolute_uri(profile.avatar.url)
+        
+        return JsonResponse({
+            "username": request.user.username,
+            "email": request.user.email,
+            "phone_number": profile.phone_number,
+            "avatar_url": avatar_url
+        })
+    elif request.method == "POST":
+        if request.content_type == "application/json":
+            try:
+                data = json.loads(request.body)
+                request.user.email = data.get("email", request.user.email)
+                profile.phone_number = data.get("phone_number", profile.phone_number)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON"}, status=400)
+        else:
+            request.user.email = request.POST.get("email", request.user.email)
+            profile.phone_number = request.POST.get("phone_number", profile.phone_number)
+            if 'avatar' in request.FILES:
+                profile.avatar = request.FILES['avatar']
+        
+        request.user.save()
+        profile.save()
+        return JsonResponse({"success": True})
+    
+    return JsonResponse({"error": "Method not allowed"}, status=405)

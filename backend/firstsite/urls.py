@@ -28,6 +28,7 @@ from home.mobile_api import (
     mobile_create_itinerary_share,
     mobile_generate_itinerary,
     mobile_search_suggestions,
+    mobile_profile,
 )
 
 urlpatterns = [
@@ -64,6 +65,8 @@ urlpatterns = [
     path('api/mobile/search-suggestions/', mobile_search_suggestions, name='mobile-search-suggestions'),
     path('api/mobile/itineraries/share/', mobile_create_itinerary_share, name='mobile-itinerary-share'),
     path('api/mobile/itineraries/generate/', mobile_generate_itinerary, name='mobile-generate-itinerary'),
+    path('api/logout/', home_views.logout_api, name='logout-api'),
+    path('api/mobile/profile/', mobile_profile, name='mobile-profile'),
 ]
 
 urlpatterns += shared_itinerary_urlpatterns

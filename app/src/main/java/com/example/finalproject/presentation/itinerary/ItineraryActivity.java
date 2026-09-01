@@ -10,6 +10,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -109,30 +114,28 @@ public class ItineraryActivity extends AppCompatActivity {
         updateBudget();
         findViewById(R.id.offlineBadge).setVisibility(itinerary.isOfflineDemo() ? TextView.VISIBLE : TextView.GONE);
         findViewById(R.id.resultBackButton).setOnClickListener(v -> finish());
-        findViewById(R.id.saveTripButton).setOnClickListener(v -> {
-            v.setEnabled(false);
-            new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
-                @Override public void onSuccess(Long id) {
-                    Intent home = new Intent(ItineraryActivity.this, MainActivity.class);
-                    home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    home.putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_TRIPS);
-                    home.putExtra(MainActivity.EXTRA_MESSAGE, getString(R.string.trip_saved_message));
-                    startActivity(home);
-                    finish();
-                }
-                @Override public void onError(Exception error) {
-                    v.setEnabled(true);
-                    Toast.makeText(ItineraryActivity.this, R.string.trip_save_error, Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+        
+        MaterialButton saveTripBtn = findViewById(R.id.saveTripButton);
+        MaterialButton publishTripBtn = findViewById(R.id.shareTripButton);
+        boolean isCommunity = getIntent().getBooleanExtra("IS_COMMUNITY", false);
+        
+        if (isCommunity) {
+            saveTripBtn.setText("Save to Device");
+            saveTripBtn.setOnClickListener(v -> saveCommunityItinerary());
+            publishTripBtn.setVisibility(View.GONE);
+        } else {
+            saveTripBtn.setOnClickListener(v -> saveTripLocally(v));
+            publishTripBtn.setText("Publish to Community");
+            publishTripBtn.setOnClickListener(v -> publishItinerary());
+        }
+
         findViewById(R.id.openMapButton).setOnClickListener(v -> {
             if (selectedDay == null) return;
             Intent intent = new Intent(this, MapActivity.class);
             intent.putExtra(MapActivity.EXTRA_DAY, selectedDay);
             startActivity(intent);
         });
-        findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
+
         findViewById(R.id.exportPdfButton).setOnClickListener(v -> exportPdf());
 
         ChipGroup chipGroup = findViewById(R.id.dayChipGroup);
@@ -285,6 +288,74 @@ public class ItineraryActivity extends AppCompatActivity {
     private void updateBudget() {
         ((TextView) findViewById(R.id.estimatedCostText)).setText(money(itinerary.getEstimatedCostVnd()));
         ((TextView) findViewById(R.id.remainingCostText)).setText(money(itinerary.getRemainingBudgetVnd()));
+    }
+
+    private void saveTripLocally(android.view.View v) {
+        v.setEnabled(false);
+        new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
+            @Override public void onSuccess(Long id) {
+                Intent home = new Intent(ItineraryActivity.this, MainActivity.class);
+                home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                home.putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_TRIPS);
+                home.putExtra(MainActivity.EXTRA_MESSAGE, getString(R.string.trip_saved_message));
+                startActivity(home);
+                finish();
+            }
+            @Override public void onError(Exception error) {
+                v.setEnabled(true);
+                Toast.makeText(ItineraryActivity.this, R.string.trip_save_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void saveCommunityItinerary() {
+        new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
+            @Override public void onSuccess(Long id) {
+                Toast.makeText(ItineraryActivity.this, "Saved to device!", Toast.LENGTH_SHORT).show();
+            }
+            @Override public void onError(Exception error) {
+                Toast.makeText(ItineraryActivity.this, "Failed to save", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void publishItinerary() {
+        pdfExecutor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                String baseUrl = RemotePlannerRepository.DEFAULT_BASE_URL;
+                if (!baseUrl.endsWith("/")) baseUrl += "/";
+                
+                connection = (HttpURLConnection) new URL(baseUrl + "api/shared-itineraries/submit/").openConnection();
+                connection.setRequestMethod("POST");
+                connection.setConnectTimeout(6000);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true);
+
+                org.json.JSONObject payload = new org.json.JSONObject();
+                payload.put("title", itinerary.getTitle());
+                payload.put("description", "A great trip in Da Lat!");
+                payload.put("mood", "CHILL");
+                
+                org.json.JSONObject plannerItinerary = com.example.finalproject.domain.model.ItineraryEditor.toJson(itinerary);
+                payload.put("planner_itinerary", plannerItinerary);
+
+                try (java.io.OutputStream output = connection.getOutputStream()) {
+                    output.write(payload.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+
+                int status = connection.getResponseCode();
+                if (status >= 200 && status < 300) {
+                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Published successfully!", Toast.LENGTH_SHORT).show());
+                } else {
+                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Failed to publish", Toast.LENGTH_SHORT).show());
+                }
+            } catch (Exception e) {
+                new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show());
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
     }
 
     private void shareItinerary() {
