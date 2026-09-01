@@ -33,8 +33,8 @@ public final class RemotePlannerRepository implements PlannerRepository {
     // Both values come from build.gradle.kts. The phone address is read from local.properties
     // so it follows whichever Wi-Fi network the development machine is on, and the release
     // build type replaces both with the deployed HTTPS origin.
-    private static final String EMULATOR_BASE_URL = BuildConfig.EMULATOR_BASE_URL;
-    private static final String PHYSICAL_PHONE_BASE_URL = BuildConfig.PHONE_BASE_URL;
+    private static final String EMULATOR_BASE_URL = "http://10.0.2.2:8000/";
+    private static final String PHYSICAL_PHONE_BASE_URL = "http://127.0.0.1:8000/";
     public static final String DEFAULT_BASE_URL = isEmulator()
         ? EMULATOR_BASE_URL : PHYSICAL_PHONE_BASE_URL;
     private final String baseUrl;
