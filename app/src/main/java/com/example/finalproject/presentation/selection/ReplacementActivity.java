@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalproject.R;
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.infrastructure.local.repository.CachingCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemoteCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
 import com.example.finalproject.presentation.SystemBarInsets;
@@ -74,7 +75,8 @@ public class ReplacementActivity extends AppCompatActivity {
         progress.setVisibility(View.VISIBLE);
         statePanel.setVisibility(View.GONE);
         String query = search.getText() == null ? "" : search.getText().toString().trim();
-        new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL).load(type, query,
+        new CachingCatalogRepository(this,
+            new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL), null).load(type, query,
             new RepositoryCallback<List<Place>>() {
                 @Override public void onSuccess(List<Place> places) {
                     progress.setVisibility(View.GONE);

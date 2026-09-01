@@ -22,6 +22,9 @@ import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.Place;
 import com.example.finalproject.domain.model.TripRequest;
 import com.example.finalproject.infrastructure.demo.DemoPlannerRepository;
+import com.example.finalproject.domain.repository.CatalogRepository;
+import com.example.finalproject.infrastructure.local.repository.CachingCatalogRepository;
+import com.example.finalproject.infrastructure.local.repository.OfflinePlannerRepository;
 import com.example.finalproject.infrastructure.remote.RemoteCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
 import com.example.finalproject.infrastructure.remote.ResilientPlannerRepository;
@@ -41,7 +44,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
 
     private TripRequest request;
     private PlaceAdapter adapter;
-    private RemoteCatalogRepository catalogRepository;
+    private CatalogRepository catalogRepository;
     private GenerateItineraryUseCase generateUseCase;
     private View progress;
     private View loadingOverlay;
@@ -54,6 +57,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
     private int requestVersion;
+    private boolean offlineNoticeShown;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +66,14 @@ public class PlaceSelectionActivity extends AppCompatActivity {
         request = readRequest();
         if (request == null) { finish(); return; }
 
-        catalogRepository = new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL);
+        catalogRepository = new CachingCatalogRepository(this,
+            new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL),
+            cachedAt -> showOfflineNotice());
         generateUseCase = new GenerateItineraryUseCase(new ResilientPlannerRepository(
-            new RemotePlannerRepository(RemotePlannerRepository.DEFAULT_BASE_URL), new DemoPlannerRepository(),
-            error -> runOnUiThread(() -> Toast.makeText(this,
-                R.string.offline_fallback_notice, Toast.LENGTH_LONG).show())));
+            new RemotePlannerRepository(RemotePlannerRepository.DEFAULT_BASE_URL),
+            new OfflinePlannerRepository(this, new DemoPlannerRepository(),
+                this::showOfflinePlanNotice),
+            null));
         progress = findViewById(R.id.selectionProgress);
         loadingOverlay = findViewById(R.id.selectionGenerating);
         selectionSummary = findViewById(R.id.selectionSummary);
@@ -111,6 +118,22 @@ public class PlaceSelectionActivity extends AppCompatActivity {
         });
         updateSummary();
         loadCurrent(false);
+    }
+
+    private void showOfflineNotice() {
+        if (offlineNoticeShown) return;
+        offlineNoticeShown = true;
+        Toast.makeText(this, R.string.offline_catalog_notice, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Says where an offline itinerary came from: places cached on the device, or the
+     * built-in sample when the user has never been online.
+     */
+    private void showOfflinePlanNotice(boolean fromCachedCatalog) {
+        Toast.makeText(this, fromCachedCatalog
+            ? R.string.offline_cached_notice : R.string.offline_fallback_notice,
+            Toast.LENGTH_LONG).show();
     }
 
     private void showOrLoad(String type) {

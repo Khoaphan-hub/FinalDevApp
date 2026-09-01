@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalproject.R;
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.domain.repository.CatalogRepository;
+import com.example.finalproject.infrastructure.local.repository.CachingCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemoteCatalogRepository;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
 import com.example.finalproject.presentation.SystemBarInsets;
@@ -25,7 +28,7 @@ import java.util.List;
 import java.util.Collections;
 
 public class CatalogActivity extends AppCompatActivity {
-    private RemoteCatalogRepository repository;
+    private CatalogRepository repository;
     private PlaceAdapter adapter;
     private TextInputEditText searchInput;
     private View progress;
@@ -35,6 +38,8 @@ public class CatalogActivity extends AppCompatActivity {
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
     private int requestVersion;
+    /** The notice is per screen visit, not per request, so scrolling does not spam toasts. */
+    private boolean offlineNoticeShown;
     private List<Place> cachedPois = Collections.emptyList();
     private List<Place> cachedEateries = Collections.emptyList();
 
@@ -43,7 +48,9 @@ public class CatalogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
         SystemBarInsets.apply(findViewById(R.id.catalogRoot));
-        repository = new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL);
+        repository = new CachingCatalogRepository(this,
+            new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL),
+            cachedAt -> showOfflineNotice());
         searchInput = findViewById(R.id.catalogSearchInput);
         progress = findViewById(R.id.catalogProgress);
         statePanel = findViewById(R.id.catalogStatePanel);
@@ -85,6 +92,12 @@ public class CatalogActivity extends AppCompatActivity {
             if ("poi".equals(type)) cachedPois = Collections.emptyList(); else cachedEateries = Collections.emptyList();
         }
         showOrLoad(type);
+    }
+
+    private void showOfflineNotice() {
+        if (offlineNoticeShown) return;
+        offlineNoticeShown = true;
+        Toast.makeText(this, R.string.offline_catalog_notice, Toast.LENGTH_LONG).show();
     }
 
     private void showOrLoad(String type) {
