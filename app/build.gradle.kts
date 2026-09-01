@@ -29,7 +29,6 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Debug default: emulators reach the host through 10.0.2.2, a real phone through the LAN.
         buildConfigField("String", "EMULATOR_BASE_URL", "\"http://10.0.2.2:8000/\"")
@@ -58,7 +57,6 @@ android {
 dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
-    implementation(libs.constraintlayout)
     implementation(libs.material)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
@@ -71,12 +69,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
 
-    // Navigation
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-
     // Test
     testImplementation(libs.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(libs.ext.junit)
 }

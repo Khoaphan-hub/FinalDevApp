@@ -34,6 +34,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class PlaceSelectionActivity extends AppCompatActivity {
     public static final String EXTRA_REQUEST = "trip_request";
@@ -83,7 +84,7 @@ public class PlaceSelectionActivity extends AppCompatActivity {
             @Override public boolean onSelectionChangeRequested(Place place, boolean selected) {
                 int max = "EATERY".equals(place.getType()) ? request.getDays() * 3
                     : request.getDays() * request.getDailyPoiLimit();
-                int current = adapter.selectedCount(place.getType().toLowerCase());
+                int current = adapter.selectedCount(place.getType().toLowerCase(Locale.ROOT));
                 if (selected && current >= max) {
                     Toast.makeText(PlaceSelectionActivity.this,
                         getString(R.string.selection_limit, max), Toast.LENGTH_SHORT).show();

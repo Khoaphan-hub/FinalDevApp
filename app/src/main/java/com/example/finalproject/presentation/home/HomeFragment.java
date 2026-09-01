@@ -19,6 +19,7 @@ import com.example.finalproject.infrastructure.remote.RemoteWeatherRepository;
 import com.example.finalproject.domain.model.WeatherSnapshot;
 import com.example.finalproject.domain.model.WeatherCodeMapper;
 import com.example.finalproject.domain.callback.RepositoryCallback;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,10 +45,58 @@ public class HomeFragment extends Fragment {
 
     private void loadWeather(View view) {
         view.findViewById(R.id.weatherRetryButton).setVisibility(View.GONE);
-        ((TextView)view.findViewById(R.id.weatherTemp)).setText(R.string.weather_loading);
+        text(view, R.id.weatherTemp).setText(R.string.weather_loading);
         new RemoteWeatherRepository().load(new RepositoryCallback<WeatherSnapshot>() {
-            @Override public void onSuccess(WeatherSnapshot w) { if(!isAdded())return; ((TextView)view.findViewById(R.id.weatherIcon)).setText(WeatherCodeMapper.icon(w.code,w.day));((TextView)view.findViewById(R.id.weatherTemp)).setText(Math.round(w.temperature)+"°C");((TextView)view.findViewById(R.id.weatherCondition)).setText(getString(R.string.weather_condition_format,getString(WeatherCodeMapper.labelRes(w.code)),Math.round(w.apparent)));((TextView)view.findViewById(R.id.weatherDetails)).setText(getString(R.string.weather_details_format,w.humidity,Math.round(w.wind)));StringBuilder f=new StringBuilder();SimpleDateFormat input=new SimpleDateFormat("yyyy-MM-dd",Locale.US),out=new SimpleDateFormat("EEE",Locale.getDefault());for(WeatherSnapshot.Day d:w.forecast){try{if(f.length()>0)f.append('\n');f.append(getString(R.string.weather_forecast_format,out.format(input.parse(d.date)),Math.round(d.min),Math.round(d.max),d.rain));}catch(Exception ignored){}}((TextView)view.findViewById(R.id.weatherForecast)).setText(f.toString()); }
-            @Override public void onError(Exception e) { if(!isAdded())return;((TextView)view.findViewById(R.id.weatherTemp)).setText(R.string.weather_unavailable);((TextView)view.findViewById(R.id.weatherCondition)).setText(R.string.weather_check_connection);view.findViewById(R.id.weatherRetryButton).setVisibility(View.VISIBLE); }
+            @Override public void onSuccess(WeatherSnapshot snapshot) {
+                // The request outlives the fragment when the user navigates away mid-flight.
+                if (!isAdded()) return;
+                showWeather(view, snapshot);
+            }
+
+            @Override public void onError(Exception error) {
+                if (!isAdded()) return;
+                showWeatherError(view);
+            }
         });
+    }
+
+    private void showWeather(View view, WeatherSnapshot snapshot) {
+        text(view, R.id.weatherIcon).setText(WeatherCodeMapper.icon(snapshot.code, snapshot.day));
+        text(view, R.id.weatherTemp).setText(getString(R.string.weather_temperature,
+            Math.round(snapshot.temperature)));
+        text(view, R.id.weatherCondition).setText(getString(R.string.weather_condition_format,
+            getString(WeatherCodeMapper.labelRes(snapshot.code)), Math.round(snapshot.apparent)));
+        text(view, R.id.weatherDetails).setText(getString(R.string.weather_details_format,
+            snapshot.humidity, Math.round(snapshot.wind)));
+        text(view, R.id.weatherForecast).setText(formatForecast(snapshot.forecast));
+    }
+
+    private void showWeatherError(View view) {
+        text(view, R.id.weatherTemp).setText(R.string.weather_unavailable);
+        text(view, R.id.weatherCondition).setText(R.string.weather_check_connection);
+        view.findViewById(R.id.weatherRetryButton).setVisibility(View.VISIBLE);
+    }
+
+    /** Turns the API's ISO dates into short weekday names, skipping any entry that fails to parse. */
+    private String formatForecast(List<WeatherSnapshot.Day> forecast) {
+        SimpleDateFormat isoDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat weekday = new SimpleDateFormat("EEE", Locale.getDefault());
+        StringBuilder lines = new StringBuilder();
+        for (WeatherSnapshot.Day day : forecast) {
+            String label;
+            try {
+                label = weekday.format(isoDate.parse(day.date));
+            } catch (ParseException | NullPointerException ignored) {
+                continue;
+            }
+            if (lines.length() > 0) lines.append('\n');
+            lines.append(getString(R.string.weather_forecast_format,
+                label, Math.round(day.min), Math.round(day.max), day.rain));
+        }
+        return lines.toString();
+    }
+
+    private TextView text(View view, int id) {
+        return view.findViewById(id);
     }
 }
