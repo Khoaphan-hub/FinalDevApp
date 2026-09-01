@@ -75,8 +75,6 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
 
-    // Firebase (Removed)
-
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
