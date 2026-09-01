@@ -6,6 +6,32 @@ import java.util.List;
 public final class ItineraryEditor {
     private ItineraryEditor() {}
 
+    public static org.json.JSONObject toJson(Itinerary itinerary) {
+        org.json.JSONObject json = new org.json.JSONObject();
+        try {
+            org.json.JSONObject results = new org.json.JSONObject();
+            for (ItineraryDay day : itinerary.getDays()) {
+                org.json.JSONArray stopsArr = new org.json.JSONArray();
+                for (ItineraryStop stop : day.getStops()) {
+                    org.json.JSONObject stopObj = new org.json.JSONObject();
+                    stopObj.put("id", stop.getId());
+                    stopObj.put("type", stop.getType().name());
+                    stopObj.put("name", stop.getName());
+                    stopObj.put("address", stop.getAddress());
+                    stopObj.put("latitude", stop.getLatitude());
+                    stopObj.put("longitude", stop.getLongitude());
+                    if (stop.getMealSlot() != null) stopObj.put("meal_slot", stop.getMealSlot());
+                    stopsArr.put(stopObj);
+                }
+                results.put(String.valueOf(day.getDayNumber()), stopsArr);
+            }
+            json.put("results", results);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
     public static Itinerary replace(Itinerary source, int dayNumber, int stopIndex, Place place) {
         List<ItineraryDay> days = new ArrayList<>();
         long oldPrice = 0;

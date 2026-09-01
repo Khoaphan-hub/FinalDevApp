@@ -23,7 +23,7 @@ from django.urls import path, reverse
 from django.utils import timezone
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
@@ -707,6 +707,7 @@ class SharedItineraryTopAPI(APIView):
         return Response({"itineraries": data})
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class GeneratedItinerarySubmissionAPI(APIView):
     """Persist the itinerary stored in session and optional feedback."""
 
@@ -781,6 +782,7 @@ class SharedItineraryDetailAPI(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SharedItineraryFeedbackAPI(APIView):
     """Create or update feedback for a public itinerary."""
 
@@ -813,6 +815,7 @@ class SharedItineraryFeedbackAPI(APIView):
         )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AdoptSharedItineraryAPI(APIView):
     """Copy a shared itinerary back into the planner session."""
 

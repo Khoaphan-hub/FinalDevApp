@@ -45,6 +45,11 @@ from .utils import get_item_image_url
 import base64
 from io import BytesIO
 import importlib
+@csrf_exempt
+@require_POST
+def logout_api(request):
+    auth_logout(request)
+    return JsonResponse({"success": True})
 
 qrcode = None
 try:

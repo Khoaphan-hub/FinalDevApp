@@ -77,14 +77,14 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.nav_home) {
             selectedFragment = new HomeFragment();
             topAppBar.setTitle("Journify");
+        } else if (itemId == R.id.nav_community) {
+            selectedFragment = new com.example.finalproject.presentation.community.CommunityFragment();
+            topAppBar.setTitle(R.string.community);
         } else if (itemId == R.id.nav_trips) {
             selectedFragment = new SavedTripsFragment();
             topAppBar.setTitle(R.string.trips);
         } else if (itemId == R.id.nav_profile) {
-            selectedFragment = ComingSoonFragment.newInstance(
-                getString(R.string.profile_title),
-                getString(R.string.profile_message)
-            );
+            selectedFragment = new com.example.finalproject.presentation.profile.ProfileFragment();
             topAppBar.setTitle(R.string.profile);
         } else return false;
         getSupportFragmentManager().beginTransaction()
