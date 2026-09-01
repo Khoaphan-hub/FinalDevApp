@@ -115,6 +115,9 @@
                 <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="ACTIVE" android:text="@string/mood_active" />
                 <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="CULTURE" android:text="@string/mood_culture" />
                 <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="HEALING" android:text="@string/mood_healing" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="SOCIAL" android:text="@string/mood_social" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="SHOPPING" android:text="@string/mood_shopping" />
+                <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:tag="BIZARRE" android:text="@string/mood_bizarre" />
             </com.google.android.material.chip.ChipGroup>
 
             <TextView

@@ -24,6 +24,7 @@ import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.ItineraryDay;
 import com.example.finalproject.domain.model.ItineraryEditor;
 import com.example.finalproject.domain.model.ItineraryStop;
+import com.example.finalproject.domain.model.MealSlotMapper;
 import com.example.finalproject.domain.model.Place;
 import com.example.finalproject.presentation.SystemBarInsets;
 import com.example.finalproject.presentation.MainActivity;
@@ -253,7 +254,10 @@ public class ItineraryActivity extends AppCompatActivity {
             for (ItineraryStop stop : day.getStops()) {
                 if (stop.getType() != ItineraryStop.Type.ACCOMMODATION) {
                     message.append("• ").append(stop.getName());
-                    if (stop.getMealSlot() != null) message.append(" (").append(stop.getMealSlot()).append(")");
+                    if (stop.getMealSlot() != null) {
+                        int slotRes = MealSlotMapper.labelRes(stop.getMealSlot());
+                        message.append(" (").append(slotRes == 0 ? stop.getMealSlot() : getString(slotRes)).append(")");
+                    }
                     message.append('\n');
                 }
             }

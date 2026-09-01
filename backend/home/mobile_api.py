@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from .algorithm import generate_itinerary
-from .constants import DEFAULT_FALLBACK_COORDS, DEFAULT_FALLBACK_LABEL, TRAVEL_MOOD_TAGS
+from .constants import DEFAULT_FALLBACK_COORDS, TRAVEL_MOOD_TAGS
 from .models import Eatery, Poi
 from .mobile_share import build_resume_snapshot, build_resume_url, create_resume_token, qr_png_base64
 from .search import get_search_tree
@@ -27,6 +27,19 @@ def _image_url(request, item_type, image_code):
         return None
     folder = 'pois' if item_type == 'POI' else 'eateries'
     return request.build_absolute_uri(f'/static/home/images/{folder}/{image_code}.png')
+
+
+def _default_start_label(language):
+    """Human-readable address for the default starting point (Da Lat Market).
+
+    DEFAULT_FALLBACK_LABEL is an internal sentinel and must not reach the UI.
+    """
+    market = Poi.objects.filter(image_code='P001').first()
+    if market:
+        label = (market.address_en or market.address) if language == 'en' else market.address
+        if label:
+            return label
+    return 'Da Lat Market, Da Lat' if language == 'en' else 'Chợ Đà Lạt, Đà Lạt'
 
 
 def _serialize_catalog_item(request, item, item_type):
@@ -182,19 +195,21 @@ def mobile_generate_itinerary(request):
     if field_errors:
         return _error('Please check the trip information.', field_errors=field_errors)
 
+    language = payload.get('language', 'vi')
     use_default = bool(payload.get('use_default_center', True))
     start_address = str(payload.get('start_address') or '').strip()
+    default_start_label = _default_start_label(language)
     trip_setup = {
         'days': days,
         'max_pois_per_day': daily_limit,
         'budget': str(budget),
         'mood': moods[0],
         'user_address': '' if use_default else start_address,
-        'place_name': DEFAULT_FALLBACK_LABEL if use_default else start_address,
+        'place_name': default_start_label if use_default else start_address,
         'start_location': {
             'lat': DEFAULT_FALLBACK_COORDS[0],
             'lon': DEFAULT_FALLBACK_COORDS[1],
-            'address_label': DEFAULT_FALLBACK_LABEL if use_default else start_address,
+            'address_label': default_start_label if use_default else start_address,
             'fallback_used': use_default,
         },
     }
@@ -241,7 +256,6 @@ def mobile_generate_itinerary(request):
     if algorithm_error:
         return _error(algorithm_error)
 
-    language = payload.get('language', 'vi')
     chosen = itinerary_en if language == 'en' else itinerary_vi
     normalized_days = []
     for day_number, stops in chosen.items():

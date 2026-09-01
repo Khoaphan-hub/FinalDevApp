@@ -607,6 +607,7 @@ def generate_itinerary(
     # Geocode accommodation if provided
     accommodation_coords = None
     accommodation_name = None
+    accommodation_name_en = None
     
     # Check if this is the default Dalat Center/Market (P001)
     from .constants import DEFAULT_FALLBACK_COORDS, DEFAULT_FALLBACK_LABEL
@@ -628,6 +629,7 @@ def generate_itinerary(
             if dalat_market:
                 accommodation_coords = (dalat_market.latitude, dalat_market.longitude)
                 accommodation_name = dalat_market.name
+                accommodation_name_en = dalat_market.name_en or dalat_market.name
                 accommodation_id = 'P001'  # Use POI ID for Dalat Market
                 print(f"[ACCOMMODATION] Using Dalat Market (P001) as default: {dalat_market.name}, lat={accommodation_coords[0]:.6f}, lon={accommodation_coords[1]:.6f}")
             else:
@@ -660,6 +662,9 @@ def generate_itinerary(
     else:
         print(f"[ACCOMMODATION] No accommodation address provided - skipping accommodation stops")
         accommodation_id = None
+
+    # A custom address has no translation, so reuse the Vietnamese value there.
+    accommodation_name_en = accommodation_name_en or accommodation_name
 
     poi_list = list(selected_pois_qs.values(
         'id', 'name', 'name_en', 'address', 'address_en', 'tags', 'rating', 'latitude', 'longitude'
@@ -1105,7 +1110,7 @@ def generate_itinerary(
             accommodation_start_en = {
                 'type': 'ACCOMMODATION',
                 'id': 0,
-                'name': accommodation_name,
+                'name': accommodation_name_en,
                 'address': accommodation_address if accommodation_address else accommodation_name,
                 'travel_to_next_km': first_destination_dist,
                 'lat': accommodation_coords[0],
@@ -1144,7 +1149,7 @@ def generate_itinerary(
             accommodation_end_en = {
                 'type': 'ACCOMMODATION',
                 'id': 0,
-                'name': accommodation_name,
+                'name': accommodation_name_en,
                 'address': accommodation_address if accommodation_address else accommodation_name,
                 'travel_to_next_km': 0.0,
                 'lat': accommodation_coords[0],
