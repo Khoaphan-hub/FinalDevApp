@@ -23,9 +23,17 @@ From `backend` on Windows PowerShell:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-mobile.txt
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py createcachetable
+.\.venv\Scripts\python.exe manage.py load_data
 .\.venv\Scripts\python.exe manage.py check
 .\.venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000 --noreload
 ```
+
+`db.sqlite3` is not in version control, so the three database commands are required on a
+fresh clone. Skipping them leaves the catalog empty and every request from the app fails
+with `no such table: home_poi`. `load_data` imports 79 attractions and 163 eateries from the
+CSV files, including their English translations.
 
 The development build selects its backend automatically: the Android emulator uses `http://10.0.2.2:8000/`, while a physical phone uses the current development computer address `http://192.168.1.10:8000/`. For direct phone testing, connect the phone with USB debugging, keep the phone and computer on the same Wi-Fi, run Django on `0.0.0.0:8000`, select the phone in Android Studio, and press Run. If the computer receives a different LAN address, update `PHYSICAL_PHONE_BASE_URL` in `RemotePlannerRepository`.
 
@@ -35,16 +43,31 @@ PDF QR links use the incoming backend address by default. For a submission/deplo
 
 Weather is loaded directly from Open-Meteo for Đà Lạt and needs no API key. If the device is offline, the card shows a clear retry action.
 
-The warnings about optional `sentence-transformers` and `google-generativeai` can be ignored for the mobile itinerary flow.
+The warnings about optional `sentence-transformers` and `google-generativeai` can be ignored for the mobile itinerary flow. They only disable the web chatbot, which replies that AI features are unavailable.
+
+`DEBUG` defaults to on for local development. Set `DJANGO_DEBUG=False` when deploying. Django
+then stops serving `/static/` itself, so the place photos the app loads need `manage.py
+collectstatic` plus a real static file server (or a host that serves `STATIC_ROOT`) in front.
+Set `DJANGO_ALLOWED_HOSTS` to the deployed hostname as well; the permissive `*` default exists
+only for emulator and LAN testing.
 
 ## Build Android
 
 Open this folder in Android Studio and run the `app` configuration, or run:
 
 ```powershell
-$env:JAVA_HOME='D:\AndroiStudio\jbr'
+$env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
 $env:GRADLE_USER_HOME="$env:USERPROFILE\.gradle"
 .\gradlew.bat assembleDebug
+```
+
+`JAVA_HOME` must point at the JBR inside your own Android Studio installation; the path above
+is the Windows default. A command-line build also needs `local.properties` in the repository
+root, which is not in version control. Android Studio writes it on first open; to create it by
+hand, add one line with the colon escaped:
+
+```
+sdk.dir=C\:/Users/<you>/AppData/Local/Android/Sdk
 ```
 
 Debug APK: `app/build/outputs/apk/debug/app-debug.apk`.

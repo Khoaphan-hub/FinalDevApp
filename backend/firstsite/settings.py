@@ -28,7 +28,10 @@ GEMINI_API_KEY_1 = os.environ.get('GEMINI_API_KEY_1', '')
 JOURNIFY_PUBLIC_BASE_URL = os.environ.get('JOURNIFY_PUBLIC_BASE_URL', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Defaults to on for local development; set DJANGO_DEBUG=False when deploying.
+# With DEBUG off, runserver stops serving /static/, so run collectstatic and
+# put a real static file server in front (see README).
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').strip().lower() not in ('0', 'false', 'no')
 # Force reload for new templatetags
 
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
@@ -130,6 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+# Target for `manage.py collectstatic`, required once DEBUG is off.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # OpenStreetMap Nominatim identification (update email to your real contact per usage policy)
 NOMINATIM_USER_AGENT = 'CS252-Dalat-TripPlanner/1.0 (mailto:tripplanner@example.com)'

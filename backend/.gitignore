@@ -36,8 +36,8 @@ Khoa/
 env/
 ENV/
 
-# Django/static artifacts (optional; uncomment if you collect locally)
-# staticfiles/
+# Django/static artifacts (STATIC_ROOT target for collectstatic)
+staticfiles/
 # media/
 
 # Environment/secret files

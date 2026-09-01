@@ -63,7 +63,9 @@ public class PlaceSelectionActivity extends AppCompatActivity {
 
         catalogRepository = new RemoteCatalogRepository(RemotePlannerRepository.DEFAULT_BASE_URL);
         generateUseCase = new GenerateItineraryUseCase(new ResilientPlannerRepository(
-            new RemotePlannerRepository(RemotePlannerRepository.DEFAULT_BASE_URL), new DemoPlannerRepository()));
+            new RemotePlannerRepository(RemotePlannerRepository.DEFAULT_BASE_URL), new DemoPlannerRepository(),
+            error -> runOnUiThread(() -> Toast.makeText(this,
+                R.string.offline_fallback_notice, Toast.LENGTH_LONG).show())));
         progress = findViewById(R.id.selectionProgress);
         loadingOverlay = findViewById(R.id.selectionGenerating);
         selectionSummary = findViewById(R.id.selectionSummary);
