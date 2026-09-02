@@ -24,6 +24,7 @@
             <TextView android:id="@+id/placeDetailHighlight" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:background="@color/primary_soft" android:padding="16dp" android:textColor="@color/text_primary" android:textSize="15sp" />
             <com.google.android.material.button.MaterialButton android:id="@+id/placeMediaButton" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="22dp" android:text="@string/view_review" app:cornerRadius="16dp" />
             <com.google.android.material.button.MaterialButton android:id="@+id/placeDirectionsButton" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="10dp" android:text="@string/directions_app" app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/placeReportButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="50dp" android:layout_marginTop="8dp" android:text="@string/report_incorrect_information" android:textColor="@color/alert_red" app:cornerRadius="16dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

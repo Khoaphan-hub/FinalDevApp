@@ -47,6 +47,62 @@ class Eatery(models.Model):
     def __str__(self):
         return self.name
 
+
+class PlaceReport(models.Model):
+    """A user-submitted data issue for an existing POI or eatery.
+
+    Reports intentionally do not update the place automatically. An admin reviews the
+    saved snapshot, edits the source record when appropriate, then closes the report.
+    """
+
+    class TargetType(models.TextChoices):
+        POI = 'POI', 'Attraction'
+        EATERY = 'EATERY', 'Eatery'
+
+    class Category(models.TextChoices):
+        CLOSED = 'CLOSED', 'Permanently closed'
+        TEMPORARILY_CLOSED = 'TEMPORARILY_CLOSED', 'Temporarily closed'
+        WRONG_PRICE = 'WRONG_PRICE', 'Incorrect price'
+        WRONG_HOURS = 'WRONG_HOURS', 'Incorrect opening hours'
+        WRONG_ADDRESS = 'WRONG_ADDRESS', 'Incorrect address or location'
+        BROKEN_REVIEW = 'BROKEN_REVIEW', 'Broken review link'
+        WRONG_IMAGE = 'WRONG_IMAGE', 'Incorrect image'
+        DUPLICATE = 'DUPLICATE', 'Duplicate place'
+        OTHER = 'OTHER', 'Other'
+
+    class Status(models.TextChoices):
+        NEW = 'NEW', 'New'
+        REVIEWING = 'REVIEWING', 'Reviewing'
+        RESOLVED = 'RESOLVED', 'Resolved'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    target_type = models.CharField(max_length=16, choices=TargetType.choices, db_index=True)
+    target_id = models.PositiveIntegerField(db_index=True)
+    target_name = models.CharField(max_length=255)
+    category = models.CharField(max_length=32, choices=Category.choices, db_index=True)
+    description = models.TextField()
+    current_snapshot = models.JSONField(default=dict, blank=True)
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.NEW,
+        db_index=True,
+    )
+    admin_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+        indexes = [
+            models.Index(fields=('target_type', 'target_id')),
+            models.Index(fields=('status', 'created_at')),
+        ]
+
+    def __str__(self):
+        return f'#{self.pk} {self.target_name} - {self.get_category_display()}'
+
 class GeocodedLocation(models.Model):
     """Cache for geocoded addresses to avoid redundant API calls."""
     raw_address = models.TextField()  # Original address as entered

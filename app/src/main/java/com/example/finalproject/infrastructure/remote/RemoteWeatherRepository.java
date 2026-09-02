@@ -3,8 +3,8 @@ package com.example.finalproject.infrastructure.remote;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.WeatherSnapshot;
+import com.example.finalproject.domain.repository.RepositoryCallback;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,15 +20,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Current conditions and a three day forecast for Da Lat, straight from Open-Meteo (no API key). */
 public final class RemoteWeatherRepository {
-    private static final String URL_TEXT = "https://api.open-meteo.com/v1/forecast"
-        + "?latitude=11.9404&longitude=108.4583"
-        + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,"
-        + "wind_speed_10m,is_day"
-        + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
-        + "&timezone=Asia%2FBangkok&forecast_days=3";
-
+    private static final String URL_PREFIX = "https://api.open-meteo.com/v1/forecast?latitude=11.9404&longitude=108.4583&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok&forecast_days=";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
 
@@ -38,14 +31,23 @@ public final class RemoteWeatherRepository {
     }
 
     public void load(RepositoryCallback<WeatherSnapshot> callback) {
-        load(callback, null);
+        load(3, callback, null);
+    }
+
+    public void load(int forecastDays, RepositoryCallback<WeatherSnapshot> callback) {
+        load(forecastDays, callback, null);
     }
 
     public void load(RepositoryCallback<WeatherSnapshot> callback, RawListener rawListener) {
+        load(3, callback, rawListener);
+    }
+
+    public void load(int forecastDays, RepositoryCallback<WeatherSnapshot> callback, RawListener rawListener) {
+        int safeDays = Math.max(1, Math.min(forecastDays, 7));
         executor.execute(() -> {
             HttpURLConnection connection = null;
             try {
-                connection = (HttpURLConnection) new URL(URL_TEXT).openConnection();
+                connection = (HttpURLConnection) new URL(URL_PREFIX + safeDays).openConnection();
                 connection.setConnectTimeout(7000);
                 connection.setReadTimeout(10000);
                 String json = read(connection.getInputStream());
@@ -82,10 +84,9 @@ public final class RemoteWeatherRepository {
             now.getInt("is_day") == 1, days);
     }
 
-    private String read(InputStream in) throws Exception {
+    private String read(InputStream input) throws Exception {
         StringBuilder result = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(in, StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) result.append(line);
         }

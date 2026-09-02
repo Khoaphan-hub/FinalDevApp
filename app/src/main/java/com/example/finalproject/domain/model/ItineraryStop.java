@@ -21,6 +21,8 @@ public final class ItineraryStop implements Serializable {
     private final String tags;
     private final String highlight;
     private final String mediaUrl;
+    private final String mapName;
+    private final String mapAddress;
 
     public ItineraryStop(int id, Type type, String name, String address, double latitude,
                          double longitude, double travelToNextKm, String mealSlot) {
@@ -37,6 +39,14 @@ public final class ItineraryStop implements Serializable {
                          double longitude, double travelToNextKm, String mealSlot, String imageUrl,
                          double rating, long priceVnd, String openHours, String tags,
                          String highlight, String mediaUrl) {
+        this(id, type, name, address, latitude, longitude, travelToNextKm, mealSlot,
+            imageUrl, rating, priceVnd, openHours, tags, highlight, mediaUrl, name, address);
+    }
+
+    public ItineraryStop(int id, Type type, String name, String address, double latitude,
+                         double longitude, double travelToNextKm, String mealSlot, String imageUrl,
+                         double rating, long priceVnd, String openHours, String tags,
+                         String highlight, String mediaUrl, String mapName, String mapAddress) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -52,6 +62,8 @@ public final class ItineraryStop implements Serializable {
         this.tags = tags;
         this.highlight = highlight;
         this.mediaUrl = mediaUrl;
+        this.mapName = mapName;
+        this.mapAddress = mapAddress;
     }
 
     public int getId() { return id; }
@@ -69,4 +81,6 @@ public final class ItineraryStop implements Serializable {
     public String getTags() { return tags; }
     public String getHighlight() { return highlight; }
     public String getMediaUrl() { return mediaUrl; }
+    public String getMapName() { return mapName; }
+    public String getMapAddress() { return mapAddress; }
 }

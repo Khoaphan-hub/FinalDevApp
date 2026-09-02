@@ -13,3 +13,5 @@ backend/.venv/
 *.py[cod]
 gradle/gradle-daemon-jvm.properties
 output/
+tmp/
+backend/.run/

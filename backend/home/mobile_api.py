@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from .algorithm import generate_itinerary
-from .constants import DEFAULT_FALLBACK_COORDS, TRAVEL_MOOD_TAGS
-from .models import Eatery, Poi
+from .constants import DEFAULT_FALLBACK_COORDS, DEFAULT_FALLBACK_LABEL, TRAVEL_MOOD_TAGS
+from .models import Eatery, PlaceReport, Poi
 from .mobile_share import build_resume_snapshot, build_resume_url, create_resume_token, qr_png_base64
 from .search import get_search_tree
 from .trip_planner import _auto_fill_selections, _build_trip_state, normalize_tag_value
@@ -58,6 +58,8 @@ def _serialize_catalog_item(request, item, item_type):
         'name_en': item.name_en,
         'address': item.address,
         'address_en': item.address_en,
+        'map_name': item.name,
+        'map_address': item.address,
         'rating': item.rating,
         'price': str(price or 0),
         'latitude': item.latitude,
@@ -125,6 +127,77 @@ def mobile_search_suggestions(request):
         if item_id in items_by_id
     ]
     return JsonResponse({'success': True, 'data': {'items': items, 'count': len(items)}})
+
+
+def _report_snapshot(place, target_type):
+    snapshot = {
+        'name': place.name,
+        'address': place.address,
+        'open_hours': place.open_hours,
+        'review_url': place.tiktok_link,
+        'rating': place.rating,
+        'latitude': place.latitude,
+        'longitude': place.longitude,
+        'image_code': place.image_code,
+    }
+    if target_type == PlaceReport.TargetType.POI:
+        snapshot['price_per_person'] = (
+            str(place.price_per_person) if place.price_per_person is not None else None
+        )
+    else:
+        snapshot['price_min'] = place.price_min
+        snapshot['price_max'] = place.price_max
+    return snapshot
+
+
+@csrf_exempt
+@require_POST
+def mobile_create_place_report(request):
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return _error('Request body must be valid JSON.')
+
+    target_type = str(payload.get('target_type') or '').strip().upper()
+    category = str(payload.get('category') or '').strip().upper()
+    description = str(payload.get('description') or '').strip()
+    field_errors = {}
+
+    if target_type not in PlaceReport.TargetType.values:
+        field_errors['target_type'] = "target_type must be 'POI' or 'EATERY'."
+    try:
+        target_id = int(payload.get('target_id'))
+        if target_id < 1:
+            raise ValueError
+    except (TypeError, ValueError):
+        target_id = 0
+        field_errors['target_id'] = 'A valid place id is required.'
+    if category not in PlaceReport.Category.values:
+        field_errors['category'] = 'Select a supported report category.'
+    if not description:
+        field_errors['description'] = 'Please describe the issue.'
+    elif len(description) > 500:
+        field_errors['description'] = 'Description must be 500 characters or fewer.'
+    if field_errors:
+        return _error('Please check the report information.', field_errors=field_errors)
+
+    model = Poi if target_type == PlaceReport.TargetType.POI else Eatery
+    place = model.objects.filter(pk=target_id).first()
+    if place is None:
+        return _error('This place no longer exists.', status=404)
+
+    report = PlaceReport.objects.create(
+        target_type=target_type,
+        target_id=place.pk,
+        target_name=place.name,
+        category=category,
+        description=description,
+        current_snapshot=_report_snapshot(place, target_type),
+    )
+    return JsonResponse({
+        'success': True,
+        'data': {'report_id': report.pk, 'status': report.status},
+    }, status=201)
 
 
 @csrf_exempt
@@ -278,6 +351,8 @@ def mobile_generate_itinerary(request):
                 'id': stop.get('id', 0),
                 'name': stop.get('name'),
                 'address': stop.get('address'),
+                'map_name': item.name if item else stop.get('name'),
+                'map_address': item.address if item else stop.get('address'),
                 'latitude': stop.get('lat'),
                 'longitude': stop.get('lon'),
                 'travel_to_next_km': stop.get('travel_to_next_km', 0),

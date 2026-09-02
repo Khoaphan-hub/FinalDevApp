@@ -79,7 +79,9 @@ public final class RemoteCatalogRepository implements CatalogRepository {
                         Math.round(item.optDouble("price", 0)), nullable(item, "image_url"),
                         item.optDouble("latitude", 0), item.optDouble("longitude", 0),
                         nullable(item, "open_hours"), nullable(item, "tags"),
-                        nullable(item, "highlight"), nullable(item, "media_url")));
+                        nullable(item, "highlight"), nullable(item, "media_url"),
+                        localized(item, "map_name", "name"),
+                        localized(item, "map_address", "address")));
                 }
                 main.post(() -> callback.onSuccess(places));
             } catch (Exception error) {

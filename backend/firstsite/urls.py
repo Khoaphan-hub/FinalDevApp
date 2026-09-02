@@ -26,6 +26,7 @@ from home import views
 from home.mobile_api import (
     mobile_catalog,
     mobile_create_itinerary_share,
+    mobile_create_place_report,
     mobile_generate_itinerary,
     mobile_search_suggestions,
     mobile_profile,
@@ -64,6 +65,7 @@ urlpatterns = [
     path('api/mobile/catalog/', mobile_catalog, name='mobile-catalog'),
     path('api/mobile/search-suggestions/', mobile_search_suggestions, name='mobile-search-suggestions'),
     path('api/mobile/itineraries/share/', mobile_create_itinerary_share, name='mobile-itinerary-share'),
+    path('api/mobile/place-reports/', mobile_create_place_report, name='mobile-place-report'),
     path('api/mobile/itineraries/generate/', mobile_generate_itinerary, name='mobile-generate-itinerary'),
     path('api/logout/', home_views.logout_api, name='logout-api'),
     path('api/mobile/profile/', mobile_profile, name='mobile-profile'),

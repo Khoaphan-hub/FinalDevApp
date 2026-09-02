@@ -52,7 +52,7 @@ public final class ItineraryEditor {
             stops.set(stopIndex, new ItineraryStop(place.getId(), type, place.getName(), place.getAddress(),
                 place.getLatitude(), place.getLongitude(), 0, old.getMealSlot(), place.getImageUrl(),
                 place.getRating(), place.getPriceVnd(), place.getOpenHours(), place.getTags(),
-                place.getHighlight(), place.getMediaUrl()));
+                place.getHighlight(), place.getMediaUrl(), place.getMapName(), place.getMapAddress()));
             days.add(new ItineraryDay(dayNumber, recalculateDistances(stops)));
         }
         long estimate = Math.max(0, source.getEstimatedCostVnd() - oldPrice + place.getPriceVnd());
@@ -67,7 +67,8 @@ public final class ItineraryEditor {
             result.add(new ItineraryStop(current.getId(), current.getType(), current.getName(),
                 current.getAddress(), current.getLatitude(), current.getLongitude(), distance,
                 current.getMealSlot(), current.getImageUrl(), current.getRating(), current.getPriceVnd(),
-                current.getOpenHours(), current.getTags(), current.getHighlight(), current.getMediaUrl()));
+                current.getOpenHours(), current.getTags(), current.getHighlight(), current.getMediaUrl(),
+                current.getMapName(), current.getMapAddress()));
         }
         return result;
     }
