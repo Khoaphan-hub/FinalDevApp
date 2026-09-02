@@ -4,6 +4,18 @@
 
 > This file is the persistent project memory. Read it before doing more work so the old web project does not need to be scanned again. Update it whenever a milestone is completed or an architectural decision changes.
 
+## Latest checkpoint — integration branch, testing pending (2 September 2026)
+
+- User authorized integrating all four branches on a separate branch, keeping both text sharing and community publishing, and preserving the original LAN phone connection. User explicitly deferred ALL build/runtime testing until further approval.
+- Working branch: `integration/merge-all`, created from `main` at `d29027f` and fast-forwarded to `origin/Minh` at `45dbe3e`. That Minh commit already contains `origin/Khai` at `48e60f9`, `origin/Thanh` at `99b178e`, and `origin/main` at `d29027f`. No duplicate cherry-picks or repeated conflict resolutions were necessary.
+- Integration includes the existing PDF/review-link/report work, location support, login/register, profile/community, offline catalog/image/weather caches, and layout/lifecycle changes from the team branches. Inclusion is established from Git history and source inspection, NOT from successful runtime tests.
+- Itinerary actions are now separate: `shareTripButton` opens the native text share sheet; `publishTripButton` submits to the community endpoint. Text sharing remains available for community itineraries too; direct republishing remains hidden there, preserving the inherited behavior.
+- Restored `RemotePlannerRepository` to the exact `main` version: emulator uses `http://10.0.2.2:8000/`, physical phone uses `http://192.168.1.10:8000/` on the same Wi-Fi. ADB reverse is not required. Removed the unused Gradle base-URL fields/local-properties override so they do not contradict the selected connection mechanism. A real HTTPS backend is still required before a distributed release.
+- The report, PDF exporter, external-link helper, Django models/admin and report migration were not changed by the integration adjustments.
+- `main` and the three member branches must remain unchanged until the integration branch has been tested and the user approves promotion to `main`.
+- No Gradle build, unit/instrumentation tests, Django checks/tests/migrations, server restarts, emulator/phone runs, or database changes were performed for this integration checkpoint. Existing APKs and earlier test results are NOT evidence that this combined branch works.
+- Next action ONLY after user approval: build/test this branch; cover login/session and offline re-entry, Room v1-to-v2 upgrade without losing saved trips, generation/edit/save, text share, community publish/profile, PDF/QR/review links, reports, language switching, rotation and LAN connection. Investigate the known login/offline entry issue and session/authorization handling during that phase, not during this merge-only step.
+
 ## Objective
 
 Convert the existing **Journify** Da Lat journey-planning MVP from a Django website into a native Android application while reusing the Python/Django backend and its route-planning algorithms.

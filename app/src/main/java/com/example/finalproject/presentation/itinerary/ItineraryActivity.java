@@ -135,7 +135,8 @@ public class ItineraryActivity extends AppCompatActivity {
         findViewById(R.id.resultBackButton).setOnClickListener(v -> finish());
         
         MaterialButton saveTripBtn = findViewById(R.id.saveTripButton);
-        MaterialButton publishTripBtn = findViewById(R.id.shareTripButton);
+        MaterialButton publishTripBtn = findViewById(R.id.publishTripButton);
+        findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
         boolean isCommunity = getIntent().getBooleanExtra("IS_COMMUNITY", false);
         
         if (isCommunity) {
@@ -144,7 +145,6 @@ public class ItineraryActivity extends AppCompatActivity {
             publishTripBtn.setVisibility(View.GONE);
         } else {
             saveTripBtn.setOnClickListener(v -> saveTripLocally(v));
-            publishTripBtn.setText(R.string.publish_to_community);
             publishTripBtn.setOnClickListener(v -> publishItinerary());
         }
 
