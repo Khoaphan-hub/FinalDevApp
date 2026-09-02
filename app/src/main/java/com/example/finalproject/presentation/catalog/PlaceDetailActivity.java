@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalproject.R;
 import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.infrastructure.link.ExternalPlaceLinks;
 import com.example.finalproject.infrastructure.remote.RemoteImageLoader;
 import com.example.finalproject.presentation.SystemBarInsets;
 import com.google.android.material.button.MaterialButton;
@@ -54,15 +55,16 @@ public class PlaceDetailActivity extends AppCompatActivity {
         MaterialButton mediaButton = findViewById(R.id.placeMediaButton);
         if (isBlank(place.getMediaUrl())) mediaButton.setVisibility(View.GONE);
         else {
-            String url = place.getMediaUrl();
+            String url = ExternalPlaceLinks.cleanReviewUrl(place.getMediaUrl());
             mediaButton.setText(url.contains("tiktok.com") ? getString(R.string.view_tiktok_review)
                 : url.contains("google.com/maps") || url.contains("maps.app.goo.gl")
                 ? getString(R.string.view_google_review) : getString(R.string.open_review_link));
             mediaButton.setOnClickListener(v -> openUrl(url));
         }
         findViewById(R.id.placeDirectionsButton).setOnClickListener(v -> {
-            Uri uri = Uri.parse("geo:" + place.getLatitude() + "," + place.getLongitude()
-                + "?q=" + Uri.encode(place.getName()));
+            Uri uri = Uri.parse(ExternalPlaceLinks.googleMapsSearchUrl(
+                place.getMapName(), place.getMapAddress(),
+                place.getLatitude(), place.getLongitude()));
             openIntent(new Intent(Intent.ACTION_VIEW, uri));
         });
     }

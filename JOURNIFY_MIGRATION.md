@@ -255,6 +255,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M6.7 — Add native PDF export with resumable QR and Đà Lạt weather.**
 - [x] **M6.8 — Add persistent Vietnamese/English UI and Trie search to the Home catalog.**
 - [x] **M6.9 — Support direct Android Studio testing on emulator and physical phone.**
+- [x] **M6.10 — Upgrade PDF export into a rich visual itinerary guide.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -338,6 +339,30 @@ Next: M7 release/report/demo packaging and deployment of Django to a public HTTP
 - USB debugging was authorized on a Samsung Galaxy S23 (`SM-S911B`), Android Studio/ADB installed and opened Journify directly, and the phone joined the same `192.168.1.0/24` Wi-Fi network as the backend computer.
 - Real-device verification succeeded: the catalog loaded Django data and remote images, and the selection screen's live Trie search returned matching hill locations for `đồi`.
 - The physical LAN address remains development-only and may change after reconnecting Wi-Fi. Release builds still require a deployed HTTPS backend.
+
+### Rich visual PDF milestone — 31 August 2026
+
+- Replaced the former text-heavy PDF with a polished A4 travel guide using the Journify cream, pine-green and coral visual system.
+- The cover now summarizes total/estimated/remaining budget, total distance, number of days and places, and shows a three-image destination mosaic.
+- Every itinerary day includes an export-time Đà Lạt forecast, day distance, and a coordinate-based route diagram with ordered start/place markers. The diagram is a lightweight visual overview; the in-app map remains the source for detailed road routing.
+- Each place is presented in a structured card with its image, name/address, type, rating, individual price, distance to the next stop, opening hours, meal slot, TikTok or Google review URL when available, and a Google Maps coordinate link.
+- The final page keeps the 30-day resume QR and itinerary totals. Missing images, ratings, prices, hours or reviews fall back to explicit placeholders instead of breaking export.
+- Image downloads are concurrent, bounded and downsampled before embedding. The verified three-day sample decreased from about 10 MB to 5.3 MB without visible loss at A4 viewing size.
+- The forecast request now follows the itinerary length (up to seven days). A weather failure does not block PDF creation; that day instead receives an unavailable message.
+- Verification completed on the connected Galaxy S23: Android unit tests and debug build passed, the app exported an eight-page A4 PDF with 18 place cards, and every rendered page was visually inspected with Poppler for clipping, overlap, missing images and QR layout.
+
+Next: M7 release/report/demo packaging and deployment of Django to a public HTTPS host so QR resume links work outside the development Wi-Fi.
+
+### Reliable TikTok and Google Maps links milestone — 1 September 2026
+
+- Fixed PDF TikTok links by removing tracking parameters without rebuilding the URI path. The original `@username/video/...` path is now preserved instead of being changed to `%40username/video/...`.
+- Place details and PDF export now share one external-link builder, preventing the two screens from producing different review or map URLs.
+- Google Maps links now use the canonical Vietnamese business name and address supplied separately by Django, while the visible place name/address can remain localized in English.
+- Django catalog, Trie suggestion and generated-itinerary payloads expose `map_name` and `map_address`. Android carries these values through catalog selection, itinerary generation, stop replacement, saved trips, detail actions and PDF export.
+- New itineraries use `https://www.google.com/maps/search/?api=1&query=...`; coordinates remain the fallback when canonical text is unavailable, including itineraries saved by an older development build.
+- Added unit coverage for preserving TikTok `@`, removing TikTok tracking queries, leaving non-TikTok review links untouched, name/address Maps search and coordinate fallback.
+- Verification completed with Django system checks and five backend tests, Android unit tests and debug build. On the connected Galaxy S23, the revised APK opened a TikTok review directly and, while Journify was in English mode, opened the exact Google Maps business profile using the original Vietnamese business identity.
+- Debug APK: `app/build/outputs/apk/debug/app-debug.apk`. Django is currently running on `0.0.0.0:8000` for LAN testing.
 
 ### Separation milestone
 

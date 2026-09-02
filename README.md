@@ -9,8 +9,8 @@ Journify is a native Android journey planner for Đà Lạt. The Android client 
 3. Generate an optimized multi-day itinerary.
 4. View place details, TikTok/Google Maps review links and the route map.
 5. Replace individual stops, then save the edited trip locally with Room.
-6. Reopen or delete saved trips, share text, or export a polished PDF containing a 30-day QR resume link.
-7. See current Đà Lạt weather and a three-day forecast on the home screen.
+6. Reopen or delete saved trips, share text, or export a polished visual PDF containing place photos, per-day route diagrams and weather, ratings, prices, opening hours, TikTok/Google Maps links, total distance, and a 30-day QR resume link.
+7. See current Đà Lạt weather and a three-day forecast on the home screen; PDF export requests enough forecast days for the itinerary, up to seven days.
 
 The Home catalog and the place-selection step both search live as the user types. Django's Trie indexes Vietnamese and English place names, so queries such as `xuan` and `flower` work without pressing a search button.
 
@@ -32,6 +32,8 @@ The development build selects its backend automatically: the Android emulator us
 The LAN address is only a development convenience. A distributed APK must use a deployed HTTPS backend rather than a private `192.168.x.x` address.
 
 PDF QR links use the incoming backend address by default. For a submission/deployed backend, set `JOURNIFY_PUBLIC_BASE_URL` to its public HTTPS origin before starting Django, for example `https://journify.example.com`. A QR containing `10.0.2.2` works only inside the Android emulator and cannot be opened by another phone.
+
+The PDF route graphic is a compact coordinate-based overview designed to remain available without a paid static-map service. For turn-by-turn road geometry, open the itinerary's map screen in Journify. Place photos, current weather and newly generated resume QR links require network access during export; missing optional data is represented by a clear fallback instead of failing the whole PDF.
 
 Weather is loaded directly from Open-Meteo for Đà Lạt and needs no API key. If the device is offline, the card shows a clear retry action.
 

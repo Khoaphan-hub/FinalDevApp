@@ -17,10 +17,20 @@ public final class Place implements Serializable {
     private final String tags;
     private final String highlight;
     private final String mediaUrl;
+    private final String mapName;
+    private final String mapAddress;
 
     public Place(int id, String type, String name, String address, double rating, long priceVnd,
                  String imageUrl, double latitude, double longitude, String openHours,
                  String tags, String highlight, String mediaUrl) {
+        this(id, type, name, address, rating, priceVnd, imageUrl, latitude, longitude,
+            openHours, tags, highlight, mediaUrl, name, address);
+    }
+
+    public Place(int id, String type, String name, String address, double rating, long priceVnd,
+                 String imageUrl, double latitude, double longitude, String openHours,
+                 String tags, String highlight, String mediaUrl, String mapName,
+                 String mapAddress) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -34,6 +44,8 @@ public final class Place implements Serializable {
         this.tags = tags;
         this.highlight = highlight;
         this.mediaUrl = mediaUrl;
+        this.mapName = mapName;
+        this.mapAddress = mapAddress;
     }
 
     public int getId() { return id; }
@@ -49,4 +61,6 @@ public final class Place implements Serializable {
     public String getTags() { return tags; }
     public String getHighlight() { return highlight; }
     public String getMediaUrl() { return mediaUrl; }
+    public String getMapName() { return mapName; }
+    public String getMapAddress() { return mapAddress; }
 }

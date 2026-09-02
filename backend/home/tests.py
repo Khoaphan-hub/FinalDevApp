@@ -2,6 +2,7 @@ from django.test import SimpleTestCase, TestCase
 
 from .prefix_tree import PrefixTree, term_variants
 from .mobile_share import build_resume_snapshot
+from .models import PlaceReport, Poi
 
 
 class PrefixTreeTests(SimpleTestCase):
@@ -69,3 +70,53 @@ class MobileShareApiTests(TestCase):
         data = response.json()['data']
         self.assertTrue(data['share_url'].startswith('http://testserver/resume/'))
         self.assertGreater(len(data['qr_base64']), 1000)
+
+
+class MobilePlaceReportApiTests(TestCase):
+    def setUp(self):
+        self.poi = Poi.objects.create(
+            name='Hồ Xuân Hương',
+            address='Phường 1, Đà Lạt',
+            open_hours='Always open',
+            tiktok_link='https://www.tiktok.com/example',
+            rating=4.5,
+            price_per_person=20000,
+            latitude=11.9416,
+            longitude=108.4383,
+            image_code='poi_001',
+        )
+
+    def test_creates_report_without_changing_place_data(self):
+        response = self.client.post('/api/mobile/place-reports/', data={
+            'target_type': 'POI',
+            'target_id': self.poi.pk,
+            'category': 'WRONG_HOURS',
+            'description': 'Giờ đóng cửa thực tế là 22:00.',
+        }, content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        report = PlaceReport.objects.get(pk=response.json()['data']['report_id'])
+        self.assertEqual(report.status, PlaceReport.Status.NEW)
+        self.assertEqual(report.target_name, self.poi.name)
+        self.assertEqual(report.current_snapshot['open_hours'], 'Always open')
+        self.poi.refresh_from_db()
+        self.assertEqual(self.poi.open_hours, 'Always open')
+
+    def test_rejects_missing_description(self):
+        response = self.client.post('/api/mobile/place-reports/', data={
+            'target_type': 'POI',
+            'target_id': self.poi.pk,
+            'category': 'OTHER',
+            'description': '   ',
+        }, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('description', response.json()['field_errors'])
+
+    def test_returns_not_found_for_unknown_place(self):
+        response = self.client.post('/api/mobile/place-reports/', data={
+            'target_type': 'EATERY',
+            'target_id': 999999,
+            'category': 'CLOSED',
+            'description': 'Địa điểm đã đóng cửa.',
+        }, content_type='application/json')
+        self.assertEqual(response.status_code, 404)

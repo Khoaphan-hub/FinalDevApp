@@ -119,7 +119,8 @@ public final class RemotePlannerRepository implements PlannerRepository {
                     stop.optDouble("travel_to_next_km"), nullable(stop, "meal_slot"),
                     nullable(stop, "image_url"), stop.optDouble("rating"),
                     Math.round(stop.optDouble("price")), nullable(stop, "open_hours"),
-                    nullable(stop, "tags"), nullable(stop, "highlight"), nullable(stop, "media_url")
+                    nullable(stop, "tags"), nullable(stop, "highlight"), nullable(stop, "media_url"),
+                    localized(stop, "map_name", "name"), localized(stop, "map_address", "address")
                 ));
             }
             days.add(new ItineraryDay(dayJson.getInt("day"), stops));
@@ -131,6 +132,11 @@ public final class RemotePlannerRepository implements PlannerRepository {
 
     private String nullable(JSONObject object, String key) {
         return object.isNull(key) ? null : object.optString(key, null);
+    }
+
+    private String localized(JSONObject object, String preferred, String fallback) {
+        String value = nullable(object, preferred);
+        return value == null || value.trim().isEmpty() ? object.optString(fallback) : value;
     }
 
     private String read(InputStream input) throws Exception {

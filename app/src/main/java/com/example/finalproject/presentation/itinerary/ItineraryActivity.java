@@ -33,8 +33,10 @@ import com.example.finalproject.presentation.selection.ReplacementActivity;
 import com.example.finalproject.infrastructure.remote.RemoteImageLoader;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
 import com.example.finalproject.infrastructure.remote.RemoteItineraryShareRepository;
+import com.example.finalproject.infrastructure.remote.RemoteWeatherRepository;
 import com.example.finalproject.infrastructure.local.export.ItineraryPdfExporter;
 import com.example.finalproject.domain.model.ItineraryShareData;
+import com.example.finalproject.domain.model.WeatherSnapshot;
 import com.example.finalproject.infrastructure.local.repository.RoomSavedTripRepository;
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import android.widget.Toast;
@@ -236,7 +238,8 @@ public class ItineraryActivity extends AppCompatActivity {
     private void openDetails(ItineraryStop stop) {
         Place place = new Place(stop.getId(), stop.getType().name(), stop.getName(), stop.getAddress(),
             stop.getRating(), stop.getPriceVnd(), stop.getImageUrl(), stop.getLatitude(), stop.getLongitude(),
-            stop.getOpenHours(), stop.getTags(), stop.getHighlight(), stop.getMediaUrl());
+            stop.getOpenHours(), stop.getTags(), stop.getHighlight(), stop.getMediaUrl(),
+            stop.getMapName(), stop.getMapAddress());
         startActivity(PlaceDetailActivity.intent(this, place));
     }
 
@@ -271,17 +274,31 @@ public class ItineraryActivity extends AppCompatActivity {
         new RemoteItineraryShareRepository(RemotePlannerRepository.DEFAULT_BASE_URL).create(itinerary,
             new RepositoryCallback<ItineraryShareData>() {
                 @Override public void onSuccess(ItineraryShareData data) {
-                    pdfExecutor.execute(() -> {
-                        try {
-                            byte[] bytes = Base64.decode(data.getQrBase64(), Base64.DEFAULT);
-                            Bitmap qr = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            File file = new ItineraryPdfExporter().export(ItineraryActivity.this, itinerary, qr, data.getShareUrl());
-                            runOnUiThread(() -> { resetPdfButton(button); sharePdf(file); });
-                        } catch (Exception e) { runOnUiThread(() -> showPdfError(button, e)); }
+                    new RemoteWeatherRepository().load(itinerary.getDays().size(), new RepositoryCallback<WeatherSnapshot>() {
+                        @Override public void onSuccess(WeatherSnapshot weather) {
+                            createVisualPdf(button, data, weather);
+                        }
+                        @Override public void onError(Exception error) {
+                            createVisualPdf(button, data, null);
+                        }
                     });
                 }
                 @Override public void onError(Exception e) { showPdfError(button, e); }
             });
+    }
+
+    private void createVisualPdf(MaterialButton button, ItineraryShareData data, WeatherSnapshot weather) {
+        pdfExecutor.execute(() -> {
+            try {
+                byte[] bytes = Base64.decode(data.getQrBase64(), Base64.DEFAULT);
+                Bitmap qr = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                File file = new ItineraryPdfExporter().export(ItineraryActivity.this, itinerary, qr,
+                    data.getShareUrl(), weather);
+                runOnUiThread(() -> { resetPdfButton(button); sharePdf(file); });
+            } catch (Exception error) {
+                runOnUiThread(() -> showPdfError(button, error));
+            }
+        });
     }
 
     private void resetPdfButton(MaterialButton button) { button.setEnabled(true); button.setText(R.string.export_pdf_qr); }
