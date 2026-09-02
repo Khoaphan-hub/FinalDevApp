@@ -256,6 +256,7 @@ Avoid new networking libraries initially. Java `HttpURLConnection` and `org.json
 - [x] **M6.8 — Add persistent Vietnamese/English UI and Trie search to the Home catalog.**
 - [x] **M6.9 — Support direct Android Studio testing on emulator and physical phone.**
 - [x] **M6.10 — Upgrade PDF export into a rich visual itinerary guide.**
+- [x] **M6.11 — Add the existing-place report and admin review workflow.**
 - [ ] **M7 — Build/test APK and prepare README/report/demo/submission structure.**
 
 ## Current state / next action
@@ -363,6 +364,18 @@ Next: M7 release/report/demo packaging and deployment of Django to a public HTTP
 - Added unit coverage for preserving TikTok `@`, removing TikTok tracking queries, leaving non-TikTok review links untouched, name/address Maps search and coordinate fallback.
 - Verification completed with Django system checks and five backend tests, Android unit tests and debug build. On the connected Galaxy S23, the revised APK opened a TikTok review directly and, while Journify was in English mode, opened the exact Google Maps business profile using the original Vietnamese business identity.
 - Debug APK: `app/build/outputs/apk/debug/app-debug.apk`. Django is currently running on `0.0.0.0:8000` for LAN testing.
+
+### Place-report and admin-review milestone — 2 September 2026
+
+- Added a bilingual `Báo thông tin chưa chính xác` / `Report incorrect information` action to every POI/eatery detail screen.
+- Users choose one of nine focused issue types (closed, temporarily closed, price, hours, address/location, review link, image, duplicate, or other) and provide one required description of up to 500 characters. Account login is not required for this MVP flow.
+- Android submits reports to `POST /api/mobile/place-reports/`. Django validates the target type, place ID, category and description before accepting the request.
+- Reports are stored in the new `PlaceReport` table with the original place ID/name, issue, user description, status, timestamps and a JSON snapshot of the relevant place data at submission time.
+- Submitting a report never edits/deletes a POI/eatery and never rebuilds or changes the route matrix. This keeps route generation stable while an admin verifies the information.
+- Django Admin now has a `Place reports` queue with search/filtering, a direct link to the reported POI/eatery, an admin note, and bulk actions for `Reviewing`, `Resolved`, and `Rejected`.
+- Migration `home.0016_placereport` was created and applied to the local database. Admins can review reports at `/admin/home/placereport/` or through `Place reports` on `/admin/`.
+- Verification completed with Django system checks, eight backend tests, Android unit tests and debug APK build. On `emulator-5554`, the full flow opened the form, selected a category, entered `EMULATOR_TEST_NOT_REAL`, submitted it to Django, and produced a `NEW` report with the correct POI snapshot. That exact test record was deleted after verification.
+- The proposed new-place submission flow remains intentionally out of scope for this milestone.
 
 ### Separation milestone
 
