@@ -4,7 +4,16 @@
 
 > This file is the persistent project memory. Read it before doing more work so the old web project does not need to be scanned again. Update it whenever a milestone is completed or an architectural decision changes.
 
-## Latest checkpoint — integration branch, testing pending (2 September 2026)
+## Latest checkpoint — per-tester LAN configuration, testing pending (2 September 2026)
+
+- User approved replacing the shared hard-coded phone IP with per-developer configuration and pushing this change to `integration/merge-all` for teammates to test. `main` remains unchanged; the earlier instruction to defer build/runtime testing still applies.
+- `app/build.gradle.kts` now reads `journify.devServerIp` from the ignored root `local.properties`, validates IPv4 format/range, enables BuildConfig generation and supplies `BuildConfig.PHONE_BASE_URL`. `RemotePlannerRepository` actually consumes that field. The port remains `8000`; the transport remains Wi-Fi, not ADB reverse.
+- Emulator URL remains `http://10.0.2.2:8000/`. If the property is absent, the phone URL also falls back to the emulator host; physical-phone testers must configure their computer's IP before building. No member-specific IP is embedded in the shared Java/Gradle configuration.
+- This machine's ignored `local.properties` was given `journify.devServerIp=192.168.1.10`, preserving the user's existing phone setup without committing that file. Its existing `sdk.dir` was preserved.
+- README now explains which branch to pull, fresh backend/account setup, finding the computer's Wi-Fi IPv4, editing the local property, and syncing/rebuilding/reinstalling after an IP change. Already installed APKs are not updated merely by editing the property.
+- No build, tests, migrations, server restarts, emulator/phone runs or database changes were performed for this configuration change. Deployment/release URL configuration is still pending; the current configuration is for local development only.
+
+## Previous checkpoint — integration branch, testing pending (2 September 2026)
 
 - User authorized integrating all four branches on a separate branch, keeping both text sharing and community publishing, and preserving the original LAN phone connection. User explicitly deferred ALL build/runtime testing until further approval.
 - Working branch: `integration/merge-all`, created from `main` at `d29027f` and fast-forwarded to `origin/Minh` at `45dbe3e`. That Minh commit already contains `origin/Khai` at `48e60f9`, `origin/Thanh` at `99b178e`, and `origin/main` at `d29027f`. No duplicate cherry-picks or repeated conflict resolutions were necessary.

@@ -35,7 +35,24 @@ fresh clone. Skipping them leaves the catalog empty and every request from the a
 with `no such table: home_poi`. `load_data` imports 79 attractions and 163 eateries from the
 CSV files, including their English translations.
 
-The development build selects its backend automatically: the Android emulator uses `http://10.0.2.2:8000/`, while a physical phone uses the current development computer address `http://192.168.1.10:8000/`. For direct phone testing, connect the phone with USB debugging, keep the phone and computer on the same Wi-Fi, run Django on `0.0.0.0:8000`, select the phone in Android Studio, and press Run. If the computer receives a different LAN address, update `PHYSICAL_PHONE_BASE_URL` in `RemotePlannerRepository`.
+The Android emulator always uses `http://10.0.2.2:8000/`. A physical phone uses the LAN IPv4 address configured in each developer's **own** `local.properties`; there is no shared developer IP to edit in Java.
+
+### Tester setup — own phone over Wi-Fi
+
+1. Switch to `integration/merge-all` and pull that branch, not `main`. This integration build is awaiting testing.
+2. Prepare and start Django on the tester's computer using the steps above. A fresh database does not contain another member's accounts; register a test user through the app once the backend is ready.
+3. Run `ipconfig` on the computer running Django and find the **IPv4 Address of its Wi-Fi adapter** (not the phone's IP or the default gateway).
+4. Open `local.properties` next to `settings.gradle.kts`. Keep the existing `sdk.dir` line and add or update this entry, replacing the example with that computer's IPv4 address:
+
+   ```properties
+   journify.devServerIp=192.168.1.25
+   ```
+
+5. Keep the phone and backend computer on the same Wi-Fi. Connect USB with USB debugging enabled for installation, select the phone in Android Studio, sync Gradle and press Run to rebuild/install. API requests use Wi-Fi; `adb reverse` is not required.
+
+`local.properties` is already ignored by Git: do not force-add it or replace someone else's SDK path. Each member's IP stays local when pulling/pushing shared code. The value is read **at build time**, so after changing IP, rebuild/reinstall the app; changing this file does not reconfigure an APK already installed on a phone. Do not include `http://`, `:8000`, or a trailing slash in the property. The backend port remains `8000`.
+
+Without the property, the build falls back to the emulator host `10.0.2.2`. Emulator testing works with no IP setup; physical-phone testers must set the property. If the computer changes Wi-Fi/IP, update only this local entry and rebuild. If connection still fails, check that Django is running on `0.0.0.0:8000` and that the network/firewall allows the phone to reach that computer.
 
 The LAN address is only a development convenience. A distributed APK must use a deployed HTTPS backend rather than a private `192.168.x.x` address.
 

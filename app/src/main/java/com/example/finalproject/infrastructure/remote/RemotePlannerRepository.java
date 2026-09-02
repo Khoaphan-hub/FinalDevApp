@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Build;
 
+import com.example.finalproject.BuildConfig;
 import com.example.finalproject.domain.callback.RepositoryCallback;
 import com.example.finalproject.domain.model.Itinerary;
 import com.example.finalproject.domain.model.ItineraryDay;
@@ -30,7 +31,8 @@ import java.util.concurrent.Executors;
 
 public final class RemotePlannerRepository implements PlannerRepository {
     private static final String EMULATOR_BASE_URL = "http://10.0.2.2:8000/";
-    private static final String PHYSICAL_PHONE_BASE_URL = "http://192.168.1.10:8000/";
+    // Compiled from the tester's ignored local.properties, not a shared source-code IP.
+    private static final String PHYSICAL_PHONE_BASE_URL = BuildConfig.PHONE_BASE_URL;
     public static final String DEFAULT_BASE_URL = isEmulator()
         ? EMULATOR_BASE_URL : PHYSICAL_PHONE_BASE_URL;
     private final String baseUrl;
