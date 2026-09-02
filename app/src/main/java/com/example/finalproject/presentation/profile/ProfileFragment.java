@@ -49,6 +49,20 @@ public class ProfileFragment extends Fragment {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private android.net.Uri selectedAvatarUri;
+    private androidx.activity.result.ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> pickMedia;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        pickMedia = registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri != null) {
+                selectedAvatarUri = uri;
+                profileAvatar.setImageURI(uri);
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,6 +78,12 @@ public class ProfileFragment extends Fragment {
         profileSaveButton = view.findViewById(R.id.profileSaveButton);
         profileSaveProgress = view.findViewById(R.id.profileSaveProgress);
         profileLogoutButton = view.findViewById(R.id.profileLogoutButton);
+
+        profileAvatar.setOnClickListener(v -> {
+            pickMedia.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+                .setMediaType(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
+        });
 
         profileSaveButton.setOnClickListener(v -> saveProfile());
         profileLogoutButton.setOnClickListener(v -> logout());
@@ -135,14 +155,40 @@ public class ProfileFragment extends Fragment {
                 connection.setRequestMethod("POST");
                 connection.setConnectTimeout(6000);
                 connection.setReadTimeout(15000);
-                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                String boundary = "----WebKitFormBoundary" + System.currentTimeMillis();
+                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
                 connection.setDoOutput(true);
 
-                String postData = "email=" + URLEncoder.encode(email, "UTF-8") +
-                        "&phone_number=" + URLEncoder.encode(phone, "UTF-8");
+                try (java.io.OutputStream output = connection.getOutputStream();
+                     java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.OutputStreamWriter(output, StandardCharsets.UTF_8), true)) {
+                    
+                    writer.append("--").append(boundary).append("\r\n");
+                    writer.append("Content-Disposition: form-data; name=\"email\"\r\n\r\n");
+                    writer.append(email).append("\r\n");
 
-                try (OutputStream output = connection.getOutputStream()) {
-                    output.write(postData.getBytes(StandardCharsets.UTF_8));
+                    writer.append("--").append(boundary).append("\r\n");
+                    writer.append("Content-Disposition: form-data; name=\"phone_number\"\r\n\r\n");
+                    writer.append(phone).append("\r\n");
+
+                    if (selectedAvatarUri != null) {
+                        writer.append("--").append(boundary).append("\r\n");
+                        writer.append("Content-Disposition: form-data; name=\"avatar\"; filename=\"avatar.jpg\"\r\n");
+                        writer.append("Content-Type: image/jpeg\r\n\r\n");
+                        writer.flush();
+                        
+                        try (InputStream is = requireContext().getContentResolver().openInputStream(selectedAvatarUri)) {
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = is.read(buffer)) != -1) {
+                                output.write(buffer, 0, bytesRead);
+                            }
+                        }
+                        output.flush();
+                        writer.append("\r\n");
+                    }
+                    
+                    writer.append("--").append(boundary).append("--\r\n");
+                    writer.flush();
                 }
 
                 int status = connection.getResponseCode();
@@ -152,7 +198,7 @@ public class ProfileFragment extends Fragment {
                     mainHandler.post(() -> Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception e) {
-                mainHandler.post(() -> Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show());
             } finally {
                 if (connection != null) connection.disconnect();
                 mainHandler.post(() -> setLoading(false));

@@ -45,11 +45,11 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         JSONObject item = items.get(position);
-        holder.title.setText(item.optString("title", "Untitled Trip"));
+        holder.title.setText(item.optString("title", holder.itemView.getContext().getString(R.string.untitled_trip)));
         JSONObject owner = item.optJSONObject("owner");
-        String author = owner != null ? owner.optString("username", "Unknown") : "Unknown";
-        holder.author.setText("By " + author);
-        holder.description.setText(item.optString("description", "No description"));
+        String author = owner != null ? owner.optString("username", holder.itemView.getContext().getString(R.string.unknown_author)) : holder.itemView.getContext().getString(R.string.unknown_author);
+        holder.author.setText(holder.itemView.getContext().getString(R.string.by_author, author));
+        holder.description.setText(item.optString("description", holder.itemView.getContext().getString(R.string.no_description)));
         
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(item);

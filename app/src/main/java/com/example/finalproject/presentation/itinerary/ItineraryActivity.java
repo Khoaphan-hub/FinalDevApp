@@ -110,7 +110,24 @@ public class ItineraryActivity extends AppCompatActivity {
         }
 
         stopsContainer = findViewById(R.id.stopsContainer);
-        ((TextView) findViewById(R.id.itineraryTitle)).setText(itinerary.getTitle());
+        TextView titleView = findViewById(R.id.itineraryTitle);
+        titleView.setText(itinerary.getTitle());
+        titleView.setOnClickListener(v -> {
+            android.widget.EditText input = new android.widget.EditText(this);
+            input.setText(itinerary.getTitle());
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.rename_itinerary)
+                .setView(input)
+                .setPositiveButton(R.string.rename, (dialog, which) -> {
+                    String newTitle = input.getText().toString().trim();
+                    if (!newTitle.isEmpty()) {
+                        itinerary = com.example.finalproject.domain.model.ItineraryEditor.rename(itinerary, newTitle);
+                        titleView.setText(itinerary.getTitle());
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+        });
         updateBudget();
         findViewById(R.id.offlineBadge).setVisibility(itinerary.isOfflineDemo() ? TextView.VISIBLE : TextView.GONE);
         findViewById(R.id.resultBackButton).setOnClickListener(v -> finish());
@@ -120,12 +137,12 @@ public class ItineraryActivity extends AppCompatActivity {
         boolean isCommunity = getIntent().getBooleanExtra("IS_COMMUNITY", false);
         
         if (isCommunity) {
-            saveTripBtn.setText("Save to Device");
+            saveTripBtn.setText(R.string.save_to_device);
             saveTripBtn.setOnClickListener(v -> saveCommunityItinerary());
             publishTripBtn.setVisibility(View.GONE);
         } else {
             saveTripBtn.setOnClickListener(v -> saveTripLocally(v));
-            publishTripBtn.setText("Publish to Community");
+            publishTripBtn.setText(R.string.publish_to_community);
             publishTripBtn.setOnClickListener(v -> publishItinerary());
         }
 
@@ -311,10 +328,10 @@ public class ItineraryActivity extends AppCompatActivity {
     private void saveCommunityItinerary() {
         new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
             @Override public void onSuccess(Long id) {
-                Toast.makeText(ItineraryActivity.this, "Saved to device!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItineraryActivity.this, R.string.saved_to_device_success, Toast.LENGTH_SHORT).show();
             }
             @Override public void onError(Exception error) {
-                Toast.makeText(ItineraryActivity.this, "Failed to save", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItineraryActivity.this, R.string.trip_save_error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -346,12 +363,12 @@ public class ItineraryActivity extends AppCompatActivity {
 
                 int status = connection.getResponseCode();
                 if (status >= 200 && status < 300) {
-                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Published successfully!", Toast.LENGTH_SHORT).show());
+                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.publish_success, Toast.LENGTH_SHORT).show());
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Failed to publish", Toast.LENGTH_SHORT).show());
+                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.publish_failed, Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show());
+                new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show());
             } finally {
                 if (connection != null) connection.disconnect();
             }

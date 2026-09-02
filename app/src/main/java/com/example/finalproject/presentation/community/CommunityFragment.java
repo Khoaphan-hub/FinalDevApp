@@ -97,13 +97,13 @@ public class CommunityFragment extends Fragment {
                 } else {
                     mainHandler.post(() -> {
                         progress.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Failed to load", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.publish_failed, Toast.LENGTH_SHORT).show();
                     });
                 }
             } catch (Exception e) {
                 mainHandler.post(() -> {
                     progress.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 });
             } finally {
                 if (connection != null) connection.disconnect();
@@ -144,12 +144,12 @@ public class CommunityFragment extends Fragment {
                 }
                 mainHandler.post(() -> {
                     progress.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Failed to load details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.publish_failed, Toast.LENGTH_SHORT).show();
                 });
             } catch (Exception e) {
                 mainHandler.post(() -> {
                     progress.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 });
             } finally {
                 if (connection != null) connection.disconnect();

@@ -707,12 +707,18 @@ class SharedItineraryTopAPI(APIView):
         return Response({"itineraries": data})
 
 
+from rest_framework.authentication import SessionAuthentication
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # Bypass CSRF for mobile clients
+
 @method_decorator(csrf_exempt, name='dispatch')
 class GeneratedItinerarySubmissionAPI(APIView):
     """Persist the itinerary stored in session and optional feedback."""
 
     permission_classes = []
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
     form_class = GeneratedItinerarySubmissionForm
 
@@ -758,7 +764,7 @@ class SharedItineraryDetailAPI(APIView):
     """Expose a single itinerary and its feedback."""
 
     permission_classes = []
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
     def get(self, request: HttpRequest, itinerary_id: int) -> Response:
         itinerary = SharedItinerary.objects.filter(pk=itinerary_id, is_public=True).first()
@@ -787,7 +793,7 @@ class SharedItineraryFeedbackAPI(APIView):
     """Create or update feedback for a public itinerary."""
 
     permission_classes = []
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
     form_class = ItineraryFeedbackForm
 
@@ -820,7 +826,7 @@ class AdoptSharedItineraryAPI(APIView):
     """Copy a shared itinerary back into the planner session."""
 
     permission_classes = []
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
     def post(self, request: HttpRequest, itinerary_id: int) -> Response:
         # Require authentication to adopt an itinerary

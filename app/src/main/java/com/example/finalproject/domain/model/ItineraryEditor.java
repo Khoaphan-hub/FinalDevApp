@@ -32,6 +32,10 @@ public final class ItineraryEditor {
         return json;
     }
 
+    public static Itinerary rename(Itinerary source, String newTitle) {
+        return new Itinerary(newTitle, source.getDays(), source.getTotalBudgetVnd(), source.getEstimatedCostVnd(), source.isOfflineDemo());
+    }
+
     public static Itinerary replace(Itinerary source, int dayNumber, int stopIndex, Place place) {
         List<ItineraryDay> days = new ArrayList<>();
         long oldPrice = 0;

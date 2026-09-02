@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="No community itineraries found."
+        android:text="@string/no_community_itineraries"
         android:textColor="@color/text_secondary"
         android:visibility="gone" />
 </FrameLayout>
