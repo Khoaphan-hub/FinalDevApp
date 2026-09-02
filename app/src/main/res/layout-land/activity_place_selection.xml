@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Landscape variant. Stacking the header, filters, search box and both action buttons above the
+  list leaves no vertical room for the list itself on a short screen, so the controls move into a
+  scrollable left column and the place list gets the remaining width. Every id matches the
+  portrait layout, so PlaceSelectionActivity needs no changes.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/selectionRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal">
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="42"
+            android:fillViewport="true">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="10dp" android:paddingEnd="20dp">
+                    <TextView android:id="@+id/selectionBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/selection_title" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+                </LinearLayout>
+                <TextView android:id="@+id/selectionSummary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="6dp" android:layout_marginEnd="20dp" android:background="@color/primary_soft" android:padding="12dp" android:textColor="@color/text_primary" android:textSize="13sp" />
+                <com.google.android.material.chip.ChipGroup android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="10dp" android:layout_marginEnd="20dp" app:selectionRequired="true" app:singleSelection="true">
+                    <com.google.android.material.chip.Chip android:id="@+id/selectionPoiChip" style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/poi_type" />
+                    <com.google.android.material.chip.Chip android:id="@+id/selectionEateryChip" style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/eatery_type" />
+                </com.google.android.material.chip.ChipGroup>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:hint="@string/selection_search_hint"
+                    app:endIconMode="clear_text">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/selectionSearchInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionGenerateButton" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginStart="20dp" android:layout_marginTop="14dp" android:layout_marginEnd="20dp" android:text="@string/generate_selected" app:cornerRadius="16dp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionSkipButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="46dp" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:text="@string/skip_selection" />
+            </LinearLayout>
+        </ScrollView>
+
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="58">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/selectionRecyclerView" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingStart="8dp" android:paddingTop="8dp" android:paddingEnd="20dp" android:paddingBottom="12dp" />
+            <ProgressBar android:id="@+id/selectionProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />
+            <LinearLayout android:id="@+id/selectionStatePanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="28dp" android:visibility="gone">
+                <TextView android:id="@+id/selectionStateMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="@color/text_secondary" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionRetryButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/reload_list" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/selectionGenerating" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#CCF8F5EE" android:clickable="true" android:focusable="true" android:gravity="center" android:orientation="vertical" android:visibility="gone">
+        <ProgressBar android:layout_width="52dp" android:layout_height="52dp" android:indeterminateTint="@color/primary" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/optimizing_route" android:textColor="@color/text_primary" android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>
