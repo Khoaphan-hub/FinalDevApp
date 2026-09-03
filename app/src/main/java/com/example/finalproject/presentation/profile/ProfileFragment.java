@@ -126,10 +126,10 @@ public class ProfileFragment extends Fragment {
                 JSONObject response = new JSONObject(readStream(stream));
                 
                 if (status >= 200 && status < 300) {
-                    final String username = response.optString("username");
-                    final String email = response.optString("email");
-                    final String phone = response.optString("phone_number");
-                    final String avatarUrl = response.optString("avatar_url");
+                    final String username = text(response, "username");
+                    final String email = text(response, "email");
+                    final String phone = text(response, "phone_number");
+                    final String avatarUrl = text(response, "avatar_url");
 
                     mainHandler.post(() -> {
                         showSignedIn(true);
@@ -163,6 +163,16 @@ public class ProfileFragment extends Fragment {
                 if (connection != null) connection.disconnect();
             }
         });
+    }
+
+    /**
+     * Reads a string field, treating JSON null as empty.
+     *
+     * optString returns the literal text "null" for a JSON null, which is how an unset phone
+     * number ended up displayed as "null" in the input.
+     */
+    private static String text(JSONObject json, String key) {
+        return json.isNull(key) ? "" : json.optString(key, "");
     }
 
     private void saveProfile() {
