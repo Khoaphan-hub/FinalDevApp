@@ -330,6 +330,21 @@ def mobile_generate_itinerary(request):
         return _error(algorithm_error)
 
     chosen = itinerary_en if language == 'en' else itinerary_vi
+
+    # Collect the stop ids up front and fetch the rows in two queries, rather than issuing
+    # one single-row SELECT per stop inside the loop below.
+    poi_ids, eatery_ids = set(), set()
+    for stops in chosen.values():
+        for stop in stops:
+            if not stop.get('id'):
+                continue
+            if stop.get('type', 'POI') == 'EATERY':
+                eatery_ids.add(stop['id'])
+            else:
+                poi_ids.add(stop['id'])
+    poi_by_id = Poi.objects.in_bulk(poi_ids) if poi_ids else {}
+    eatery_by_id = Eatery.objects.in_bulk(eatery_ids) if eatery_ids else {}
+
     normalized_days = []
     for day_number, stops in chosen.items():
         normalized_stops = []
@@ -337,9 +352,9 @@ def mobile_generate_itinerary(request):
             item_type = stop.get('type', 'POI')
             item = None
             if item_type == 'POI' and stop.get('id'):
-                item = Poi.objects.filter(id=stop['id']).first()
+                item = poi_by_id.get(stop['id'])
             elif item_type == 'EATERY' and stop.get('id'):
-                item = Eatery.objects.filter(id=stop['id']).first()
+                item = eatery_by_id.get(stop['id'])
             image_code = item.image_code if item else None
             item_price = Decimal('0')
             if item_type == 'POI' and item:
