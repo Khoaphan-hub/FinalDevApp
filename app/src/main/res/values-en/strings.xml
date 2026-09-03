@@ -56,4 +56,5 @@
     <string name="password_hint">Password</string>
     <string name="signup_prompt">Don\'t have an account? Sign up</string>
     <string name="username_hint">Username</string>
+    <string name="sign_in_required_title">Sign-in required</string><string name="sign_in_required_message">Your profile and the community features need an account. Exploring places and building itineraries keep working without one.</string><string name="logged_out">Signed out.</string>
 </resources>

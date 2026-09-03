@@ -51,10 +51,18 @@ public class ProfileFragment extends Fragment {
 
     private android.net.Uri selectedAvatarUri;
     private androidx.activity.result.ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> pickMedia;
+    private androidx.activity.result.ActivityResultLauncher<Intent> signInLauncher;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // LoginActivity now reports back instead of restarting the app, so a successful
+        // sign-in can simply reload this screen with the account that was just used.
+        signInLauncher = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == android.app.Activity.RESULT_OK) loadProfile();
+            });
         pickMedia = registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
                 selectedAvatarUri = uri;
@@ -128,8 +136,16 @@ public class ProfileFragment extends Fragment {
                             profileAvatar.setImageResource(android.R.drawable.sym_def_app_icon);
                         }
                     });
+                } else if (status == 401) {
+                    // Browsing needs no account, so reaching Profile signed out is a normal
+                    // state, not an error: offer the sign-in instead of just reporting failure.
+                    mainHandler.post(this::promptSignIn);
                 } else {
-                    mainHandler.post(() -> Toast.makeText(getContext(), "Failed to load profile", Toast.LENGTH_SHORT).show());
+                    mainHandler.post(() -> {
+                        if (isAdded()) {
+                            Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -206,6 +222,21 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Asks whether to sign in, and reloads the screen if the user comes back signed in.
+     * Declining simply leaves Profile empty; the rest of the app keeps working.
+     */
+    private void promptSignIn() {
+        if (!isAdded()) return;
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.sign_in_required_title)
+            .setMessage(R.string.sign_in_required_message)
+            .setNegativeButton(R.string.keep, null)
+            .setPositiveButton(R.string.login_button,
+                (dialog, which) -> signInLauncher.launch(new Intent(requireContext(), LoginActivity.class)))
+            .show();
+    }
+
     private void logout() {
         executor.execute(() -> {
             HttpURLConnection connection = null;
@@ -226,12 +257,11 @@ public class ProfileFragment extends Fragment {
                 java.net.CookieHandler.setDefault(new java.net.CookieManager());
                 
                 mainHandler.post(() -> {
-                    if (getActivity() != null) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        getActivity().finish();
-                    }
+                    if (!isAdded()) return;
+                    // Signing out no longer means leaving the app: the user stays on Profile,
+                    // which reloads into its signed-out state and offers to sign in again.
+                    Toast.makeText(getContext(), R.string.logged_out, Toast.LENGTH_SHORT).show();
+                    loadProfile();
                 });
             }
         });

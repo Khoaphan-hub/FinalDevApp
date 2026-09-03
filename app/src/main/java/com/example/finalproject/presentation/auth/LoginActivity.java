@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalproject.R;
 import com.example.finalproject.infrastructure.remote.RemotePlannerRepository;
-import com.example.finalproject.presentation.MainActivity;
 import com.example.finalproject.presentation.SystemBarInsets;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -116,8 +115,9 @@ public class LoginActivity extends AppCompatActivity {
     }
     
     private void onLoginSuccess() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        // This screen is now opened from wherever an account was needed, rather than being
+        // the app's entry point, so finishing returns the user to what they were doing.
+        setResult(RESULT_OK);
         finish();
     }
     

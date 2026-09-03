@@ -125,10 +125,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
     
     private void onRegisterSuccess() {
-        // Go to main activity directly after successful registration
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        // Registering signs the user in, so hand the result back the same way a sign-in does
+        // and let the screen that asked for an account carry on.
+        setResult(RESULT_OK);
         finish();
     }
     
