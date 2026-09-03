@@ -14,10 +14,34 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public final class RemoteImageLoader {
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
+    private static final int PARALLEL_DOWNLOADS = 4;
+
+    /**
+     * Decode target when the ImageView has not been measured yet, i.e. the very first layout
+     * pass. Full screen width, so a hero image is not visibly soft; recycled list rows report
+     * their real width and get a far smaller bitmap than this.
+     */
+    private static final int DEFAULT_TARGET_PX = 1080;
+
+    /**
+     * Newest request first.
+     *
+     * ThreadPoolExecutor enqueues through offer(), so routing offer() to offerFirst() turns the
+     * queue into a stack. With a plain FIFO queue, scrolling past fifty rows leaves the images
+     * for the rows now on screen at the back of the queue, behind every row that already
+     * scrolled away, which is why pictures appeared to fill in from the top downwards long
+     * after scrolling stopped.
+     */
+    private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(
+        PARALLEL_DOWNLOADS, PARALLEL_DOWNLOADS, 0L, TimeUnit.MILLISECONDS,
+        new LinkedBlockingDeque<Runnable>() {
+            @Override public boolean offer(Runnable task) { return offerFirst(task); }
+        });
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     /**
      * An eighth of the heap, measured in kilobytes. LruCache counts entries by default, so a
@@ -46,11 +70,21 @@ public final class RemoteImageLoader {
             target.setImageBitmap(cached);
             return;
         }
+        // Read the view size here, on the main thread, while touching the view is safe.
+        // A recycled row is already measured; a brand new one reports 0 and takes the default.
+        int measured = Math.max(target.getWidth(), target.getHeight());
+        final int targetPx = measured > 0 ? measured : DEFAULT_TARGET_PX;
+
         EXECUTOR.execute(() -> {
+            // The view may have been rebound while this task waited in the queue. Checking the
+            // tag BEFORE any disk or network work means a fast scroll costs nothing for rows
+            // that are already gone, instead of decoding and transferring bytes nobody sees.
+            if (!url.equals(target.getTag())) return;
+
             // Disk first: offline this is the only source, and online it saves a round trip.
             byte[] stored = ImageDiskCache.read(url);
             if (stored != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(stored, 0, stored.length);
+                Bitmap bitmap = decodeScaled(stored, targetPx);
                 if (bitmap != null) {
                     publish(url, bitmap, target);
                     return;
@@ -65,7 +99,7 @@ public final class RemoteImageLoader {
                 connection.setInstanceFollowRedirects(true);
                 try (InputStream stream = connection.getInputStream()) {
                     byte[] bytes = readAll(stream);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    Bitmap bitmap = decodeScaled(bytes, targetPx);
                     if (bitmap != null) {
                         ImageDiskCache.write(url, bytes);
                         publish(url, bitmap, target);
@@ -84,6 +118,32 @@ public final class RemoteImageLoader {
         MAIN.post(() -> {
             if (url.equals(target.getTag())) target.setImageBitmap(bitmap);
         });
+    }
+
+    /**
+     * Decodes at the smallest power-of-two reduction that still covers targetPx.
+     *
+     * The catalog photos are full-resolution originals; the largest is 2592x1944, which would
+     * occupy about 19 MB as a bitmap while being shown in a 104dp thumbnail. Decoding it at 1/8
+     * scale looks identical on screen for a fraction of the memory, and decodes far faster,
+     * which is most of why the list felt slow.
+     */
+    private static Bitmap decodeScaled(byte[] data, int targetPx) {
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        // Reads the header only: fills in outWidth/outHeight without allocating any pixels.
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(data, 0, data.length, bounds);
+
+        int sampleSize = 1;
+        while (bounds.outWidth / (sampleSize * 2) >= targetPx
+            && bounds.outHeight / (sampleSize * 2) >= targetPx) {
+            sampleSize *= 2;
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        // BitmapFactory only honours powers of two, which is why the loop doubles.
+        options.inSampleSize = sampleSize;
+        return BitmapFactory.decodeByteArray(data, 0, data.length, options);
     }
 
     private static byte[] readAll(InputStream stream) throws java.io.IOException {
