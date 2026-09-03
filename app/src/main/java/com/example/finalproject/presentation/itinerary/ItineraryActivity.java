@@ -322,7 +322,8 @@ public class ItineraryActivity extends AppCompatActivity {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(R.string.sign_in_required_title)
             .setMessage(R.string.sign_in_to_save)
-            .setNegativeButton(R.string.keep, null)
+            // Not R.string.keep: that reads "keep this trip" and belongs to the delete dialog.
+            .setNegativeButton(R.string.stay_here, null)
             .setPositiveButton(R.string.login_button, (dialog, which) -> signInLauncher.launch(
                 new Intent(this, com.example.finalproject.presentation.auth.LoginActivity.class)))
             .show();
