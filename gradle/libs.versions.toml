@@ -7,6 +7,7 @@ activityKtx = "1.13.0"
 room = "2.7.1"
 lifecycle = "2.9.1"
 recyclerview = "1.4.0"
+viewpager2 = "1.1.0"
 cardview = "1.0.0"
 
 [libraries]
@@ -19,6 +20,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
 lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "lifecycle" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
 cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
 
 [plugins]

@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.recyclerview)
+    implementation(libs.viewpager2)
     implementation(libs.cardview)
 
     // Room
