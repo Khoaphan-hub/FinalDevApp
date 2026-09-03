@@ -268,8 +268,9 @@ public class ProfileFragment extends Fragment {
             } finally {
                 if (connection != null) connection.disconnect();
                 
-                // Clear cookies and return to login
-                java.net.CookieHandler.setDefault(new java.net.CookieManager());
+                // Replacing the handler would throw away the persistent store for the rest of
+                // the process; clearing it keeps the same store and wipes what is on disk.
+                com.example.finalproject.infrastructure.local.PersistentCookieStore.clear(context);
                 
                 com.example.finalproject.infrastructure.local.SessionState
                     .markSignedOut(context.getApplicationContext());
