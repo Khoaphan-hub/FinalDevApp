@@ -4,6 +4,7 @@ from math import radians, sin, cos, sqrt, atan2, ceil
 from sklearn.cluster import KMeans
 import os
 import sqlite3
+import threading
 from itertools import permutations
 
 MEAL_SLOT_LABELS = {
@@ -17,6 +18,10 @@ _DISTANCE_DB_PATH = None
 _LOCATION_ID_SET = None
 # Maps a model primary key to the id used inside dalat_distances.db, e.g. ('POI', 80) -> 'P001'.
 _MATRIX_ID_BY_PK = None
+# One read-only connection per thread. The dev server is multi-threaded and a SQLite
+# connection cannot be shared across threads, but reopening a 19 MB file on every distance
+# lookup was costing more than the queries themselves.
+_DISTANCE_CONN = threading.local()
 
 # --- 1. CORE FUNCTIONS ---
 
@@ -36,6 +41,21 @@ def get_distance_db_path():
     
     return _DISTANCE_DB_PATH
 
+def get_distance_connection():
+    """
+    Returns this thread's read-only connection to the distance database, opening it once.
+
+    The file is a pre-computed, never-modified road-distance matrix, so a long-lived
+    read-only connection is safe and avoids paying the open/close cost per lookup.
+    """
+    conn = getattr(_DISTANCE_CONN, 'conn', None)
+    if conn is None:
+        # mode=ro tells SQLite the file is read-only, so it skips journal and lock setup.
+        conn = sqlite3.connect('file:%s?mode=ro' % get_distance_db_path(), uri=True)
+        _DISTANCE_CONN.conn = conn
+    return conn
+
+
 def get_all_location_ids():
     """
     Get all unique location IDs from the distance database (cached).
@@ -50,14 +70,11 @@ def get_all_location_ids():
         db_path = get_distance_db_path()
         print(f"Loading location IDs from: {db_path}")
         
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
+        cursor = get_distance_connection().cursor()
+
         # Get all unique origin_ids (which should include all locations)
         cursor.execute("SELECT DISTINCT origin_id FROM distances")
         location_ids = set(row[0] for row in cursor.fetchall())
-        
-        conn.close()
         
         _LOCATION_ID_SET = location_ids
         print(f"Location IDs loaded successfully. Count: {len(location_ids)} locations")
@@ -72,18 +89,15 @@ def get_distance_from_db(origin_id: str, dest_id: str) -> float:
     Returns distance in km, or None if not found.
     """
     try:
-        db_path = get_distance_db_path()
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
+        cursor = get_distance_connection().cursor()
+
         cursor.execute(
             "SELECT distance_km FROM distances WHERE origin_id = ? AND dest_id = ?",
             (origin_id, dest_id)
         )
-        
+
         result = cursor.fetchone()
-        conn.close()
-        
+
         if result:
             return float(result[0])
         return None
@@ -235,9 +249,7 @@ def build_distance_matrix_optimized(locations):
     if all_in_db:
         # OPTIMIZED: Batch lookup using SQL
         try:
-            db_path = get_distance_db_path()
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
+            cursor = get_distance_connection().cursor()
             
             # Build query to fetch all distances we need in one go
             pairs = []
@@ -267,7 +279,6 @@ def build_distance_matrix_optimized(locations):
                     dist_matrix[i][j] = float(distance)
                     dist_matrix[j][i] = float(distance)
             
-            conn.close()
             return dist_matrix
         except Exception as e:
             print(f"Warning: Batch database lookup failed ({e}), falling back to individual lookups")
