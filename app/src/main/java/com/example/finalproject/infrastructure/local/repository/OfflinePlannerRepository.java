@@ -50,6 +50,9 @@ public final class OfflinePlannerRepository implements PlannerRepository {
     @Override
     public void generate(TripRequest request, RepositoryCallback<Itinerary> callback) {
         executor.execute(() -> {
+            // Same reason as in CachingCatalogRepository: without this a fresh install plans
+            // the whole trip from nine hardcoded sample places.
+            cache.seedFromAssetsIfEmpty();
             List<Place> pois = cache.load("poi", "", CANDIDATE_LIMIT);
             List<Place> eateries = cache.load("eatery", "", CANDIDATE_LIMIT);
             Itinerary itinerary = OfflineItineraryBuilder.build(request, pois, eateries, labels());

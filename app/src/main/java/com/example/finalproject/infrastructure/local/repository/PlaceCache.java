@@ -3,6 +3,7 @@ package com.example.finalproject.infrastructure.local.repository;
 import android.content.Context;
 
 import com.example.finalproject.domain.model.Place;
+import com.example.finalproject.infrastructure.local.AssetCatalogSeed;
 import com.example.finalproject.infrastructure.local.dao.CachedPlaceDao;
 import com.example.finalproject.infrastructure.local.db.JournifyDatabase;
 import com.example.finalproject.infrastructure.local.entity.CachedPlaceEntity;
@@ -17,10 +18,35 @@ import java.util.Locale;
  * Every method here blocks, so callers must already be off the main thread.
  */
 public final class PlaceCache {
+    /**
+     * Timestamp written on rows that came from the bundled asset rather than from Django.
+     * Zero keeps lastUpdatedAt() honest: nothing has actually been downloaded yet.
+     */
+    private static final long BUNDLED_AT = 0L;
+
+    private final Context context;
     private final CachedPlaceDao dao;
 
     public PlaceCache(Context context) {
+        this.context = context.getApplicationContext();
         this.dao = JournifyDatabase.get(context).cachedPlaceDao();
+    }
+
+    /**
+     * Loads the catalog shipped inside the APK when this language has no rows yet.
+     *
+     * Without it a first launch with no reachable backend has nothing to fall back on, because
+     * the cache only ever fills from a successful download. Blocking, like the rest of this
+     * class, so callers must already be off the main thread.
+     */
+    public void seedFromAssetsIfEmpty() {
+        String language = currentLanguage();
+        if (dao.count("POI", language) > 0 || dao.count("EATERY", language) > 0) return;
+
+        List<Place> bundled = AssetCatalogSeed.load(context);
+        if (bundled.isEmpty()) return;
+        // The type argument is unused here: every bundled row carries its own type.
+        save("POI", bundled, BUNDLED_AT);
     }
 
     /** The catalog is stored per language because Django returns localized names and addresses. */
@@ -29,9 +55,12 @@ public final class PlaceCache {
     }
 
     public void save(String type, List<Place> places) {
+        save(type, places, System.currentTimeMillis());
+    }
+
+    private void save(String type, List<Place> places, long cachedAt) {
         if (places.isEmpty()) return;
         String language = currentLanguage();
-        long now = System.currentTimeMillis();
         List<CachedPlaceEntity> rows = new ArrayList<>(places.size());
         for (Place place : places) {
             CachedPlaceEntity row = new CachedPlaceEntity();
@@ -50,7 +79,7 @@ public final class PlaceCache {
             row.tags = place.getTags();
             row.highlight = place.getHighlight();
             row.mediaUrl = place.getMediaUrl();
-            row.cachedAt = now;
+            row.cachedAt = cachedAt;
             rows.add(row);
         }
         dao.upsertAll(rows);

@@ -67,6 +67,9 @@ public final class CachingCatalogRepository implements CatalogRepository {
 
         @Override public void onError(Exception error) {
             executor.execute(() -> {
+                // A first launch that has never been online has an empty cache; fill it from
+                // the catalog bundled in the APK so Explore shows real places, not an error.
+                cache.seedFromAssetsIfEmpty();
                 List<Place> cached = cache.load(type, query, 80);
                 long cachedAt = cache.lastUpdatedAt();
                 main.post(() -> {
