@@ -168,3 +168,35 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'email_cua_ban@gmail.com'
 # EMAIL_HOST_PASSWORD = 'mat_khau_ung_dung_google' # Không phải mật khẩu đăng nhập, là App Password
+
+
+# --- Logging -----------------------------------------------------------------
+# The itinerary algorithm emits a detailed step-by-step trace (clustering, TSP routing,
+# eatery placement). It is useful while debugging and pure noise otherwise, so it sits at
+# DEBUG level and is silenced by default.
+#
+# Enable it for one run with:  JOURNIFY_LOG_LEVEL=DEBUG python manage.py runserver
+ALGORITHM_LOG_LEVEL = os.environ.get('JOURNIFY_LOG_LEVEL', 'WARNING').upper()
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {'format': '[%(levelname)s] %(name)s: %(message)s'},
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        # Vietnamese place names appear in these messages, which is exactly why they must not
+        # go through a bare print() to a stdout that may not be UTF-8.
+        'home.algorithm': {
+            'handlers': ['console'],
+            'level': ALGORITHM_LOG_LEVEL,
+            'propagate': False,
+        },
+    },
+}

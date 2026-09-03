@@ -2,10 +2,17 @@ import numpy as np
 import pandas as pd
 from math import radians, sin, cos, sqrt, atan2, ceil
 from sklearn.cluster import KMeans
+import logging
 import os
 import sqlite3
 import threading
 from itertools import permutations
+
+# The step-by-step trace below used to go to stdout via print(). That had two problems: it
+# printed Vietnamese place names, which raised UnicodeEncodeError whenever process stdout was
+# not UTF-8 (the wsgi/gunicorn case), and it could not be silenced in production. Logging is
+# encoding-safe and its level is configured in settings.LOGGING.
+logger = logging.getLogger(__name__)
 
 MEAL_SLOT_LABELS = {
     'morning': 'Sáng',
@@ -68,7 +75,7 @@ def get_all_location_ids():
     
     try:
         db_path = get_distance_db_path()
-        print(f"Loading location IDs from: {db_path}")
+        logger.debug(f"Loading location IDs from: {db_path}")
         
         cursor = get_distance_connection().cursor()
 
@@ -77,10 +84,10 @@ def get_all_location_ids():
         location_ids = set(row[0] for row in cursor.fetchall())
         
         _LOCATION_ID_SET = location_ids
-        print(f"Location IDs loaded successfully. Count: {len(location_ids)} locations")
+        logger.debug(f"Location IDs loaded successfully. Count: {len(location_ids)} locations")
         return location_ids
     except Exception as e:
-        print(f"Error loading location IDs: {e}")
+        logger.error(f"Error loading location IDs: {e}")
         return set()
 
 def get_distance_from_db(origin_id: str, dest_id: str) -> float:
@@ -102,7 +109,7 @@ def get_distance_from_db(origin_id: str, dest_id: str) -> float:
             return float(result[0])
         return None
     except Exception as e:
-        print(f"Error fetching distance from DB: {e}")
+        logger.error(f"Error fetching distance from DB: {e}")
         return None
 
 def get_matrix_id_map():
@@ -176,7 +183,7 @@ def redistribute_pois(df, daily_poi_limit, num_days, kmeans_centers):
     overloaded_clusters = [k for k, v in cluster_counts.items() if v > daily_poi_limit]
     underloaded_clusters = [k for k, v in cluster_counts.items() if v < daily_poi_limit]
 
-    print(f"Initial Cluster Counts: {cluster_counts}")
+    logger.debug(f"Initial Cluster Counts: {cluster_counts}")
 
     while overloaded_clusters:
         # 1. Identify the largest cluster (source)
@@ -213,12 +220,12 @@ def redistribute_pois(df, daily_poi_limit, num_days, kmeans_centers):
         cluster_counts[source_cluster_id] -= 1
         cluster_counts[dest_cluster_id] += 1
         
-        print(f"-> Moved {poi_to_move['name']} (from Day {source_cluster_id+1} to Day {dest_cluster_id+1})")
+        logger.debug(f"-> Moved {poi_to_move['name']} (from Day {source_cluster_id+1} to Day {dest_cluster_id+1})")
 
         if cluster_counts[source_cluster_id] <= daily_poi_limit:
             overloaded_clusters.remove(source_cluster_id)
 
-    print(f"Final Balanced Counts: {cluster_counts}")
+    logger.debug(f"Final Balanced Counts: {cluster_counts}")
     return df
 
 def build_distance_matrix_optimized(locations):
@@ -281,7 +288,7 @@ def build_distance_matrix_optimized(locations):
             
             return dist_matrix
         except Exception as e:
-            print(f"Warning: Batch database lookup failed ({e}), falling back to individual lookups")
+            logger.warning(f"Warning: Batch database lookup failed ({e}), falling back to individual lookups")
     
     # Fallback: Build matrix with individual lookups or haversine
     for i in range(n):
@@ -568,7 +575,7 @@ def _solve_tsp_bnb_full(locations, dist_matrix, max_nodes):
     initial_remaining = set(range(1, n))
     branch_and_bound([0], initial_remaining, 0)
     
-    print(f"Branch & Bound: Explored {nodes_explored[0]} nodes, Best cost: {best_cost:.2f}km")
+    logger.debug(f"Branch & Bound: Explored {nodes_explored[0]} nodes, Best cost: {best_cost:.2f}km")
     
     return [locations[i] for i in best_path]
 
@@ -634,7 +641,7 @@ def generate_itinerary(
         accommodation_address: User's accommodation address to geocode and use as start/end point
         use_default_center: If True, use Dalat Market (P001) as accommodation without geocoding
     """
-    print("--- Starting Itinerary Generation ---")
+    logger.debug("--- Starting Itinerary Generation ---")
 
     # --- Step 1: Convert QuerySets to DataFrames & Check Capacity ---
     
@@ -672,36 +679,36 @@ def generate_itinerary(
                 accommodation_name = dalat_market.name
                 accommodation_name_en = dalat_market.name_en or dalat_market.name
                 accommodation_id = 'P001'  # Use POI ID for Dalat Market
-                print(f"[ACCOMMODATION] Using Dalat Market (P001) as default: {dalat_market.name}, lat={accommodation_coords[0]:.6f}, lon={accommodation_coords[1]:.6f}")
+                logger.debug(f"[ACCOMMODATION] Using Dalat Market (P001) as default: {dalat_market.name}, lat={accommodation_coords[0]:.6f}, lon={accommodation_coords[1]:.6f}")
             else:
                 # Fallback to default coordinates if POI not found
                 accommodation_coords = DEFAULT_FALLBACK_COORDS
                 accommodation_name = "Dalat Center"
                 accommodation_id = None
-                print(f"[ACCOMMODATION] Dalat Market (P001) not found in DB, using fallback coordinates")
+                logger.warning(f"[ACCOMMODATION] Dalat Market (P001) not found in DB, using fallback coordinates")
         except Exception as e:
-            print(f"[ACCOMMODATION] Error fetching Dalat Market: {e}, using fallback")
+            logger.error(f"[ACCOMMODATION] Error fetching Dalat Market: {e}, using fallback")
             accommodation_coords = DEFAULT_FALLBACK_COORDS
             accommodation_name = "Dalat Center"
             accommodation_id = None
     elif accommodation_address and accommodation_address.strip():
         # Custom address provided - geocode it
         from .geocode import geocode_address
-        print(f"\n--- Geocoding Accommodation: '{accommodation_address}' ---")
+        logger.debug(f"--- Geocoding Accommodation: '{accommodation_address}' ---")
         result = geocode_address(accommodation_address, return_id=True)
         accommodation_name = accommodation_address
         accommodation_id = None
         if result:
             accommodation_coords = (result[0], result[1])
             accommodation_id = result[2]  # May be None if not from accommodations DB
-            print(f"[ACCOMMODATION] Geocoded to lat={accommodation_coords[0]:.6f}, lon={accommodation_coords[1]:.6f}")
+            logger.debug(f"[ACCOMMODATION] Geocoded to lat={accommodation_coords[0]:.6f}, lon={accommodation_coords[1]:.6f}")
             if accommodation_id:
-                print(f"[ACCOMMODATION] Found in accommodations database with ID: {accommodation_id}")
+                logger.debug(f"[ACCOMMODATION] Found in accommodations database with ID: {accommodation_id}")
         else:
-            print(f"[ACCOMMODATION] Warning: Could not geocode accommodation address. Accommodation will not be added to itinerary.")
+            logger.warning(f"[ACCOMMODATION] Warning: Could not geocode accommodation address. Accommodation will not be added to itinerary.")
             accommodation_coords = None
     else:
-        print(f"[ACCOMMODATION] No accommodation address provided - skipping accommodation stops")
+        logger.debug(f"[ACCOMMODATION] No accommodation address provided - skipping accommodation stops")
         accommodation_id = None
 
     # A custom address has no translation, so reuse the Vietnamese value there.
@@ -714,7 +721,7 @@ def generate_itinerary(
 
     # ENFORCEMENT: Check for minimum POI selection
     if not poi_list:
-        print("\n[ALERT] Minimum Selection Error: You must select at least one POI to build a valid itinerary.")
+        logger.error("[ALERT] Minimum Selection Error: You must select at least one POI to build a valid itinerary.")
         # Return an error message or code for the view to handle
         return None, None, "You must select at least one POI to build a valid itinerary."
 
@@ -726,11 +733,11 @@ def generate_itinerary(
     total_pois_selected = len(selected_pois_df)
     total_capacity = num_days * daily_poi_limit
 
-    print(f"Total POIs Selected: {total_pois_selected}")
-    print(f"Total Capacity ({num_days} days * {daily_poi_limit} POIs/day): {total_capacity}")
+    logger.debug(f"Total POIs Selected: {total_pois_selected}")
+    logger.debug(f"Total Capacity ({num_days} days * {daily_poi_limit} POIs/day): {total_capacity}")
 
     if total_pois_selected > total_capacity:
-        print("\n[CAPACITY ALERT] The itinerary is overloaded!")
+        logger.debug("[CAPACITY ALERT] The itinerary is overloaded!")
         error_msg = f"Please remove {total_pois_selected - total_capacity} POIs or increase the duration/daily limit."
         return None, None, error_msg # Halt process and return error
 
@@ -786,30 +793,30 @@ def generate_itinerary(
     else:
         # Handle case where no eateries are selected
         preferred_eateries_df = pd.DataFrame(columns=['id', 'name', 'address', 'time_tags', 'lat', 'lon', 'mealTime', 'forcedSlot'])
-        print("No eateries were passed from the view.")
-        print("---------------------------------------\n")
+        logger.debug("No eateries were passed from the view.")
+        logger.debug("---------------------------------------\n")
         # --- END OF PRINT STATEMENT ---
 
     # --- Step 2: Geographic Clustering and Feasibility ---
-    print("\n--- Step 2: K-Means Clustering for Geographic Grouping ---")
+    logger.debug("--- Step 2: K-Means Clustering for Geographic Grouping ---")
     
     X = selected_pois_df[['lat', 'lon']].values
     n_clusters = num_days
     
     if n_clusters < 1 or n_clusters > len(X):
         n_clusters = len(X)
-        print(f"[INFO] Reduced number of clusters to match number of selected POIs: {n_clusters}")
+        logger.debug(f"[INFO] Reduced number of clusters to match number of selected POIs: {n_clusters}")
 
     try:
         kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10, init='k-means++')
         selected_pois_df['cluster'] = kmeans.fit_predict(X)
         kmeans_centers = kmeans.cluster_centers_
     except ValueError as e:
-        print(f"[ERROR] Clustering failed: {e}")
+        logger.error(f"[ERROR] Clustering failed: {e}")
         return None, None, f"Clustering failed: {e}"
 
     # --- Step 2.5: Capacity Enforcement (NEW STEP) ---
-    print("\n--- Step 2.5: Enforcing Daily Capacity Limit ---")
+    logger.debug("--- Step 2.5: Enforcing Daily Capacity Limit ---")
     selected_pois_df = redistribute_pois(selected_pois_df, daily_poi_limit, num_days, kmeans_centers)
 
     daily_itineraries = {i: [] for i in range(num_days)}
@@ -819,7 +826,7 @@ def generate_itinerary(
         daily_itineraries[i] = cluster_data.to_dict('records')
 
     # --- Step 3: Sequential Time Slotting & Eatery Placement ---
-    print("\n--- Step 3: Sequential Ordering & Eatery Placement ---")
+    logger.debug("--- Step 3: Sequential Ordering & Eatery Placement ---")
     
     final_itinerary_vi = {}
     final_itinerary_en = {}
@@ -985,7 +992,7 @@ def generate_itinerary(
                 unassigned_preferred_eateries.remove(meal_eatery['id'])
         
         # 3.3 Enforce meal order while still using TSP for POIs.
-        print(f"\n--- Optimizing Day {day_num} with TSP ---")
+        logger.debug(f"--- Optimizing Day {day_num} with TSP ---")
         optimized_pois = solve_tsp_for_locations(poi_locations, force_order_indices=None) if poi_locations else []
         num_optimized_pois = len(optimized_pois)
 
@@ -1200,7 +1207,7 @@ def generate_itinerary(
         
         final_itinerary_vi[day_num] = day_schedule_vi
         final_itinerary_en[day_num] = day_schedule_en
-        print(f"Day {day_num} optimized: {len(day_schedule_vi)} stops (including accommodation)")
+        logger.debug(f"Day {day_num} optimized: {len(day_schedule_vi)} stops (including accommodation)")
         
         # Print route summary for verification
         if accommodation_coords:
@@ -1208,7 +1215,7 @@ def generate_itinerary(
                 f"{s['name'][:20]}({'ACCOM' if s['type']=='ACCOMMODATION' else s['type']})"
                 for s in day_schedule_vi
             ])
-            print(f"[TSP Route Day {day_num}] {route_summary}")
+            logger.debug(f"[TSP Route Day {day_num}] {route_summary}")
 
     # Return both itineraries and no error message
     return final_itinerary_vi, final_itinerary_en, None
