@@ -15,6 +15,8 @@ MEAL_SLOT_LABELS = {
 # Global variables to cache the distance database connection and location IDs
 _DISTANCE_DB_PATH = None
 _LOCATION_ID_SET = None
+# Maps a model primary key to the id used inside dalat_distances.db, e.g. ('POI', 80) -> 'P001'.
+_MATRIX_ID_BY_PK = None
 
 # --- 1. CORE FUNCTIONS ---
 
@@ -89,6 +91,34 @@ def get_distance_from_db(origin_id: str, dest_id: str) -> float:
         print(f"Error fetching distance from DB: {e}")
         return None
 
+def get_matrix_id_map():
+    """
+    Builds, once per process, the map from a model primary key to its distance-matrix id.
+
+    These are two different numbering schemes. dalat_distances.db was generated from the
+    original CSV ordering and uses P001-P079 / E001-E163, while the Django primary keys are
+    whatever the database assigned on import (currently POIs 80-158, eateries 164-326).
+    image_code is the column that carries the original CSV code, so it is the correct join
+    key between the two. Only 242 rows, so a single pass is cheap.
+    """
+    global _MATRIX_ID_BY_PK
+
+    if _MATRIX_ID_BY_PK is not None:
+        return _MATRIX_ID_BY_PK
+
+    from .models import Poi, Eatery
+    mapping = {}
+    for pk, code in Poi.objects.values_list('id', 'image_code'):
+        if code:
+            mapping[('POI', pk)] = code
+    for pk, code in Eatery.objects.values_list('id', 'image_code'):
+        if code:
+            mapping[('EATERY', pk)] = code
+
+    _MATRIX_ID_BY_PK = mapping
+    return mapping
+
+
 def get_location_matrix_id(location):
     """
     Convert a location dict with 'id' and 'type' to matrix ID format.
@@ -96,15 +126,15 @@ def get_location_matrix_id(location):
     """
     loc_id = location.get('id')
     loc_type = location.get('type', 'POI')
-    
+
     if loc_id is None or loc_id <= 0:
         return None
-    
-    # Format: E001 for eateries, P001 for POIs
-    if loc_type == 'EATERY':
-        return f"E{loc_id:03d}"
-    else:
-        return f"P{loc_id:03d}"
+
+    # Look the code up instead of formatting the primary key. Formatting produced ids such as
+    # P080/E164 that match no row in the matrix, so every lookup missed and the routing fell
+    # back to straight-line distance for every leg.
+    key = ('EATERY' if loc_type == 'EATERY' else 'POI', loc_id)
+    return get_matrix_id_map().get(key)
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculates the distance between two points on the Earth's surface."""
