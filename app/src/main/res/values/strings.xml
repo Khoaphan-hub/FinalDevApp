@@ -59,4 +59,6 @@
     <string name="signup_prompt">Chưa có tài khoản? Đăng ký</string>
     <string name="username_hint">Tên đăng nhập</string>
     <string name="sign_in_required_title">Cần đăng nhập</string><string name="sign_in_required_message">Hồ sơ và các tính năng cộng đồng cần tài khoản. Phần khám phá địa điểm và tạo lịch trình vẫn dùng được bình thường.</string><string name="logged_out">Đã đăng xuất.</string>
+    <string name="profile_signed_out_message">Bạn chưa đăng nhập.
+Đăng nhập để xem và chỉnh sửa thông tin cá nhân.</string><string name="sign_in_to_publish">Cần đăng nhập để đăng lịch trình lên cộng đồng.</string>
 </resources>

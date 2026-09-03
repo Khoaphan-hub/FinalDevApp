@@ -367,6 +367,11 @@ public class ItineraryActivity extends AppCompatActivity {
                 int status = connection.getResponseCode();
                 if (status >= 200 && status < 300) {
                     new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.publish_success, Toast.LENGTH_SHORT).show());
+                } else if (status == 401 || status == 403) {
+                    // Publishing is the step that genuinely needs an account, unlike saving a
+                    // trip, which stays on the device. Say so instead of a generic failure.
+                    new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(this, R.string.sign_in_to_publish, Toast.LENGTH_LONG).show());
                 } else {
                     new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.publish_failed, Toast.LENGTH_SHORT).show());
                 }

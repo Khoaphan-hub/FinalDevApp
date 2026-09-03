@@ -45,6 +45,8 @@ public class ProfileFragment extends Fragment {
     private MaterialButton profileSaveButton;
     private ProgressBar profileSaveProgress;
     private MaterialButton profileLogoutButton;
+    private View signedOutPanel;
+    private View signedInPanel;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -86,6 +88,10 @@ public class ProfileFragment extends Fragment {
         profileSaveButton = view.findViewById(R.id.profileSaveButton);
         profileSaveProgress = view.findViewById(R.id.profileSaveProgress);
         profileLogoutButton = view.findViewById(R.id.profileLogoutButton);
+        signedOutPanel = view.findViewById(R.id.profileSignedOutPanel);
+        signedInPanel = view.findViewById(R.id.profileSignedInPanel);
+        view.findViewById(R.id.profileSignInButton).setOnClickListener(
+            v -> signInLauncher.launch(new Intent(requireContext(), LoginActivity.class)));
 
         profileAvatar.setOnClickListener(v -> {
             pickMedia.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
@@ -125,6 +131,7 @@ public class ProfileFragment extends Fragment {
                     final String avatarUrl = response.optString("avatar_url");
 
                     mainHandler.post(() -> {
+                        showSignedIn(true);
                         profileUsername.setText(username);
                         profileEmailInput.setText(email);
                         profilePhoneInput.setText(phone);
@@ -139,7 +146,7 @@ public class ProfileFragment extends Fragment {
                 } else if (status == 401) {
                     // Browsing needs no account, so reaching Profile signed out is a normal
                     // state, not an error: offer the sign-in instead of just reporting failure.
-                    mainHandler.post(this::promptSignIn);
+                    mainHandler.post(() -> showSignedIn(false));
                 } else {
                     mainHandler.post(() -> {
                         if (isAdded()) {
@@ -223,18 +230,22 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Asks whether to sign in, and reloads the screen if the user comes back signed in.
-     * Declining simply leaves Profile empty; the rest of the app keeps working.
+     * Switches the screen between "sign in to see this" and the editable profile.
+     *
+     * Browsing needs no account, so arriving here signed out is an ordinary state rather than
+     * an error. Hiding the inputs entirely is clearer than leaving empty fields the user could
+     * type into and never be able to save.
      */
-    private void promptSignIn() {
+    private void showSignedIn(boolean signedIn) {
         if (!isAdded()) return;
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.sign_in_required_title)
-            .setMessage(R.string.sign_in_required_message)
-            .setNegativeButton(R.string.keep, null)
-            .setPositiveButton(R.string.login_button,
-                (dialog, which) -> signInLauncher.launch(new Intent(requireContext(), LoginActivity.class)))
-            .show();
+        signedInPanel.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        signedOutPanel.setVisibility(signedIn ? View.GONE : View.VISIBLE);
+        profileAvatar.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        if (!signedIn) {
+            profileUsername.setText(R.string.profile_title);
+            profileEmailInput.setText("");
+            profilePhoneInput.setText("");
+        }
     }
 
     private void logout() {

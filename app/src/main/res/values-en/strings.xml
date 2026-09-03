@@ -57,4 +57,6 @@
     <string name="signup_prompt">Don\'t have an account? Sign up</string>
     <string name="username_hint">Username</string>
     <string name="sign_in_required_title">Sign-in required</string><string name="sign_in_required_message">Your profile and the community features need an account. Exploring places and building itineraries keep working without one.</string><string name="logged_out">Signed out.</string>
+    <string name="profile_signed_out_message">You are not signed in.
+Sign in to view and edit your personal details.</string><string name="sign_in_to_publish">Sign in to publish an itinerary to the community.</string>
 </resources>
