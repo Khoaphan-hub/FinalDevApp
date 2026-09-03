@@ -21,4 +21,39 @@
     <string name="pdf_rating">Rating %1$.1f/5</string><string name="pdf_no_rating">No rating yet</string><string name="pdf_price">Price %1$s</string><string name="pdf_price_unknown">Free/price unavailable</string><string name="pdf_hours">Open: %1$s</string><string name="pdf_hours_unknown">Opening hours unavailable</string><string name="pdf_next_short">Next %1$.1f km</string><string name="pdf_review_tiktok">TikTok review</string><string name="pdf_review_google">Google Maps review</string><string name="pdf_review_link">Review</string><string name="pdf_review_unavailable">No review link available</string><string name="pdf_map_link">Google Maps</string><string name="pdf_link_help">Tap or copy the links using your PDF reader.</string><string name="pdf_no_image">JOURNIFY</string>
     <string name="share_itinerary_text">Share itinerary as text</string>
     <string name="publish_to_community">Publish to community</string>
+
+    <!-- Khoi phuc sau merge integration/merge-all: bi mat khi giai quyet xung dot -->
+    <string name="community">Community</string>
+    <string name="default_centre_name">Da Lat Market</string>
+    <string name="error_empty_fields">Please enter both username and password.</string>
+    <string name="locating">Getting your location…</string>
+    <string name="location_far_message">Your current position is about %1$d km from central Da Lat. Journify only has places in Da Lat, so using this as the starting point makes the first leg very long.</string>
+    <string name="location_far_title">You are outside Da Lat</string>
+    <string name="location_filled">Current location set as the starting point.</string>
+    <string name="location_permission_denied">Location permission is needed to fill this in. You can still type an address.</string>
+    <string name="location_unavailable">Could not read your location. Turn location on and try again.</string>
+    <string name="location_use_anyway">Use my location anyway</string>
+    <string name="location_use_dalat">Use Da Lat Market</string>
+    <string name="login_button">Login</string>
+    <string name="offline_cached_notice">No connection. Built from the places saved on this device.</string>
+    <string name="offline_catalog_notice">Offline • showing places saved on this device</string>
+    <string name="offline_fallback_notice">Could not reach the server. Showing a sample offline itinerary.</string>
+    <string name="offline_return_label">Return to accommodation</string>
+    <string name="offline_start_label">Starting point</string>
+    <string name="offline_trip_title">Da Lat, your way</string>
+    <string name="offline_weather_notice">Offline • showing the last saved weather</string>
+    <string name="saved_title_with_highlight">%1$s • %2$s</string>
+    <string name="slot_afternoon">Afternoon</string>
+    <string name="slot_evening">Evening</string>
+    <string name="slot_morning">Morning</string>
+    <string name="use_current_location">Use my current location</string>
+    <string name="weather_temperature">%1$d°C</string>
+
+    <string name="login_subtitle">Welcome back! Login to continue.</string>
+    <string name="mood_bizarre">🎭 Bizarre</string>
+    <string name="mood_shopping">🛍 Shopping</string>
+    <string name="mood_social">🤝 Social</string>
+    <string name="password_hint">Password</string>
+    <string name="signup_prompt">Don\'t have an account? Sign up</string>
+    <string name="username_hint">Username</string>
 </resources>

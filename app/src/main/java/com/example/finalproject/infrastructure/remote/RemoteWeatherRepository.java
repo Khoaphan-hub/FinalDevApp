@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.example.finalproject.domain.model.WeatherSnapshot;
-import com.example.finalproject.domain.repository.RepositoryCallback;
+import com.example.finalproject.domain.callback.RepositoryCallback;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

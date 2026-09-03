@@ -23,4 +23,39 @@
     <string name="pdf_trip_overview">TỔNG QUAN CHUYẾN ĐI</string><string name="pdf_days_count">%1$d ngày</string><string name="pdf_places_count">%1$d địa điểm</string><string name="pdf_route_title">SƠ ĐỒ TUYẾN ĐƯỜNG</string><string name="pdf_route_note">Sơ đồ thể hiện thứ tự theo tọa độ. Mở Journify để xem đường lái xe chi tiết.</string><string name="pdf_day_distance">Ngày này: %1$.1f km</string><string name="pdf_weather_title">DỰ BÁO ĐÀ LẠT</string><string name="pdf_weather_line">%1$s • %2$d–%3$d°C • mưa %4$d%%</string><string name="pdf_weather_unavailable">Chưa có dự báo cho ngày này</string><string name="pdf_weather_note">Dự báo được cập nhật tại thời điểm xuất PDF.</string><string name="pdf_places_section">ĐỊA ĐIỂM TRONG NGÀY</string><string name="pdf_continued">TIẾP THEO</string>
     <string name="pdf_rating">Rating %1$.1f/5</string><string name="pdf_no_rating">Chưa có rating</string><string name="pdf_price">Giá %1$s</string><string name="pdf_price_unknown">Miễn phí/chưa có giá</string><string name="pdf_hours">Mở cửa: %1$s</string><string name="pdf_hours_unknown">Chưa có giờ mở cửa</string><string name="pdf_next_short">Tiếp theo %1$.1f km</string><string name="pdf_review_tiktok">TikTok review</string><string name="pdf_review_google">Google Maps review</string><string name="pdf_review_link">Review</string><string name="pdf_review_unavailable">Chưa có link review</string><string name="pdf_map_link">Google Maps</string><string name="pdf_link_help">Bạn có thể chạm hoặc sao chép các đường link bằng ứng dụng đọc PDF.</string><string name="pdf_no_image">JOURNIFY</string>
     <string name="share_itinerary_text">Chia sẻ lịch trình dạng văn bản</string>
+
+    <!-- Khoi phuc sau merge integration/merge-all: bi mat khi giai quyet xung dot -->
+    <string name="community">Cộng đồng</string>
+    <string name="default_centre_name">Chợ Đà Lạt</string>
+    <string name="error_empty_fields">Vui lòng nhập đầy đủ thông tin.</string>
+    <string name="locating">Đang lấy vị trí…</string>
+    <string name="location_far_message">Vị trí hiện tại cách trung tâm Đà Lạt khoảng %1$d km. Journify chỉ có dữ liệu địa điểm ở Đà Lạt, nên nếu lấy đây làm điểm bắt đầu thì chặng đầu tiên sẽ rất xa.</string>
+    <string name="location_far_title">Bạn đang ở ngoài Đà Lạt</string>
+    <string name="location_filled">Đã điền vị trí hiện tại làm điểm bắt đầu.</string>
+    <string name="location_permission_denied">Cần quyền vị trí để tự điền điểm bắt đầu. Bạn vẫn có thể nhập địa chỉ bằng tay.</string>
+    <string name="location_unavailable">Không lấy được vị trí. Hãy bật GPS/định vị rồi thử lại.</string>
+    <string name="location_use_anyway">Vẫn dùng vị trí của tôi</string>
+    <string name="location_use_dalat">Dùng Chợ Đà Lạt</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="offline_cached_notice">Không có kết nối. Lịch trình được dựng từ các địa điểm đã lưu trên máy.</string>
+    <string name="offline_catalog_notice">Đang ngoại tuyến • hiển thị địa điểm đã lưu trên máy</string>
+    <string name="offline_fallback_notice">Không kết nối được máy chủ. Đang hiển thị lịch trình mẫu ngoại tuyến.</string>
+    <string name="offline_return_label">Trở về điểm nghỉ</string>
+    <string name="offline_start_label">Điểm bắt đầu</string>
+    <string name="offline_trip_title">Đà Lạt theo cách của bạn</string>
+    <string name="offline_weather_notice">Đang ngoại tuyến • hiển thị thời tiết đã lưu gần nhất</string>
+    <string name="saved_title_with_highlight">%1$s • %2$s</string>
+    <string name="slot_afternoon">Trưa</string>
+    <string name="slot_evening">Tối</string>
+    <string name="slot_morning">Sáng</string>
+    <string name="use_current_location">Dùng vị trí hiện tại</string>
+    <string name="weather_temperature">%1$d°C</string>
+
+    <string name="login_subtitle">Chào mừng trở lại! Đăng nhập để tiếp tục.</string>
+    <string name="mood_bizarre">🎭 Khác lạ</string>
+    <string name="mood_shopping">🛍 Mua sắm</string>
+    <string name="mood_social">🤝 Kết nối</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="signup_prompt">Chưa có tài khoản? Đăng ký</string>
+    <string name="username_hint">Tên đăng nhập</string>
 </resources>
