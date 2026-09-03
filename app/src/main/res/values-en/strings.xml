@@ -61,4 +61,5 @@
 Sign in to view and edit your personal details.</string><string name="sign_in_to_publish">Sign in to publish an itinerary to the community.</string>
     <string name="sign_in_to_save">Sign in to save this itinerary to your account.</string><string name="trips_signed_out_message">Sign in to see the trips you have saved.</string><string name="community_signed_out_message">Sign in to browse itineraries shared by the community.</string>
     <string name="stay_here">Stay here</string>
+    <string name="continue_without_login">Continue without logging in</string>
 </resources>

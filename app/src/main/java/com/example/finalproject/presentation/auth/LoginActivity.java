@@ -58,6 +58,14 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.signupButton).setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
+
+        findViewById(R.id.continueWithoutLoginButton).setOnClickListener(v -> {
+            setResult(RESULT_CANCELED);
+            if (isTaskRoot()) {
+                startActivity(new Intent(this, com.example.finalproject.presentation.MainActivity.class));
+            }
+            finish();
+        });
     }
 
     private void performLogin() {

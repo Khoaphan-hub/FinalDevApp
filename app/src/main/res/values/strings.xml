@@ -63,4 +63,5 @@
 Đăng nhập để xem và chỉnh sửa thông tin cá nhân.</string><string name="sign_in_to_publish">Cần đăng nhập để đăng lịch trình lên cộng đồng.</string>
     <string name="sign_in_to_save">Cần đăng nhập để lưu lịch trình vào tài khoản của bạn.</string><string name="trips_signed_out_message">Đăng nhập để xem các chuyến đi đã lưu của bạn.</string><string name="community_signed_out_message">Đăng nhập để xem lịch trình do cộng đồng chia sẻ.</string>
     <string name="stay_here">Ở lại</string>
+    <string name="continue_without_login">Tiếp tục không đăng nhập</string>
 </resources>

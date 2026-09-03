@@ -60,6 +60,13 @@ public class RegisterActivity extends AppCompatActivity {
         findViewById(R.id.loginPromptButton).setOnClickListener(v -> {
             finish(); // Go back to login screen
         });
+
+        findViewById(R.id.continueWithoutLoginButton).setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void performRegister() {

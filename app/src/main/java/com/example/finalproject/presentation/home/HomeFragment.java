@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import com.example.finalproject.R;
 import com.example.finalproject.presentation.planner.PlannerActivity;
 import com.example.finalproject.presentation.catalog.CatalogActivity;
+import com.example.finalproject.presentation.auth.LoginActivity;
+import com.example.finalproject.infrastructure.local.SessionState;
 import com.example.finalproject.infrastructure.local.repository.CachingWeatherRepository;
 import com.example.finalproject.domain.model.WeatherSnapshot;
 import com.example.finalproject.domain.model.WeatherCodeMapper;
@@ -24,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class HomeFragment extends Fragment {
+    private View homeLoginButton;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -40,7 +44,29 @@ public class HomeFragment extends Fragment {
             startActivity(new Intent(requireContext(), CatalogActivity.class))
         );
         view.findViewById(R.id.weatherRetryButton).setOnClickListener(v -> loadWeather(view));
+
+        homeLoginButton = view.findViewById(R.id.homeLoginButton);
+        if (homeLoginButton != null) {
+            homeLoginButton.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), LoginActivity.class))
+            );
+        }
+        updateLoginButtonVisibility();
+
         loadWeather(view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateLoginButtonVisibility();
+    }
+
+    private void updateLoginButtonVisibility() {
+        if (homeLoginButton != null && getContext() != null) {
+            boolean signedIn = SessionState.isSignedIn(requireContext());
+            homeLoginButton.setVisibility(signedIn ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void loadWeather(View view) {
