@@ -20,3 +20,8 @@ backend/.run/
 # Passwords live in local.properties, which is already ignored above.
 *.jks
 *.keystore
+
+# Full-resolution originals kept aside by manage.py optimize_place_images.
+# The served copies under static/ are the optimized ones; these stay local and are
+# also recoverable from git history if they are ever needed again.
+backend/home/static_originals/
