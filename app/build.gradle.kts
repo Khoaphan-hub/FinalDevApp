@@ -11,6 +11,17 @@ val localBuildProperties = Properties().apply {
     if (propertiesFile.exists()) propertiesFile.inputStream().use { load(it) }
 }
 val devServerIp = localBuildProperties.getProperty("journify.devServerIp")?.trim() ?: "10.0.2.2"
+
+// Where a release build talks to. A shipped APK must never point at a private 192.168.x.x
+// address, so this is set separately from the development IP above. Until the backend is
+// deployed the placeholder simply fails to connect, and the app falls back to offline mode.
+val releaseBaseUrl = localBuildProperties.getProperty("journify.releaseBaseUrl")?.trim()
+    ?: "https://journify.example.com/"
+
+// Signing material also lives in the ignored local.properties. When it is absent the release
+// build still assembles unsigned, so a teammate without the keystore is not blocked.
+val releaseStoreFile = localBuildProperties.getProperty("journify.storeFile")?.trim()
+val hasReleaseSigning = releaseStoreFile != null && file(releaseStoreFile).exists()
 require(
     Regex("[0-9]{1,3}(\\.[0-9]{1,3}){3}").matches(devServerIp)
         && devServerIp.split('.').all { it.toInt() in 0..255 }
@@ -27,7 +38,10 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.finalproject"
+        // Distinct from the `namespace` above: namespace is the Java package that R and
+        // BuildConfig are generated into, applicationId is the identity Android installs under.
+        // Only the latter needs to leave the com.example.* sample space.
+        applicationId = "com.journify.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -36,8 +50,24 @@ android {
         buildConfigField("String", "PHONE_BASE_URL", "\"http://$devServerIp:8000/\"")
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = localBuildProperties.getProperty("journify.storePassword")
+                keyAlias = localBuildProperties.getProperty("journify.keyAlias")
+                keyPassword = localBuildProperties.getProperty("journify.keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            // Overrides the debug default so the shipped APK does not carry a LAN address.
+            buildConfigField("String", "PHONE_BASE_URL", "\"$releaseBaseUrl\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
