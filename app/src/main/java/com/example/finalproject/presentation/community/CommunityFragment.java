@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CommunityFragment extends Fragment {
+    private androidx.activity.result.ActivityResultLauncher<android.content.Intent> signInLauncher;
 
     private RecyclerView recyclerView;
     private View progress;
@@ -50,6 +51,16 @@ public class CommunityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        signInLauncher = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (getView() != null) applySignedInState(getView());
+            });
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.communityRecycler);
         progress = view.findViewById(R.id.communityProgress);
@@ -62,6 +73,28 @@ public class CommunityFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
+        ((android.widget.TextView) view.findViewById(R.id.signedOutMessage))
+            .setText(R.string.community_signed_out_message);
+        view.findViewById(R.id.signedOutSignInButton).setOnClickListener(v ->
+            signInLauncher.launch(new android.content.Intent(requireContext(),
+                com.example.finalproject.presentation.auth.LoginActivity.class)));
+        applySignedInState(view);
+    }
+
+    /**
+     * Community itineraries are fetched with the signed-in session, so without an account the
+     * request only comes back empty. Showing the prompt says why, instead of an empty list.
+     */
+    private void applySignedInState(View root) {
+        boolean signedIn = com.example.finalproject.infrastructure.local.SessionState
+            .isSignedIn(requireContext());
+        root.findViewById(R.id.signedOutPanel).setVisibility(signedIn ? View.GONE : View.VISIBLE);
+        recyclerView.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        progress.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        if (!signedIn) {
+            empty.setVisibility(View.GONE);
+            return;
+        }
         loadCommunityItineraries();
     }
 

@@ -22,6 +22,7 @@ import com.example.finalproject.presentation.itinerary.ItineraryActivity;
 import java.util.List;
 
 public class SavedTripsFragment extends Fragment {
+    private androidx.activity.result.ActivityResultLauncher<Intent> signInLauncher;
     private SavedTripAdapter adapter;
     private View progress;
     private View empty;
@@ -30,6 +31,15 @@ public class SavedTripsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_saved_trips, container, false);
+    }
+
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        signInLauncher = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (getView() != null) applySignedInState(getView());
+            });
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -54,6 +64,27 @@ public class SavedTripsFragment extends Fragment {
         recycler.setAdapter(adapter);
         progress = view.findViewById(R.id.savedTripsProgress);
         empty = view.findViewById(R.id.savedTripsEmpty);
+
+        ((android.widget.TextView) view.findViewById(R.id.signedOutMessage))
+            .setText(R.string.trips_signed_out_message);
+        view.findViewById(R.id.signedOutSignInButton).setOnClickListener(v ->
+            signInLauncher.launch(new Intent(requireContext(),
+                com.example.finalproject.presentation.auth.LoginActivity.class)));
+        applySignedInState(view);
+    }
+
+    /**
+     * Draws the sign-in prompt instead of the list when there is no account yet. Trips are
+     * saved against an account, so an empty list would be misleading while signed out.
+     */
+    private void applySignedInState(View root) {
+        boolean signedIn = com.example.finalproject.infrastructure.local.SessionState
+            .isSignedIn(requireContext());
+        root.findViewById(R.id.signedOutPanel).setVisibility(signedIn ? View.GONE : View.VISIBLE);
+        root.findViewById(R.id.savedTripsRecycler).setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        progress.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+        if (!signedIn) empty.setVisibility(View.GONE);
+        if (signedIn) load();
     }
 
     private void deleteTrip(SavedTrip trip) {
@@ -73,7 +104,9 @@ public class SavedTripsFragment extends Fragment {
 
     @Override public void onResume() {
         super.onResume();
-        load();
+        // Goes through the gate rather than straight to load(), so returning to this tab while
+        // signed out shows the prompt instead of an empty list.
+        if (getView() != null) applySignedInState(getView());
     }
 
     private void load() {

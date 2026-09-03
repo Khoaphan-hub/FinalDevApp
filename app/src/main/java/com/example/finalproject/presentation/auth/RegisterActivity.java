@@ -127,6 +127,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void onRegisterSuccess() {
         // Registering signs the user in, so hand the result back the same way a sign-in does
         // and let the screen that asked for an account carry on.
+        com.example.finalproject.infrastructure.local.SessionState.markSignedIn(this);
         setResult(RESULT_OK);
         finish();
     }

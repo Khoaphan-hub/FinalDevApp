@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
     private void onLoginSuccess() {
         // This screen is now opened from wherever an account was needed, rather than being
         // the app's entry point, so finishing returns the user to what they were doing.
+        com.example.finalproject.infrastructure.local.SessionState.markSignedIn(this);
         setResult(RESULT_OK);
         finish();
     }

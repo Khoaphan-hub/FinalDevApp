@@ -26,4 +26,6 @@
         android:text="@string/no_community_itineraries"
         android:textColor="@color/text_secondary"
         android:visibility="gone" />
+
+    <include layout="@layout/view_signed_out" />
 </FrameLayout>

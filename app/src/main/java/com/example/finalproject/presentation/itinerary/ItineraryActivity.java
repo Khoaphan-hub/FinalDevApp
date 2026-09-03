@@ -75,12 +75,20 @@ public class ItineraryActivity extends AppCompatActivity {
     private int pendingStopIndex;
     private ActivityResultLauncher<Intent> replacementLauncher;
     private final ExecutorService pdfExecutor = Executors.newSingleThreadExecutor();
+    private Runnable pendingAfterSignIn;
+    private ActivityResultLauncher<Intent> signInLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itinerary);
         SystemBarInsets.apply(findViewById(R.id.itineraryRoot));
+        signInLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                Runnable pending = pendingAfterSignIn;
+                pendingAfterSignIn = null;
+                if (result.getResultCode() == RESULT_OK && pending != null) pending.run();
+            });
         replacementLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
@@ -305,12 +313,32 @@ public class ItineraryActivity extends AppCompatActivity {
         startActivity(PlaceDetailActivity.intent(this, place));
     }
 
+    /**
+     * Sends the user to the sign-in screen and retries the action they asked for if it works.
+     * Declining leaves the itinerary on screen, so nothing they built is lost.
+     */
+    private void promptSignIn(Runnable retryAfterSignIn) {
+        pendingAfterSignIn = retryAfterSignIn;
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.sign_in_required_title)
+            .setMessage(R.string.sign_in_to_save)
+            .setNegativeButton(R.string.keep, null)
+            .setPositiveButton(R.string.login_button, (dialog, which) -> signInLauncher.launch(
+                new Intent(this, com.example.finalproject.presentation.auth.LoginActivity.class)))
+            .show();
+    }
+
     private void updateBudget() {
         ((TextView) findViewById(R.id.estimatedCostText)).setText(money(itinerary.getEstimatedCostVnd()));
         ((TextView) findViewById(R.id.remainingCostText)).setText(money(itinerary.getRemainingBudgetVnd()));
     }
 
     private void saveTripLocally(android.view.View v) {
+        // Saved trips belong to an account, so ask for one before writing anything.
+        if (!com.example.finalproject.infrastructure.local.SessionState.isSignedIn(this)) {
+            promptSignIn(() -> saveTripLocally(v));
+            return;
+        }
         v.setEnabled(false);
         new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
             @Override public void onSuccess(Long id) {
@@ -329,6 +357,10 @@ public class ItineraryActivity extends AppCompatActivity {
     }
 
     private void saveCommunityItinerary() {
+        if (!com.example.finalproject.infrastructure.local.SessionState.isSignedIn(this)) {
+            promptSignIn(this::saveCommunityItinerary);
+            return;
+        }
         new RoomSavedTripRepository(this).save(itinerary, new RepositoryCallback<Long>() {
             @Override public void onSuccess(Long id) {
                 Toast.makeText(ItineraryActivity.this, R.string.saved_to_device_success, Toast.LENGTH_SHORT).show();

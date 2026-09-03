@@ -1,5 +1,6 @@
 package com.example.finalproject.presentation.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -146,6 +147,8 @@ public class ProfileFragment extends Fragment {
                 } else if (status == 401) {
                     // Browsing needs no account, so reaching Profile signed out is a normal
                     // state, not an error: offer the sign-in instead of just reporting failure.
+                    com.example.finalproject.infrastructure.local.SessionState
+                        .markSignedOut(requireContext().getApplicationContext());
                     mainHandler.post(() -> showSignedIn(false));
                 } else {
                     mainHandler.post(() -> {
@@ -249,6 +252,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void logout() {
+        final Context context = requireContext().getApplicationContext();
         executor.execute(() -> {
             HttpURLConnection connection = null;
             try {
@@ -267,6 +271,8 @@ public class ProfileFragment extends Fragment {
                 // Clear cookies and return to login
                 java.net.CookieHandler.setDefault(new java.net.CookieManager());
                 
+                com.example.finalproject.infrastructure.local.SessionState
+                    .markSignedOut(context.getApplicationContext());
                 mainHandler.post(() -> {
                     if (!isAdded()) return;
                     // Signing out no longer means leaving the app: the user stays on Profile,
