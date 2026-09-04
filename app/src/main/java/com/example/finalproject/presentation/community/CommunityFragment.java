@@ -67,9 +67,17 @@ public class CommunityFragment extends Fragment {
         empty = view.findViewById(R.id.communityEmpty);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new CommunityAdapter(item -> {
-            // Fetch detailed itinerary and open ItineraryActivity in view-only mode
-            fetchAndOpenItinerary(item.optInt("id"));
+        adapter = new CommunityAdapter(new CommunityAdapter.Listener() {
+            @Override
+            public void onClick(JSONObject item) {
+                // Fetch detailed itinerary and open ItineraryActivity in view-only mode
+                fetchAndOpenItinerary(item.optInt("id"));
+            }
+
+            @Override
+            public void onRate(JSONObject item, float rating) {
+                submitRating(item.optInt("id"), (int) rating);
+            }
         });
         recyclerView.setAdapter(adapter);
 
@@ -143,6 +151,47 @@ public class CommunityFragment extends Fragment {
                 mainHandler.post(() -> {
                     progress.setVisibility(View.GONE);
                     Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                });
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    private void submitRating(int id, int rating) {
+        executor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                String baseUrl = com.example.finalproject.infrastructure.remote.RemotePlannerRepository.DEFAULT_BASE_URL;
+                if (!baseUrl.endsWith("/")) baseUrl += "/";
+                
+                connection = (HttpURLConnection) new URL(baseUrl + "api/shared-itineraries/" + id + "/feedback/").openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true);
+                
+                JSONObject payload = new JSONObject();
+                payload.put("rating", rating);
+                
+                try (java.io.OutputStream os = connection.getOutputStream()) {
+                    byte[] input = payload.toString().getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+                
+                int status = connection.getResponseCode();
+                if (status >= 200 && status < 300) {
+                    mainHandler.post(() -> {
+                        android.widget.Toast.makeText(getContext(), R.string.rating_success, android.widget.Toast.LENGTH_SHORT).show();
+                        if (getView() != null) applySignedInState(getView()); // Refresh the list
+                    });
+                } else {
+                    mainHandler.post(() -> {
+                        android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
                 });
             } finally {
                 if (connection != null) connection.disconnect();

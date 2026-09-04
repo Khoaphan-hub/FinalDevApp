@@ -69,4 +69,8 @@
 
     <string name="theme_light">Sáng</string><string name="theme_dark">Tối</string>
     <string name="back">Quay lại</string>
+    <string name="average_rating_text">⭐ %1$.1f (%2 đánh giá)</string>
+    <string name="no_ratings_yet">Chưa có đánh giá</string>
+    <string name="rating_success">Đã gửi đánh giá</string>
+    <string name="rating_failed">Lỗi khi gửi đánh giá</string>
 </resources>

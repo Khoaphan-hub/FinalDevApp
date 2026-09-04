@@ -19,6 +19,7 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
 
     public interface Listener {
         void onClick(JSONObject item);
+        void onRate(JSONObject item, float rating);
     }
 
     private final List<JSONObject> items = new ArrayList<>();
@@ -51,6 +52,22 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         holder.author.setText(holder.itemView.getContext().getString(R.string.by_author, author));
         holder.description.setText(item.optString("description", holder.itemView.getContext().getString(R.string.no_description)));
         
+        double avgRating = item.optDouble("average_rating", 0.0);
+        int ratingCount = item.optInt("rating_count", 0);
+        if (ratingCount > 0) {
+            holder.ratingInfo.setText(holder.itemView.getContext().getString(R.string.average_rating_text, avgRating, ratingCount));
+        } else {
+            holder.ratingInfo.setText(R.string.no_ratings_yet);
+        }
+        
+        holder.ratingBar.setOnRatingBarChangeListener(null);
+        holder.ratingBar.setRating(0); // Optional: show user's own previous rating if available. Currently we don't have it in collection.
+        holder.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            if (fromUser && listener != null) {
+                listener.onRate(item, rating);
+            }
+        });
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(item);
         });
@@ -65,12 +82,16 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         final TextView title;
         final TextView author;
         final TextView description;
+        final TextView ratingInfo;
+        final android.widget.RatingBar ratingBar;
 
         ViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.communityTitle);
             author = view.findViewById(R.id.communityAuthor);
             description = view.findViewById(R.id.communityDescription);
+            ratingInfo = view.findViewById(R.id.communityRatingInfo);
+            ratingBar = view.findViewById(R.id.communityRatingBar);
         }
     }
 }
