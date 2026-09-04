@@ -76,7 +76,7 @@ public class CommunityFragment extends Fragment {
 
             @Override
             public void onRate(JSONObject item, float rating) {
-                submitRating(item.optInt("id"), (int) rating);
+                submitRating(item, (int) rating);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -158,13 +158,14 @@ public class CommunityFragment extends Fragment {
         });
     }
 
-    private void submitRating(int id, int rating) {
+    private void submitRating(JSONObject item, int rating) {
         executor.execute(() -> {
             HttpURLConnection connection = null;
             try {
                 String baseUrl = com.example.finalproject.infrastructure.remote.RemotePlannerRepository.DEFAULT_BASE_URL;
                 if (!baseUrl.endsWith("/")) baseUrl += "/";
                 
+                int id = item.optInt("id");
                 connection = (HttpURLConnection) new URL(baseUrl + "api/shared-itineraries/" + id + "/feedback/").openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
@@ -180,18 +181,33 @@ public class CommunityFragment extends Fragment {
                 
                 int status = connection.getResponseCode();
                 if (status >= 200 && status < 300) {
+                    JSONObject response = new JSONObject(readStream(connection.getInputStream()));
                     mainHandler.post(() -> {
-                        android.widget.Toast.makeText(getContext(), R.string.rating_success, android.widget.Toast.LENGTH_SHORT).show();
-                        if (getView() != null) applySignedInState(getView()); // Refresh the list
+                        if (getContext() != null) {
+                            android.widget.Toast.makeText(getContext(), R.string.rating_success, android.widget.Toast.LENGTH_SHORT).show();
+                            try {
+                                if (response.has("average_rating") && !response.isNull("average_rating")) {
+                                    item.put("average_rating", response.getDouble("average_rating"));
+                                }
+                                if (response.has("rating_count")) {
+                                    item.put("rating_count", response.getInt("rating_count"));
+                                }
+                                adapter.notifyDataSetChanged();
+                            } catch (Exception ignored) {}
+                        }
                     });
                 } else {
                     mainHandler.post(() -> {
-                        android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
+                        if (getContext() != null) {
+                            android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
+                        }
                     });
                 }
             } catch (Exception e) {
                 mainHandler.post(() -> {
-                    android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
+                    if (getContext() != null) {
+                        android.widget.Toast.makeText(getContext(), R.string.rating_failed, android.widget.Toast.LENGTH_SHORT).show();
+                    }
                 });
             } finally {
                 if (connection != null) connection.disconnect();
