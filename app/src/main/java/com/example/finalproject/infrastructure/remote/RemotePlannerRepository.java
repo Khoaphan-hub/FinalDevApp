@@ -33,8 +33,10 @@ public final class RemotePlannerRepository implements PlannerRepository {
     private static final String EMULATOR_BASE_URL = "http://10.0.2.2:8000/";
     // Compiled from the tester's ignored local.properties, not a shared source-code IP.
     private static final String PHYSICAL_PHONE_BASE_URL = BuildConfig.PHONE_BASE_URL;
-    public static final String DEFAULT_BASE_URL = isEmulator()
-        ? EMULATOR_BASE_URL : PHYSICAL_PHONE_BASE_URL;
+    public static final String DEFAULT_BASE_URL =
+        (PHYSICAL_PHONE_BASE_URL != null && PHYSICAL_PHONE_BASE_URL.startsWith("https://"))
+            ? PHYSICAL_PHONE_BASE_URL
+            : (isEmulator() ? EMULATOR_BASE_URL : PHYSICAL_PHONE_BASE_URL);
     private final String baseUrl;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());

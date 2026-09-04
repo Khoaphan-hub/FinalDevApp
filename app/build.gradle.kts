@@ -10,23 +10,30 @@ val localBuildProperties = Properties().apply {
     val propertiesFile = rootProject.file("local.properties")
     if (propertiesFile.exists()) propertiesFile.inputStream().use { load(it) }
 }
-val devServerIp = localBuildProperties.getProperty("journify.devServerIp")?.trim() ?: "10.0.2.2"
+val devServerIp = localBuildProperties.getProperty("journify.devServerIp")?.trim()
+val customServerUrl = localBuildProperties.getProperty("journify.serverUrl")?.trim()
 
-// Where a release build talks to. A shipped APK must never point at a private 192.168.x.x
-// address, so this is set separately from the development IP above. Until the backend is
-// deployed the placeholder simply fails to connect, and the app falls back to offline mode.
+// Where a release build talks to. A shipped APK must never point at a private 192.168.x.x address.
 val releaseBaseUrl = localBuildProperties.getProperty("journify.releaseBaseUrl")?.trim()
-    ?: "https://journify.example.com/"
+    ?: "https://journify-backend-hiky.onrender.com/"
+
+val defaultBaseUrl = when {
+    !customServerUrl.isNullOrEmpty() -> customServerUrl
+    !devServerIp.isNullOrEmpty() -> "http://$devServerIp:8000/"
+    else -> releaseBaseUrl
+}
 
 // Signing material also lives in the ignored local.properties. When it is absent the release
 // build still assembles unsigned, so a teammate without the keystore is not blocked.
 val releaseStoreFile = localBuildProperties.getProperty("journify.storeFile")?.trim()
 val hasReleaseSigning = releaseStoreFile != null && file(releaseStoreFile).exists()
-require(
-    Regex("[0-9]{1,3}(\\.[0-9]{1,3}){3}").matches(devServerIp)
-        && devServerIp.split('.').all { it.toInt() in 0..255 }
-) {
-    "journify.devServerIp in local.properties must be an IPv4 address only, e.g. 192.168.1.25 (no http:// or port)."
+if (!devServerIp.isNullOrEmpty()) {
+    require(
+        Regex("[0-9]{1,3}(\\.[0-9]{1,3}){3}").matches(devServerIp)
+            && devServerIp.split('.').all { it.toInt() in 0..255 }
+    ) {
+        "journify.devServerIp in local.properties must be an IPv4 address only, e.g. 192.168.1.25 (no http:// or port)."
+    }
 }
 
 android {
@@ -46,8 +53,8 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        // Development configuration only; a distributed release still needs a public HTTPS backend.
-        buildConfigField("String", "PHONE_BASE_URL", "\"http://$devServerIp:8000/\"")
+        // Defaults to the deployed cloud backend unless a custom server/devServerIp is configured.
+        buildConfigField("String", "PHONE_BASE_URL", "\"$defaultBaseUrl\"")
     }
 
     signingConfigs {
