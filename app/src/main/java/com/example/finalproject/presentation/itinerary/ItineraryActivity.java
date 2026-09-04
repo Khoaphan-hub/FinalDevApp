@@ -406,7 +406,15 @@ public class ItineraryActivity extends AppCompatActivity {
                     new Handler(Looper.getMainLooper()).post(() ->
                         Toast.makeText(this, R.string.sign_in_to_publish, Toast.LENGTH_LONG).show());
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.publish_failed, Toast.LENGTH_SHORT).show());
+                    String errorMessage = "";
+                    try (java.io.InputStream errorStream = connection.getErrorStream()) {
+                        if (errorStream != null) {
+                            java.util.Scanner s = new java.util.Scanner(errorStream).useDelimiter("\\A");
+                            errorMessage = s.hasNext() ? s.next() : "";
+                        }
+                    }
+                    final String err = errorMessage;
+                    new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, getString(R.string.publish_failed) + ": " + err, Toast.LENGTH_LONG).show());
                 }
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show());
