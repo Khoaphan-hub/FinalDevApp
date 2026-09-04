@@ -191,7 +191,10 @@ public class CommunityFragment extends Fragment {
 
                                             stops.add(new com.example.finalproject.domain.model.ItineraryStop(
                                                 stopObj.optInt("id"), type, stopObj.optString("name"), stopObj.optString("address"),
-                                                stopObj.optDouble("latitude"), stopObj.optDouble("longitude"), 0, mealSlot, image
+                                                stopObj.optDouble("latitude"), stopObj.optDouble("longitude"), 0, mealSlot, image,
+                                                stopObj.optDouble("rating", 0), Math.round(stopObj.optDouble("price", 0)),
+                                                stopObj.optString("open_hours", null), stopObj.optString("tags", null),
+                                                stopObj.optString("highlight", null), stopObj.optString("media_url", null)
                                             ));
                                         }
                                     }
@@ -201,7 +204,10 @@ public class CommunityFragment extends Fragment {
                             java.util.Collections.sort(days, (a, b) -> Integer.compare(a.getDayNumber(), b.getDayNumber()));
                             
                             long totalBudget = Math.round(response.optDouble("budget_amount", 0));
+                            if (totalBudget == 0) totalBudget = Math.round(plannerData.optDouble("budget_amount", 0));
+                            
                             long remainingBudget = Math.round(response.optDouble("budget_remaining", 0));
+                            if (remainingBudget == 0) remainingBudget = Math.round(plannerData.optDouble("budget_remaining", 0));
                             
                             com.example.finalproject.domain.model.Itinerary itinerary = new com.example.finalproject.domain.model.Itinerary(
                                 response.optString("title", "Itinerary"), days, totalBudget, totalBudget - remainingBudget, false

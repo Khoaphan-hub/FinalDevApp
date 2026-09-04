@@ -561,13 +561,19 @@ class SharedItineraryService:
         start_location = trip_setup.get("start_location") or {}
         counts = planner_itinerary.get("selected_counts") or {}
 
+        budget_amount = cls._safe_decimal(stored_planner_itinerary.get("budget_amount"))
+        if not budget_amount:
+            budget_amount = cls._safe_decimal(stored_trip_setup.get("budget"))
+            
+        budget_remaining = cls._safe_decimal(stored_planner_itinerary.get("budget_remaining"))
+
         itinerary = SharedItinerary.objects.create(
             owner=owner,
             title=title,
             mood=mood,
             trip_days=int(stored_trip_setup.get("days") or len(planner_itinerary.get("results", {})) or 1),
-            budget_amount=cls._safe_decimal(stored_trip_setup.get("budget")),
-            budget_remaining=cls._safe_decimal(planner_itinerary.get("budget_remaining")),
+            budget_amount=budget_amount,
+            budget_remaining=budget_remaining,
             poi_count=int(counts.get("pois") or 0),
             eatery_count=int(counts.get("eateries") or 0),
             start_address=start_location.get("address_label", ""),
@@ -784,6 +790,35 @@ class SharedItineraryDetailAPI(APIView):
         itinerary = SharedItinerary.objects.filter(pk=itinerary_id, is_public=True).first()
         if not itinerary:
             return Response({"error": "Itinerary not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+        # Enrich old itineraries that lack images and prices
+        planner_itinerary_data = deepcopy(itinerary.planner_itinerary or {})
+        if planner_itinerary_data:
+            from .models import Poi, Eatery
+            actual_itinerary = planner_itinerary_data.get('results', planner_itinerary_data)
+            for day_num, stops in list(actual_itinerary.items()):
+                for item in stops:
+                    try:
+                        if item.get('type') == 'POI' and item.get('id') and item['id'] > 0:
+                            poi_data = Poi.objects.filter(id=item['id']).values('address', 'image_code', 'price_per_person', 'rating').first()
+                            if poi_data:
+                                if not item.get('address'): item['address'] = poi_data['address']
+                                if not item.get('image_url') and not item.get('image_code'): item['image_code'] = poi_data['image_code']
+                                if 'price' not in item and poi_data['price_per_person'] is not None: item['price'] = float(poi_data['price_per_person'])
+                                if 'rating' not in item and poi_data['rating'] is not None: item['rating'] = poi_data['rating']
+                        elif item.get('type') == 'EATERY' and item.get('id') and item['id'] > 0:
+                            eatery_data = Eatery.objects.filter(id=item['id']).values('address', 'image_code', 'price_per_person', 'rating').first()
+                            if eatery_data:
+                                if not item.get('address'): item['address'] = eatery_data['address']
+                                if not item.get('image_url') and not item.get('image_code'): item['image_code'] = eatery_data['image_code']
+                                if 'price' not in item and eatery_data['price_per_person'] is not None: item['price'] = float(eatery_data['price_per_person'])
+                                if 'rating' not in item and eatery_data['rating'] is not None: item['rating'] = eatery_data['rating']
+                    except Exception:
+                        pass
+            
+            # Since as_payload just reads self.planner_itinerary, we temporarily overwrite it
+            itinerary.planner_itinerary = planner_itinerary_data
+            
         return Response(itinerary.as_payload(include_feedback=True))
 
     def delete(self, request: HttpRequest, itinerary_id: int) -> Response:

@@ -9,6 +9,8 @@ public final class ItineraryEditor {
     public static org.json.JSONObject toJson(Itinerary itinerary) {
         org.json.JSONObject json = new org.json.JSONObject();
         try {
+            json.put("budget_amount", itinerary.getTotalBudgetVnd());
+            json.put("budget_remaining", itinerary.getRemainingBudgetVnd());
             org.json.JSONObject results = new org.json.JSONObject();
             for (ItineraryDay day : itinerary.getDays()) {
                 org.json.JSONArray stopsArr = new org.json.JSONArray();
@@ -21,6 +23,12 @@ public final class ItineraryEditor {
                     stopObj.put("latitude", stop.getLatitude());
                     stopObj.put("longitude", stop.getLongitude());
                     if (stop.getMealSlot() != null) stopObj.put("meal_slot", stop.getMealSlot());
+                    if (stop.getImageUrl() != null) stopObj.put("image_url", stop.getImageUrl());
+                    stopObj.put("price", stop.getPriceVnd());
+                    stopObj.put("rating", stop.getRating());
+                    if (stop.getOpenHours() != null) stopObj.put("open_hours", stop.getOpenHours());
+                    if (stop.getTags() != null) stopObj.put("tags", stop.getTags());
+                    if (stop.getHighlight() != null) stopObj.put("highlight", stop.getHighlight());
                     stopsArr.put(stopObj);
                 }
                 results.put(String.valueOf(day.getDayNumber()), stopsArr);
