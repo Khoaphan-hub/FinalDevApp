@@ -20,12 +20,12 @@ public final class ItineraryEditor {
                     stopObj.put("type", stop.getType().name());
                     stopObj.put("name", stop.getName());
                     stopObj.put("address", stop.getAddress());
-                    stopObj.put("latitude", stop.getLatitude());
-                    stopObj.put("longitude", stop.getLongitude());
+                    if (!Double.isNaN(stop.getLatitude())) stopObj.put("latitude", stop.getLatitude());
+                    if (!Double.isNaN(stop.getLongitude())) stopObj.put("longitude", stop.getLongitude());
                     if (stop.getMealSlot() != null) stopObj.put("meal_slot", stop.getMealSlot());
                     if (stop.getImageUrl() != null) stopObj.put("image_url", stop.getImageUrl());
                     stopObj.put("price", stop.getPriceVnd());
-                    stopObj.put("rating", stop.getRating());
+                    if (!Double.isNaN(stop.getRating())) stopObj.put("rating", stop.getRating());
                     if (stop.getOpenHours() != null) stopObj.put("open_hours", stop.getOpenHours());
                     if (stop.getTags() != null) stopObj.put("tags", stop.getTags());
                     if (stop.getHighlight() != null) stopObj.put("highlight", stop.getHighlight());
