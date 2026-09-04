@@ -387,6 +387,7 @@ public class ItineraryActivity extends AppCompatActivity {
 
                 org.json.JSONObject payload = new org.json.JSONObject();
                 payload.put("title", itinerary.getTitle());
+                payload.put("share_public", true);
                 payload.put("description", "A great trip in Da Lat!");
                 payload.put("mood", "CHILL");
                 
