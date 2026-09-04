@@ -164,26 +164,23 @@ public class CommunityFragment extends Fragment {
                 int status = connection.getResponseCode();
                 if (status >= 200 && status < 300) {
                     JSONObject response = new JSONObject(readStream(connection.getInputStream()));
-                    JSONObject data = response.optJSONObject("itinerary");
-                    if (data != null) {
-                        JSONObject plannerData = data.optJSONObject("planner_itinerary");
-                        if (plannerData != null) {
-                            String json = plannerData.toString();
-                            mainHandler.post(() -> {
-                                progress.setVisibility(View.GONE);
-                                Intent intent = new Intent(requireContext(), ItineraryActivity.class);
-                                intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, json);
-                                intent.putExtra("IS_COMMUNITY", true);
-                                intent.putExtra("COMMUNITY_ID", id);
-                                startActivity(intent);
-                            });
-                            return;
-                        }
+                    JSONObject plannerData = response.optJSONObject("planner_itinerary");
+                    if (plannerData != null) {
+                        String json = plannerData.toString();
+                        mainHandler.post(() -> {
+                            progress.setVisibility(View.GONE);
+                            Intent intent = new Intent(requireContext(), ItineraryActivity.class);
+                            intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, json);
+                            intent.putExtra("IS_COMMUNITY", true);
+                            intent.putExtra("COMMUNITY_ID", id);
+                            startActivity(intent);
+                        });
+                        return;
                     }
                 }
                 mainHandler.post(() -> {
                     progress.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), R.string.publish_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 });
             } catch (Exception e) {
                 mainHandler.post(() -> {
