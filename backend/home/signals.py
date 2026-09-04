@@ -22,8 +22,11 @@ def trigger_ai_data_reload(sender=None, instance=None, **kwargs):
         
     logging.info("--- (Signal) Phát hiện thay đổi CSDL. Bắt đầu tải lại AI... ---")
     
-    cache.clear()
-    logging.info("--- (Signal) Đã xóa cache cũ. ---")
+    try:
+        cache.clear()
+        logging.info("--- (Signal) Đã xóa cache cũ. ---")
+    except Exception as e:
+        logging.warning("--- (Signal) Không thể xóa cache: %s ---", e)
     
     t = threading.Thread(target=ai_service.load_data_and_vectorize)
     t.daemon = True
