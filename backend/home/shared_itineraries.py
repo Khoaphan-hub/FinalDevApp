@@ -456,8 +456,11 @@ class SharedItineraryService:
         *,
         title: str,
         share_public: bool,
+        planner_itinerary_override: Optional[Dict[str, Any]] = None,
     ) -> SharedItinerary:
         trip_setup, planner_step3, planner_itinerary = cls._session_snapshot(request)
+        if planner_itinerary_override:
+            planner_itinerary = planner_itinerary_override
         if not planner_itinerary or not planner_itinerary.get("results"):
             raise ValidationError("No generated itinerary found in session.")
 
@@ -498,7 +501,9 @@ class SharedItineraryService:
             global_candidates = SharedItinerary.objects.filter(is_public=True)
 
             # Limit comparison set using basic attributes to reduce workload
-            trip_days_value = int(trip_setup.get("days") or 1)
+            trip_days_value = int((trip_setup or {}).get("days") or len(planner_itinerary.get("results", {})))
+            if trip_days_value < 1:
+                trip_days_value = 1
             global_candidates = global_candidates.filter(trip_days=trip_days_value)
 
             poi_ids_signature, eatery_ids_signature = signature
@@ -559,8 +564,8 @@ class SharedItineraryService:
             owner=owner,
             title=title,
             mood=mood,
-            trip_days=int(trip_setup.get("days") or 1),
-            budget_amount=cls._safe_decimal(trip_setup.get("budget")),
+            trip_days=int(stored_trip_setup.get("days") or len(planner_itinerary.get("results", {})) or 1),
+            budget_amount=cls._safe_decimal(stored_trip_setup.get("budget")),
             budget_remaining=cls._safe_decimal(planner_itinerary.get("budget_remaining")),
             poi_count=int(counts.get("pois") or 0),
             eatery_count=int(counts.get("eateries") or 0),
@@ -735,10 +740,18 @@ class GeneratedItinerarySubmissionAPI(APIView):
             return Response({"errors": form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            planner_itinerary_override = request.data.get("planner_itinerary")
+            if isinstance(planner_itinerary_override, str):
+                import json
+                try:
+                    planner_itinerary_override = json.loads(planner_itinerary_override)
+                except json.JSONDecodeError:
+                    pass
             itinerary = SharedItineraryService.store_generated_itinerary(
                 request,
                 title=form.cleaned_data["title"],
                 share_public=form.cleaned_data.get("share_public", False),
+                planner_itinerary_override=planner_itinerary_override,
             )
         except ValidationError as exc:
             return Response(
