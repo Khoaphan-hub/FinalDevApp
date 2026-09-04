@@ -19,7 +19,7 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
 
     public interface Listener {
         void onClick(JSONObject item);
-        void onRate(JSONObject item, float rating);
+        void onRateClicked(JSONObject item, int position);
     }
 
     private final List<JSONObject> items = new ArrayList<>();
@@ -55,18 +55,26 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         double avgRating = item.optDouble("average_rating", 0.0);
         int ratingCount = item.optInt("rating_count", 0);
         if (ratingCount > 0) {
+            if (holder.ratingIndicator != null) {
+                holder.ratingIndicator.setVisibility(View.VISIBLE);
+                holder.ratingIndicator.setRating((float) avgRating);
+            }
             holder.ratingInfo.setText(holder.itemView.getContext().getString(R.string.average_rating_text, avgRating, ratingCount));
         } else {
+            if (holder.ratingIndicator != null) {
+                holder.ratingIndicator.setVisibility(View.GONE);
+            }
             holder.ratingInfo.setText(R.string.no_ratings_yet);
         }
-        
-        holder.ratingBar.setOnRatingBarChangeListener(null);
-        holder.ratingBar.setRating(0); // Optional: show user's own previous rating if available. Currently we don't have it in collection.
-        holder.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            if (fromUser && listener != null) {
-                listener.onRate(item, rating);
-            }
-        });
+
+        if (holder.rateButton != null) {
+            holder.rateButton.setOnClickListener(v -> {
+                int pos = holder.getBindingAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onRateClicked(item, pos);
+                }
+            });
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(item);
@@ -83,7 +91,8 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
         final TextView author;
         final TextView description;
         final TextView ratingInfo;
-        final android.widget.RatingBar ratingBar;
+        final android.widget.RatingBar ratingIndicator;
+        final View rateButton;
 
         ViewHolder(View view) {
             super(view);
@@ -91,7 +100,8 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.View
             author = view.findViewById(R.id.communityAuthor);
             description = view.findViewById(R.id.communityDescription);
             ratingInfo = view.findViewById(R.id.communityRatingInfo);
-            ratingBar = view.findViewById(R.id.communityRatingBar);
+            ratingIndicator = view.findViewById(R.id.communityRatingIndicator);
+            rateButton = view.findViewById(R.id.communityRateButton);
         }
     }
 }

@@ -68,8 +68,12 @@ Sign in to view and edit your personal details.</string><string name="sign_in_to
 
     <string name="theme_light">Light</string><string name="theme_dark">Dark</string>
     <string name="back">Back</string>
-    <string name="average_rating_text">⭐ %1$.1f (%2 ratings)</string>
+    <string name="average_rating_text">⭐ %1$.1f (%2$d ratings)</string>
     <string name="no_ratings_yet">No ratings yet</string>
-    <string name="rating_success">Rating submitted</string>
+    <string name="rate_button">Rate</string>
+    <string name="rate_itinerary_title">Rate Itinerary</string>
+    <string name="rating_stars_label">%1$d stars</string>
+    <string name="submit">Submit</string>
+    <string name="rating_success">Rating submitted successfully</string>
     <string name="rating_failed">Failed to submit rating</string>
 </resources>

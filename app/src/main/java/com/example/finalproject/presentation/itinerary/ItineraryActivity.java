@@ -146,11 +146,18 @@ public class ItineraryActivity extends AppCompatActivity {
         MaterialButton publishTripBtn = findViewById(R.id.publishTripButton);
         findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
         boolean isCommunity = getIntent().getBooleanExtra("IS_COMMUNITY", false);
+        int communityId = getIntent().getIntExtra("COMMUNITY_ID", -1);
         
         if (isCommunity) {
             saveTripBtn.setText(R.string.save_to_device);
             saveTripBtn.setOnClickListener(v -> saveCommunityItinerary());
-            publishTripBtn.setVisibility(View.GONE);
+            if (communityId != -1) {
+                publishTripBtn.setText(R.string.rate_button);
+                publishTripBtn.setVisibility(View.VISIBLE);
+                publishTripBtn.setOnClickListener(v -> showCommunityRatingDialog(communityId));
+            } else {
+                publishTripBtn.setVisibility(View.GONE);
+            }
         } else {
             saveTripBtn.setOnClickListener(v -> saveTripLocally(v));
             publishTripBtn.setOnClickListener(v -> publishItinerary());
@@ -381,6 +388,69 @@ public class ItineraryActivity extends AppCompatActivity {
             }
             @Override public void onError(Exception error) {
                 Toast.makeText(ItineraryActivity.this, R.string.trip_save_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showCommunityRatingDialog(int communityId) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_rate_itinerary, null);
+        android.widget.RatingBar ratingBar = dialogView.findViewById(R.id.dialogRatingBar);
+        TextView ratingLabel = dialogView.findViewById(R.id.dialogRatingLabel);
+
+        ratingBar.setRating(5.0f);
+        ratingLabel.setText(getString(R.string.rating_stars_label, 5));
+
+        ratingBar.setOnRatingBarChangeListener((bar, rating, fromUser) -> {
+            int stars = Math.max(1, Math.round(rating));
+            if (rating < 1.0f) {
+                bar.setRating(1.0f);
+            }
+            ratingLabel.setText(getString(R.string.rating_stars_label, stars));
+        });
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.rate_itinerary_title)
+                .setView(dialogView)
+                .setPositiveButton(R.string.submit, (dialog, which) -> {
+                    int finalRating = Math.max(1, Math.min(5, Math.round(ratingBar.getRating())));
+                    submitCommunityRating(communityId, finalRating);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void submitCommunityRating(int communityId, int rating) {
+        pdfExecutor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                String baseUrl = RemotePlannerRepository.DEFAULT_BASE_URL;
+                if (!baseUrl.endsWith("/")) baseUrl += "/";
+
+                connection = (HttpURLConnection) new URL(baseUrl + "api/shared-itineraries/" + communityId + "/feedback/").openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true);
+
+                org.json.JSONObject payload = new org.json.JSONObject();
+                payload.put("rating", rating);
+
+                try (java.io.OutputStream output = connection.getOutputStream()) {
+                    output.write(payload.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+
+                int status = connection.getResponseCode();
+                if (status >= 200 && status < 300) {
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            Toast.makeText(this, R.string.rating_success, Toast.LENGTH_SHORT).show());
+                } else {
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            Toast.makeText(this, R.string.rating_failed, Toast.LENGTH_SHORT).show());
+                }
+            } catch (Exception e) {
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(this, R.string.rating_failed, Toast.LENGTH_SHORT).show());
+            } finally {
+                if (connection != null) connection.disconnect();
             }
         });
     }

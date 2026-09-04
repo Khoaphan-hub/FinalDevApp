@@ -69,8 +69,12 @@
 
     <string name="theme_light">Sáng</string><string name="theme_dark">Tối</string>
     <string name="back">Quay lại</string>
-    <string name="average_rating_text">⭐ %1$.1f (%2 đánh giá)</string>
+    <string name="average_rating_text">⭐ %1$.1f (%2$d đánh giá)</string>
     <string name="no_ratings_yet">Chưa có đánh giá</string>
-    <string name="rating_success">Đã gửi đánh giá</string>
-    <string name="rating_failed">Lỗi khi gửi đánh giá</string>
+    <string name="rate_button">Đánh giá</string>
+    <string name="rate_itinerary_title">Đánh giá lịch trình</string>
+    <string name="rating_stars_label">%1$d sao</string>
+    <string name="submit">Gửi</string>
+    <string name="rating_success">Đã gửi đánh giá thành công</string>
+    <string name="rating_failed">Không thể gửi đánh giá</string>
 </resources>

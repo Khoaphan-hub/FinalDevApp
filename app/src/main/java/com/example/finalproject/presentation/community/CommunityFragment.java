@@ -75,8 +75,8 @@ public class CommunityFragment extends Fragment {
             }
 
             @Override
-            public void onRate(JSONObject item, float rating) {
-                submitRating(item, (int) rating);
+            public void onRateClicked(JSONObject item, int position) {
+                showRatingDialog(item, position);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -158,7 +158,37 @@ public class CommunityFragment extends Fragment {
         });
     }
 
-    private void submitRating(JSONObject item, int rating) {
+    private void showRatingDialog(JSONObject item, int position) {
+        if (getContext() == null) return;
+
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_rate_itinerary, null);
+        android.widget.RatingBar ratingBar = dialogView.findViewById(R.id.dialogRatingBar);
+        android.widget.TextView ratingLabel = dialogView.findViewById(R.id.dialogRatingLabel);
+
+        ratingBar.setRating(5.0f);
+        ratingLabel.setText(getString(R.string.rating_stars_label, 5));
+
+        ratingBar.setOnRatingBarChangeListener((bar, rating, fromUser) -> {
+            int stars = Math.max(1, Math.round(rating));
+            if (rating < 1.0f) {
+                bar.setRating(1.0f);
+            }
+            ratingLabel.setText(getString(R.string.rating_stars_label, stars));
+        });
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.rate_itinerary_title)
+                .setView(dialogView)
+                .setPositiveButton(R.string.submit, (dialog, which) -> {
+                    int finalRating = Math.max(1, Math.min(5, Math.round(ratingBar.getRating())));
+                    submitRating(item, position, finalRating);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void submitRating(JSONObject item, int position, int rating) {
         executor.execute(() -> {
             HttpURLConnection connection = null;
             try {
@@ -192,7 +222,11 @@ public class CommunityFragment extends Fragment {
                                 if (response.has("rating_count")) {
                                     item.put("rating_count", response.getInt("rating_count"));
                                 }
-                                adapter.notifyDataSetChanged();
+                                if (position >= 0 && position < adapter.getItemCount()) {
+                                    adapter.notifyItemChanged(position);
+                                } else {
+                                    adapter.notifyDataSetChanged();
+                                }
                             } catch (Exception ignored) {}
                         }
                     });
