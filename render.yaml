@@ -2,6 +2,7 @@ services:
   - type: web
     name: journify-backend
     runtime: python
+    plan: free
     rootDir: backend
     buildCommand: "./build.sh"
     startCommand: "gunicorn firstsite.wsgi:application"
