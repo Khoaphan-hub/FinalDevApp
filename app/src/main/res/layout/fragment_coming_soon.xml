@@ -14,7 +14,7 @@
         android:textColor="@color/accent"
         android:textSize="48sp" />
 
-    <TextView
+    <TextView android:fontFamily="@font/journify_display"
         android:id="@+id/pageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

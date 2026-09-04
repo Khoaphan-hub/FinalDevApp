@@ -1,57 +1,142 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.FinalProject" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!--
+      Editorial theme: ivory paper, deep pine, terracotta, with Lora for headings.
+
+      The parent is DayNight, so switching the device to dark mode swaps in
+      values-night/colors.xml with no extra work. Anything colour-related belongs in colors.xml
+      rather than here, so both modes stay in sync.
+    -->
+    <style name="Base.Theme.FinalProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorSecondary">@color/accent</item>
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
         <item name="android:windowBackground">@color/background</item>
-        
-        <item name="android:fontFamily">sans</item>
+
         <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_muted</item>
         <item name="android:navigationBarColor">@color/card_background</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>
-        
-        <!-- Apply shapes globally -->
+
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Journify.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Journify.MediumComponent</item>
-        
-        <!-- Button Styles -->
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Journify.LargeComponent</item>
+
         <item name="materialButtonStyle">@style/Widget.Journify.Button</item>
         <item name="textInputStyle">@style/Widget.Journify.TextInputLayout</item>
+        <item name="materialCardViewStyle">@style/Widget.Journify.Card</item>
+        <item name="chipStyle">@style/Widget.Journify.Chip</item>
+
+        <!-- Headline slots are what make the serif show up on Material's own widgets. -->
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Journify.Display</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Journify.Title</item>
     </style>
 
     <style name="Theme.FinalProject" parent="Base.Theme.FinalProject" />
 
+    <!--
+      Type scale. Display and Title carry Lora; everything smaller stays on the system sans,
+      where a serif would only cost legibility. Apply with android:textAppearance.
+    -->
+    <style name="TextAppearance.Journify.Display" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/journify_display</item>
+        <item name="android:fontFamily">@font/journify_display</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingMultiplier">1.15</item>
+    </style>
+
+    <style name="TextAppearance.Journify.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/journify_display</item>
+        <item name="android:fontFamily">@font/journify_display</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Journify.Serif" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/journify_display</item>
+        <item name="android:fontFamily">@font/journify_display</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <!-- Small all-caps label above a section, the magazine kicker. -->
+    <style name="TextAppearance.Journify.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Journify.Body" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.35</item>
+    </style>
+
     <style name="ShapeAppearance.Journify.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">18dp</item>
+        <item name="cornerSize">14dp</item>
     </style>
-    
+
     <style name="ShapeAppearance.Journify.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">24dp</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Journify.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">26dp</item>
     </style>
 
     <style name="Widget.Journify.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="backgroundTint">@color/primary</item>
+        <item name="backgroundTint">@color/primary_container</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:stateListAnimator">@null</item> <!-- Flatter look -->
-        <!-- We can add a bottom border shadow by wrapping it, or just keep it flat like the image -->
+        <item name="android:stateListAnimator">@null</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="rippleColor">@color/primary_soft</item>
+    </style>
+
+    <!--
+      Cards were all elevation 0, which is most of why the app read as flat. A small, consistent
+      lift plus a hairline stroke gives depth without the heavy Material drop shadow.
+    -->
+    <style name="Widget.Journify.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">3dp</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.Journify.Chip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipBackgroundColor">@color/surface_variant</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="chipStrokeColor">@color/divider</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">16dp</item>
     </style>
 
     <style name="Widget.Journify.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/input_border</item>
-        <item name="boxStrokeWidth">2dp</item>
+        <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
         <item name="boxBackgroundColor">@color/input_background</item>
+        <item name="hintTextColor">@color/text_secondary</item>
         <item name="boxCornerRadiusTopStart">16dp</item>
         <item name="boxCornerRadiusTopEnd">16dp</item>
         <item name="boxCornerRadiusBottomStart">16dp</item>

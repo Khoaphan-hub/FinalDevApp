@@ -1,29 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Journify editorial palette — light.
+
+  Ivory paper, deep pine green and terracotta: a travel-magazine feel for Da Lat. Every colour
+  name here already existed, so the 149 @color references across the layouts pick the new values
+  up without a single layout edit. values-night/colors.xml mirrors this file for dark mode, so
+  add any new colour to BOTH files.
+-->
 <resources>
-    <color name="primary">#1F5D50</color>
-    <color name="primary_dark">#153F37</color>
-    <color name="primary_soft">#DDEBE5</color>
-    <color name="accent">#F28C68</color>
-    <color name="accent_soft">#FCE8DF</color>
-    
-    <color name="safe_green">#58CC02</color>
-    <color name="alert_red">#FF4B4B</color>
-    <color name="pending_yellow">#FFC800</color>
-    
+    <!-- Pine forest. primary stays dark enough that @color/white reads on top of it. -->
+    <color name="primary">#2C4A3B</color>
+    <color name="primary_dark">#1B2A22</color>
+    <color name="primary_soft">#DCE7DF</color>
+    <!--
+      primary is used 38 times as a foreground (text, strokes, tints) and only twice as a
+      background, so in dark mode it lightens. Anything that must stay dark under white text
+      uses primary_container instead.
+    -->
+    <color name="primary_container">#2C4A3B</color>
+    <color name="text_on_primary_muted">#C7D6CC</color>
+
+    <!-- Terracotta roof tiles, the warm counterweight to all the green. -->
+    <color name="accent">#D96F4A</color>
+    <color name="accent_soft">#F7E4DA</color>
+
+    <!-- Aged brass, used for ratings and editorial flourishes. -->
+    <color name="gold">#C9A227</color>
+    <color name="gold_soft">#F5EBCE</color>
+
+    <color name="safe_green">#4F7A43</color>
+    <color name="alert_red">#B3452F</color>
+    <color name="pending_yellow">#C9A227</color>
+
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    
-    <!-- Softer dark text -->
-    <color name="text_primary">#1E2D29</color>
-    <color name="text_secondary">#687A74</color>
-    
-    <!-- Clean white backgrounds -->
-    <color name="background">#F8F5EE</color>
+
+    <color name="text_primary">#1B2A22</color>
+    <color name="text_secondary">#6E7F76</color>
+    <!-- For captions and metadata that must recede behind text_secondary. -->
+    <color name="text_muted">#98A69E</color>
+
+    <!-- Ivory paper rather than plain white: warmer, and it makes cards read as raised. -->
+    <color name="background">#FBF7F0</color>
     <color name="card_background">#FFFFFF</color>
-    
-    <!-- Light gray for input fields -->
+
     <color name="input_background">#FFFFFF</color>
-    <color name="input_border">#D7E0DC</color>
-    <color name="surface_variant">#EEF3F0</color>
-    <color name="divider">#E5E9E6</color>
+    <color name="input_border">#E2DACC</color>
+    <color name="surface_variant">#F3EDE2</color>
+    <color name="divider">#EAE3D7</color>
+
+    <!-- Laid over photographs so white text stays legible on any image. -->
+    <color name="scrim_strong">#A6000000</color>
+    <color name="scrim_soft">#40000000</color>
 </resources>

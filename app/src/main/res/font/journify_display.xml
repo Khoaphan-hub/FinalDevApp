@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Lora, bundled rather than downloaded so headings render identically offline and without
+  Google Play Services.
+
+  Four weights are declared from two files on purpose: many of the titles in this app already
+  carry android:textStyle="bold", which asks for weight 700. Without a 700 entry the system
+  finds no match in the family and silently falls back to the default sans, so the serif never
+  appears. Mapping 400/500 to medium and 600/700 to semibold makes both plain and bold resolve.
+-->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font
+        android:font="@font/lora_medium"
+        android:fontStyle="normal"
+        android:fontWeight="400" />
+    <font
+        android:font="@font/lora_medium"
+        android:fontStyle="normal"
+        android:fontWeight="500" />
+    <font
+        android:font="@font/lora_semibold"
+        android:fontStyle="normal"
+        android:fontWeight="600" />
+    <font
+        android:font="@font/lora_semibold"
+        android:fontStyle="normal"
+        android:fontWeight="700" />
+</font-family>

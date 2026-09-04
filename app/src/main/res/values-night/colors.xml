@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Journify editorial palette — dark. Mirrors values/colors.xml name for name.
+
+  primary deliberately stays a mid-dark green instead of the lighter tint dark themes usually
+  take: the layouts put @color/white on top of it (cost figures, the home hero card, button
+  spinners), and a pale primary would leave that text unreadable.
+-->
+<resources>
+    <color name="primary">#9DC4AC</color>
+    <color name="primary_dark">#0D120F</color>
+    <color name="primary_soft">#26362C</color>
+    <!-- Light enough to read as text on the near-black background. -->
+    <color name="primary_container">#2F5A47</color>
+    <color name="text_on_primary_muted">#C7D6CC</color>
+
+    <color name="accent">#E8916D</color>
+    <color name="accent_soft">#3A2A22</color>
+
+    <color name="gold">#D9B441</color>
+    <color name="gold_soft">#332C18</color>
+
+    <color name="safe_green">#7BAE6B</color>
+    <color name="alert_red">#E07A63</color>
+    <color name="pending_yellow">#D9B441</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="text_primary">#ECEFE9</color>
+    <color name="text_secondary">#A3B0A7</color>
+    <color name="text_muted">#78857C</color>
+
+    <!-- Warm near-black rather than pure black: keeps the paper feel after dark. -->
+    <color name="background">#141A16</color>
+    <color name="card_background">#1D2620</color>
+
+    <color name="input_background">#1D2620</color>
+    <color name="input_border">#334036</color>
+    <color name="surface_variant">#232D26</color>
+    <color name="divider">#2A352E</color>
+
+    <color name="scrim_strong">#B3000000</color>
+    <color name="scrim_soft">#59000000</color>
+</resources>

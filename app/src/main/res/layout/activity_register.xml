@@ -14,7 +14,7 @@
         android:padding="32dp"
         android:gravity="center_vertical">
 
-        <TextView
+        <TextView android:fontFamily="@font/journify_display"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/register_title"

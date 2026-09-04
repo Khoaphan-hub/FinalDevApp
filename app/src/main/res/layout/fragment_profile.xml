@@ -21,7 +21,7 @@
             android:scaleType="centerCrop"
             android:src="@android:drawable/sym_def_app_icon" />
 
-        <TextView
+        <TextView android:fontFamily="@font/journify_display"
             android:id="@+id/profileUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +30,64 @@
             android:textColor="@color/primary"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+        <!--
+          Appearance sits outside both panels: the theme is a device preference, so it stays
+          reachable whether or not anyone is signed in.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="18dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dark_mode"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/dark_mode_hint"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!--
+                  SwitchMaterial, not MaterialSwitch: the latter needs a Material 3 theme and
+                  crashes measuring null on/off labels under this Material 2 one. showText off
+                  keeps SwitchCompat from trying to lay out those labels at all.
+                -->
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/profileDarkModeSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textOff=""
+                    android:textOn=""
+                    app:showText="false" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Shown only when signed out: nothing here is editable without an account. -->
         <LinearLayout

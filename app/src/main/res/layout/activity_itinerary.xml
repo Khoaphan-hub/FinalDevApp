@@ -24,7 +24,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="20dp">
         <TextView android:id="@+id/resultBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:id="@+id/itineraryTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+            <TextView android:fontFamily="@font/journify_display" android:id="@+id/itineraryTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
             <TextView android:id="@+id/offlineBadge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/offline_preview" android:textColor="@color/accent" android:textSize="11sp" android:textStyle="bold" />
         </LinearLayout>
         <com.google.android.material.button.MaterialButton
@@ -36,15 +36,15 @@
             android:textColor="@color/primary" />
     </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" app:cardBackgroundColor="@color/primary" app:cardCornerRadius="22dp" app:cardElevation="0dp">
+    <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" app:cardBackgroundColor="@color/primary_container" app:cardCornerRadius="22dp" app:cardElevation="3dp">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="18dp">
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/estimated_cost" android:textColor="@color/primary_soft" android:textSize="11sp" />
-                <TextView android:id="@+id/estimatedCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/estimated_cost" android:textColor="@color/text_on_primary_muted" android:textSize="11sp" />
+                <TextView android:fontFamily="@font/journify_display" android:id="@+id/estimatedCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/remaining" android:textColor="@color/primary_soft" android:textSize="11sp" />
-                <TextView android:id="@+id/remainingCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/remaining" android:textColor="@color/text_on_primary_muted" android:textSize="11sp" />
+                <TextView android:fontFamily="@font/journify_display" android:id="@+id/remainingCostText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

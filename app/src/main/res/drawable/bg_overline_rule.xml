@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thin rule under a section kicker, the magazine cue that a new section starts. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <size android:height="2dp" />
+    <solid android:color="@color/gold" />
+</shape>

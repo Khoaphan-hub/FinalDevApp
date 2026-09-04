@@ -7,7 +7,7 @@
     <ProgressBar android:id="@+id/savedTripsProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />
     <LinearLayout android:id="@+id/savedTripsEmpty" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:padding="32dp" android:visibility="gone">
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🧳" android:textSize="46sp" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:gravity="center" android:text="@string/saved_empty_title" android:textColor="@color/text_primary" android:textSize="21sp" android:textStyle="bold" />
+        <TextView android:fontFamily="@font/journify_display" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:gravity="center" android:text="@string/saved_empty_title" android:textColor="@color/text_primary" android:textSize="21sp" android:textStyle="bold" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:text="@string/saved_empty_message" android:textColor="@color/text_secondary" android:textSize="14sp" />
     </LinearLayout>
 

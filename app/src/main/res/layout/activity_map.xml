@@ -8,7 +8,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
         <TextView android:id="@+id/mapBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:id="@+id/mapTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
+            <TextView android:fontFamily="@font/journify_display" android:id="@+id/mapTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/map_subtitle" android:textColor="@color/text_secondary" android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>

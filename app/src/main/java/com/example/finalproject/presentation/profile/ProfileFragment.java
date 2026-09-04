@@ -91,6 +91,18 @@ public class ProfileFragment extends Fragment {
         profileLogoutButton = view.findViewById(R.id.profileLogoutButton);
         signedOutPanel = view.findViewById(R.id.profileSignedOutPanel);
         signedInPanel = view.findViewById(R.id.profileSignedInPanel);
+        com.google.android.material.switchmaterial.SwitchMaterial darkModeSwitch =
+            view.findViewById(R.id.profileDarkModeSwitch);
+        darkModeSwitch.setChecked(
+            com.example.finalproject.presentation.ThemePreference.isDark(requireContext()));
+        darkModeSwitch.setOnCheckedChangeListener((button, checked) -> {
+            // Only react to a real tap: setChecked above would otherwise recreate the activity
+            // every time this screen is opened.
+            if (!button.isPressed()) return;
+            com.example.finalproject.presentation.ThemePreference.setDark(requireContext(), checked);
+            requireActivity().recreate();
+        });
+
         view.findViewById(R.id.profileSignInButton).setOnClickListener(
             v -> signInLauncher.launch(new Intent(requireContext(), LoginActivity.class)));
 

@@ -1,0 +1,38 @@
+<resources>
+    <!--
+      Dark mode only needs the two things colours cannot express: the status bar icons have to
+      flip to light, and cards need a touch more lift because a shadow barely shows on a dark
+      surface. Everything else comes from values-night/colors.xml.
+    -->
+    <style name="Base.Theme.FinalProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:windowBackground">@color/background</item>
+
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_muted</item>
+        <item name="android:navigationBarColor">@color/card_background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Journify.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Journify.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Journify.LargeComponent</item>
+
+        <item name="materialButtonStyle">@style/Widget.Journify.Button</item>
+        <item name="textInputStyle">@style/Widget.Journify.TextInputLayout</item>
+        <item name="materialCardViewStyle">@style/Widget.Journify.Card.Night</item>
+        <item name="chipStyle">@style/Widget.Journify.Chip</item>
+
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Journify.Display</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Journify.Title</item>
+    </style>
+
+    <style name="Widget.Journify.Card.Night" parent="Widget.Journify.Card">
+        <item name="cardElevation">6dp</item>
+    </style>
+</resources>
