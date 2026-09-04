@@ -6,6 +6,10 @@ services:
     rootDir: backend
     buildCommand: "./build.sh"
     startCommand: "gunicorn firstsite.wsgi:application"
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
