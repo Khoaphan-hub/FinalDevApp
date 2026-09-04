@@ -81,6 +81,12 @@ public class CommunityFragment extends Fragment {
         applySignedInState(view);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getView() != null) applySignedInState(getView());
+    }
+
     /**
      * Community itineraries are fetched with the signed-in session, so without an account the
      * request only comes back empty. Showing the prompt says why, instead of an empty list.

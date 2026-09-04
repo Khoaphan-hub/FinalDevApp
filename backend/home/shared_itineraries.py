@@ -144,6 +144,7 @@ class SharedItinerary(models.Model):
             "created_at": self.created_at.isoformat(),
             "planner_itinerary": self.planner_itinerary,
             "metadata": self.metadata,
+            "owner": {"username": self.owner.username} if self.owner else None,
         }
 
         if include_feedback:
