@@ -13,12 +13,18 @@
             <TextView android:id="@+id/savedTripTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="17sp" android:textStyle="bold" />
             <TextView android:id="@+id/savedTripMeta" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
         </LinearLayout>
+        <!-- Icon-only tonal danger button: quieter than a red word, and it frees the row. -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/savedTripDelete"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.Journify.Button.Danger"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/delete"
-            android:textColor="@color/alert_red" />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/delete"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:icon="@drawable/ic_trash_16"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

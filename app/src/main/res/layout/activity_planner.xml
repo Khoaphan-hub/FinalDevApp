@@ -17,14 +17,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:id="@+id/backButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:gravity="center"
-                android:text="‹"
-                android:textColor="@color/primary"
-                android:textSize="36sp" />
+            <TextView android:id="@+id/backButton" style="@style/Widget.Journify.BackButton" />
 
             <TextView android:fontFamily="@font/journify_display"
                 android:layout_width="match_parent"
@@ -153,12 +146,11 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/useCurrentLocationButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Journify.Button.Outline"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/use_current_location"
-                app:cornerRadius="14dp"
                 app:icon="@drawable/ic_location_20"
                 app:iconGravity="textStart" />
 
@@ -174,10 +166,9 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/generateButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/continue_select_places"
-                app:cornerRadius="18dp" />
+                android:text="@string/continue_select_places" />
         </LinearLayout>
     </ScrollView>
 

@@ -9,7 +9,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="28dp">
         <FrameLayout android:layout_width="match_parent" android:layout_height="280dp">
             <ImageView android:id="@+id/placeDetailImage" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="@string/place_image" android:scaleType="centerCrop" />
-            <TextView android:id="@+id/placeDetailBack" android:layout_width="48dp" android:layout_height="48dp" android:layout_margin="16dp" android:background="@color/card_background" android:elevation="4dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
+            <TextView android:id="@+id/placeDetailBack" style="@style/Widget.Journify.BackButton" android:layout_margin="20dp" />
         </FrameLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
             <TextView android:id="@+id/placeDetailType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/primary" android:textSize="12sp" android:textStyle="bold" />
@@ -22,9 +22,9 @@
             <TextView android:id="@+id/placeDetailHours" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textColor="@color/text_primary" android:textSize="15sp" />
             <TextView android:id="@+id/placeDetailTags" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/text_secondary" android:textSize="14sp" />
             <TextView android:id="@+id/placeDetailHighlight" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:background="@color/primary_soft" android:padding="16dp" android:textColor="@color/text_primary" android:textSize="15sp" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/placeMediaButton" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="22dp" android:text="@string/view_review" app:cornerRadius="16dp" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/placeDirectionsButton" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="10dp" android:text="@string/directions_app" app:cornerRadius="16dp" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/placeReportButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="50dp" android:layout_marginTop="8dp" android:text="@string/report_incorrect_information" android:textColor="@color/alert_red" app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/placeMediaButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="@string/view_review" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/placeDirectionsButton" style="@style/Widget.Journify.Button.Outline" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/directions_app" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/placeReportButton" style="@style/Widget.Journify.Button.Text" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/report_incorrect_information" android:textColor="@color/alert_red" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

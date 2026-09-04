@@ -66,4 +66,7 @@
     <string name="continue_without_login">Tiếp tục không đăng nhập</string>
 
     <string name="dark_mode">Chế độ tối</string><string name="dark_mode_hint">Theo thiết bị cho tới khi bạn tự chọn</string>
+
+    <string name="theme_light">Sáng</string><string name="theme_dark">Tối</string>
+    <string name="back">Quay lại</string>
 </resources>

@@ -11,6 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
+
+import android.os.Handler;
+import android.os.Looper;
 
 import com.example.finalproject.R;
 import com.example.finalproject.presentation.planner.PlannerActivity;
@@ -26,6 +30,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class HomeFragment extends Fragment {
+    /** Long enough to read the caption, short enough that the scenery keeps moving. */
+    private static final long SLIDE_INTERVAL_MS = 4500L;
+
+    private final Handler slideHandler = new Handler(Looper.getMainLooper());
+    private ViewPager2 heroPager;
+    private Runnable advanceSlide;
+
     private View homeLoginButton;
 
     @Nullable
@@ -43,6 +54,7 @@ public class HomeFragment extends Fragment {
         view.findViewById(R.id.explorePlacesButton).setOnClickListener(v ->
             startActivity(new Intent(requireContext(), CatalogActivity.class))
         );
+        setupHeroCarousel(view);
         view.findViewById(R.id.weatherRetryButton).setOnClickListener(v -> loadWeather(view));
 
         homeLoginButton = view.findViewById(R.id.homeLoginButton);
@@ -60,6 +72,7 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateLoginButtonVisibility();
+        restartSlideTimer();
     }
 
     private void updateLoginButtonVisibility() {
@@ -123,6 +136,50 @@ public class HomeFragment extends Fragment {
                 label, Math.round(day.min), Math.round(day.max), day.rain));
         }
         return lines.toString();
+    }
+
+
+    /**
+     * Auto-advancing scenery. The runnable is re-posted after every page rather than run on a
+     * fixed schedule, so a manual swipe resets the timer instead of fighting it, and it stops
+     * entirely while the fragment is not visible.
+     */
+    private void setupHeroCarousel(View view) {
+        heroPager = view.findViewById(R.id.heroPager);
+        heroPager.setAdapter(new HeroSlideAdapter(
+            getResources().getStringArray(R.array.hero_kickers),
+            getResources().getStringArray(R.array.hero_captions)));
+
+        advanceSlide = () -> {
+            if (heroPager == null || !isAdded()) return;
+            int next = (heroPager.getCurrentItem() + 1) % HeroSlideAdapter.slideCount();
+            heroPager.setCurrentItem(next, true);
+        };
+
+        heroPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override public void onPageSelected(int position) {
+                restartSlideTimer();
+            }
+        });
+    }
+
+    private void restartSlideTimer() {
+        if (advanceSlide == null) return;
+        slideHandler.removeCallbacks(advanceSlide);
+        slideHandler.postDelayed(advanceSlide, SLIDE_INTERVAL_MS);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (advanceSlide != null) slideHandler.removeCallbacks(advanceSlide);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (advanceSlide != null) slideHandler.removeCallbacks(advanceSlide);
+        heroPager = null;
     }
 
     private TextView text(View view, int id) {

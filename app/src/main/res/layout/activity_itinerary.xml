@@ -22,18 +22,17 @@
             android:orientation="vertical">
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="20dp">
-        <TextView android:id="@+id/resultBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
+        <TextView android:id="@+id/resultBackButton" style="@style/Widget.Journify.BackButton" />
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
             <TextView android:fontFamily="@font/journify_display" android:id="@+id/itineraryTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
             <TextView android:id="@+id/offlineBadge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="@string/offline_preview" android:textColor="@color/accent" android:textSize="11sp" android:textStyle="bold" />
         </LinearLayout>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveTripButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.Journify.Button.Tonal"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/save"
-            android:textColor="@color/primary" />
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" app:cardBackgroundColor="@color/primary_container" app:cardCornerRadius="22dp" app:cardElevation="3dp">
@@ -51,51 +50,42 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/openMapButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.Journify.Button.Tonal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/view_route_map"
-        android:textColor="@color/primary"
-        app:cornerRadius="16dp"
-        app:strokeColor="@color/primary" />
+        android:text="@string/view_route_map" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/exportPdfButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent" android:layout_height="50dp"
+        style="@style/Widget.Journify.Button.Tonal"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginStart="20dp" android:layout_marginTop="8dp" android:layout_marginEnd="20dp"
-        android:text="@string/export_pdf_qr" android:textColor="@color/primary" app:cornerRadius="16dp" app:strokeColor="@color/primary" />
+        android:text="@string/export_pdf_qr" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/shareTripButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.Journify.Button.Outline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
         android:minHeight="50dp"
-        android:text="@string/share_itinerary_text"
-        android:textColor="@color/primary"
-        app:cornerRadius="16dp"
-        app:strokeColor="@color/primary" />
+        android:text="@string/share_itinerary_text" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/publishTripButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.Journify.Button.Outline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="50dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/publish_to_community"
-        android:textColor="@color/primary"
-        app:cornerRadius="16dp"
-        app:strokeColor="@color/primary" />
+        android:text="@string/publish_to_community" />
 
     <com.google.android.material.chip.ChipGroup android:id="@+id/dayChipGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="12dp" android:layout_marginEnd="20dp" app:chipSpacingHorizontal="8dp" app:singleSelection="true" app:selectionRequired="true" />
 

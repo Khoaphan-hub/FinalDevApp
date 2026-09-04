@@ -79,9 +79,8 @@
                 android:id="@+id/loginButton"
                 style="@style/Widget.Journify.Button"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="@string/login_button"
-                app:cornerRadius="18dp" />
+                android:layout_height="wrap_content"
+                android:text="@string/login_button" />
 
             <ProgressBar
                 android:id="@+id/loginProgressBar"
@@ -94,17 +93,16 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/signupButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.Journify.Button.Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/signup_prompt"
-            android:textColor="@color/primary"
             android:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/continueWithoutLoginButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.Journify.Button.Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

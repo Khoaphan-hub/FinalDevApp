@@ -264,15 +264,28 @@ public class ItineraryActivity extends AppCompatActivity {
                 LinearLayout actions = new LinearLayout(this);
                 actions.setOrientation(LinearLayout.HORIZONTAL);
                 actions.setPadding(0, dp(10), 0, 0);
+                // Both buttons are built by hand, so they have to be sized by hand too: the
+                // outlined Material style and the app's own button style carry different insets
+                // and minimum heights, which is what made this pair look mismatched.
                 MaterialButton details = new MaterialButton(this, null,
                     com.google.android.material.R.attr.materialButtonOutlinedStyle);
                 details.setText(R.string.details);
-                details.setTextSize(12);
                 details.setOnClickListener(v -> openDetails(stop));
                 MaterialButton replace = new MaterialButton(this);
                 replace.setText(R.string.replace);
-                replace.setTextSize(12);
                 final int selectedIndex = index;
+                for (MaterialButton action : new MaterialButton[]{details, replace}) {
+                    action.setTextSize(12);
+                    action.setAllCaps(false);
+                    action.setInsetTop(0);
+                    action.setInsetBottom(0);
+                    action.setMinHeight(0);
+                    action.setMinimumHeight(0);
+                    action.setMinWidth(0);
+                    action.setMinimumWidth(0);
+                    action.setPadding(dp(12), 0, dp(12), 0);
+                    action.setCornerRadius(dp(12));
+                }
                 replace.setOnClickListener(v -> openReplacement(day.getDayNumber(), selectedIndex, stop));
                 LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(0, dp(42), 1);
                 actionParams.rightMargin = dp(8);

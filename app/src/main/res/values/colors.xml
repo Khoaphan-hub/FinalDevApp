@@ -52,4 +52,5 @@
     <!-- Laid over photographs so white text stays legible on any image. -->
     <color name="scrim_strong">#A6000000</color>
     <color name="scrim_soft">#40000000</color>
+    <color name="alert_red_soft">#F7E2DD</color>
 </resources>

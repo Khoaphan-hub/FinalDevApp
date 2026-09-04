@@ -94,20 +94,95 @@
         <item name="cornerSize">26dp</item>
     </style>
 
+    <!--
+      One button family, four roles. Before this the layouts mixed raw Material styles at six
+      different heights and three corner radii; every button now inherits the same height,
+      radius and label treatment so a screen reads as one set of controls.
+
+      Filled  - the single main action on a screen.
+      Tonal   - supporting actions that still deserve a surface (map, export).
+      Outline - secondary actions next to a filled one.
+      Text    - low emphasis, inline.
+      Danger  - destructive, tonal rather than loud red.
+    -->
     <style name="Widget.Journify.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:minWidth">0dp</item>
         <item name="backgroundTint">@color/primary_container</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingEnd">22dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:stateListAnimator">@null</item>
-        <item name="cornerRadius">16dp</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="elevation">0dp</item>
         <item name="rippleColor">@color/primary_soft</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconSize">18dp</item>
+        <item name="iconTint">@color/white</item>
+    </style>
+
+    <style name="Widget.Journify.Button.Tonal" parent="Widget.Journify.Button">
+        <item name="backgroundTint">@color/primary_soft</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="iconTint">@color/primary</item>
+        <item name="rippleColor">@color/primary</item>
+    </style>
+
+    <style name="Widget.Journify.Button.Outline" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingEnd">22dp</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="strokeColor">@color/input_border</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconSize">18dp</item>
+        <item name="iconTint">@color/primary</item>
+        <item name="rippleColor">@color/primary_soft</item>
+    </style>
+
+    <style name="Widget.Journify.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="iconSize">18dp</item>
+        <item name="iconTint">@color/primary</item>
+        <item name="rippleColor">@color/primary_soft</item>
+    </style>
+
+    <style name="Widget.Journify.Button.Danger" parent="Widget.Journify.Button.Tonal">
+        <item name="android:minHeight">40dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="backgroundTint">@color/alert_red_soft</item>
+        <item name="android:textColor">@color/alert_red</item>
+        <item name="iconTint">@color/alert_red</item>
+        <item name="rippleColor">@color/alert_red</item>
+        <item name="cornerRadius">12dp</item>
     </style>
 
     <!--
@@ -141,5 +216,50 @@
         <item name="boxCornerRadiusTopEnd">16dp</item>
         <item name="boxCornerRadiusBottomStart">16dp</item>
         <item name="boxCornerRadiusBottomEnd">16dp</item>
+    </style>
+
+    <!--
+      Toolbar segment. Separate from Button.Text because that style carries 14dp of horizontal
+      padding, which inside a 36dp segment leaves no room for the label and ellipsises "VN".
+    -->
+    <style name="Widget.Journify.Segment" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/language_segment_text</item>
+        <item name="backgroundTint">@color/language_segment_background</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">15dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconTint">@color/language_segment_text</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!--
+      Back button. Previously each screen rolled its own: 48dp or 25sp, primary or text_primary,
+      and place detail even had a square card background. One circular tonal target now matches
+      the tonal buttons used elsewhere.
+    -->
+    <style name="Widget.Journify.BackButton" parent="">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/bg_icon_button</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:text">‹</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:contentDescription">@string/back</item>
     </style>
 </resources>

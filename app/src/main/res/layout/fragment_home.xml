@@ -31,7 +31,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/homeLoginButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Journify.Button.Outline"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:insetTop="0dp"
@@ -42,13 +42,9 @@
                 android:paddingTop="0dp"
                 android:paddingBottom="0dp"
                 android:text="@string/login_button"
-                android:textColor="@color/primary"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:textAllCaps="false"
-                app:cornerRadius="18dp"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="1.5dp" />
+                android:textAllCaps="false" />
         </LinearLayout>
 
         <TextView android:fontFamily="@font/journify_display"
@@ -75,7 +71,7 @@
                 </LinearLayout>
                 <TextView android:id="@+id/weatherDetails" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/text_secondary" android:textSize="13sp" />
                 <TextView android:id="@+id/weatherForecast" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:lineSpacingExtra="3dp" android:textColor="@color/text_primary" android:textSize="13sp" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/weatherRetryButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/retry" android:textColor="@color/primary" android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/weatherRetryButton" style="@style/Widget.Journify.Button.Text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/retry" android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -85,44 +81,10 @@
             android:layout_marginTop="18dp"
             app:cardCornerRadius="26dp"
             app:cardElevation="3dp">
-            <FrameLayout
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/heroPager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/hero_dalat_description"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/hero_dalat" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/scrim_image_bottom" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:orientation="vertical"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="18dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/hero_kicker"
-                        android:textColor="@color/gold"
-                        android:textAppearance="@style/TextAppearance.Journify.Overline"
-                        android:textSize="11sp" />
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/journify_display"
-                        android:text="@string/hero_caption"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-                </LinearLayout>
-            </FrameLayout>
+                android:layout_height="match_parent" />
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -169,12 +131,12 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/startPlanningButton"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
                     android:text="@string/plan_now"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/primary_container"
                     app:backgroundTint="@color/white"
-                    app:cornerRadius="18dp" />
+                    app:rippleColor="@color/primary_soft" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -196,11 +158,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/explorePlacesButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.Journify.Button.Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/view_places"
-                android:textColor="@color/primary" />
+                android:text="@string/view_places" />
         </LinearLayout>
 
         <LinearLayout

@@ -42,4 +42,5 @@
 
     <color name="scrim_strong">#B3000000</color>
     <color name="scrim_soft">#59000000</color>
+    <color name="alert_red_soft">#3A2621</color>
 </resources>

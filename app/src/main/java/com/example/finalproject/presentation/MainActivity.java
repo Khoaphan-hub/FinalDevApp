@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         topAppBar = findViewById(R.id.topAppBar);
         setupLanguageSwitch();
+        setupThemeSwitch();
 
         bottomNav = findViewById(R.id.bottom_navigation);
         tabPager = findViewById(R.id.tabPager);
@@ -77,6 +78,21 @@ public class MainActivity extends AppCompatActivity {
             String target = checkedId == R.id.languageEnglishButton ? "en" : "vi";
             if (target.equals(Locale.getDefault().getLanguage())) return;
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(target));
+        });
+    }
+
+
+    /** Mirrors setupLanguageSwitch: same control shape, same guard against reacting to setup. */
+    private void setupThemeSwitch() {
+        MaterialButtonToggleGroup themeToggle = findViewById(R.id.themeToggleGroup);
+        boolean dark = ThemePreference.isDark(this);
+        themeToggle.check(dark ? R.id.themeDarkButton : R.id.themeLightButton);
+        themeToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (!isChecked) return;
+            boolean wantDark = checkedId == R.id.themeDarkButton;
+            if (wantDark == ThemePreference.isDark(this)) return;
+            ThemePreference.setDark(this, wantDark);
+            recreate();
         });
     }
 

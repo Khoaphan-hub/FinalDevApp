@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular tonal surface for the back chevron, matching Widget.Journify.Button.Tonal. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/primary">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/surface_variant" />
+        </shape>
+    </item>
+</ripple>

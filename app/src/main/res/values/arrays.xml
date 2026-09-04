@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Hero carousel copy. The three arrays are read in lockstep by HeroSlideAdapter, so they must
+  stay the same length and the same order as HeroSlide.IMAGES. values-en holds the translations.
+-->
+<resources>
+    <string-array name="hero_kickers">
+        <item>Đường hoa tháng Giêng</item>
+        <item>Trái tim thành phố</item>
+        <item>Thác nước Lâm Đồng</item>
+        <item>Đồi cỏ mùa khô</item>
+        <item>Hồ giữa rừng thông</item>
+    </string-array>
+    <string-array name="hero_captions">
+        <item>Mai anh đào nở hồng con dốc</item>
+        <item>Hồ Xuân Hương lúc sương tan</item>
+        <item>Pongour đổ trắng bảy tầng đá</item>
+        <item>Đồi cỏ hồng trở màu lúc bình minh</item>
+        <item>Tuyền Lâm lặng dưới rừng thông</item>
+    </string-array>
+</resources>

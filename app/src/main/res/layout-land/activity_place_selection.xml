@@ -22,7 +22,7 @@
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="16dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="10dp" android:paddingEnd="20dp">
-                    <TextView android:id="@+id/selectionBackButton" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="‹" android:textColor="@color/primary" android:textSize="36sp" />
+                    <TextView android:id="@+id/selectionBackButton" style="@style/Widget.Journify.BackButton" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/selection_title" android:textColor="@color/text_primary" android:textSize="22sp" android:textStyle="bold" />
                 </LinearLayout>
                 <TextView android:id="@+id/selectionSummary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginTop="6dp" android:layout_marginEnd="20dp" android:background="@color/primary_soft" android:padding="12dp" android:textColor="@color/text_primary" android:textSize="13sp" />
@@ -46,8 +46,8 @@
                         android:inputType="text"
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
-                <com.google.android.material.button.MaterialButton android:id="@+id/selectionGenerateButton" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginStart="20dp" android:layout_marginTop="14dp" android:layout_marginEnd="20dp" android:text="@string/generate_selected" app:cornerRadius="16dp" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/selectionSkipButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="46dp" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:text="@string/skip_selection" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionGenerateButton" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginStart="20dp" android:layout_marginTop="14dp" android:layout_marginEnd="20dp" android:text="@string/generate_selected" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionSkipButton" style="@style/Widget.Journify.Button.Text" android:layout_width="match_parent" android:layout_height="46dp" android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:text="@string/skip_selection" />
             </LinearLayout>
         </ScrollView>
 
@@ -56,7 +56,7 @@
             <ProgressBar android:id="@+id/selectionProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />
             <LinearLayout android:id="@+id/selectionStatePanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="28dp" android:visibility="gone">
                 <TextView android:id="@+id/selectionStateMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="@color/text_secondary" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/selectionRetryButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/reload_list" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/selectionRetryButton" style="@style/Widget.Journify.Button.Text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/reload_list" />
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

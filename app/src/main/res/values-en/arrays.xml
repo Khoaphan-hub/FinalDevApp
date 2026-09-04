@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="hero_kickers">
+        <item>Blossom road in January</item>
+        <item>The heart of the city</item>
+        <item>Lam Dong waterfall</item>
+        <item>Grass hill in the dry season</item>
+        <item>A lake in the pines</item>
+    </string-array>
+    <string-array name="hero_captions">
+        <item>Cherry blossom turns the slope pink</item>
+        <item>Xuan Huong Lake as the mist lifts</item>
+        <item>Pongour falls white over seven ledges</item>
+        <item>Pink grass hill catches the sunrise</item>
+        <item>Tuyen Lam lies still beneath the pines</item>
+    </string-array>
+</resources>
