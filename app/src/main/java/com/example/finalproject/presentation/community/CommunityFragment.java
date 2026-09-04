@@ -166,16 +166,57 @@ public class CommunityFragment extends Fragment {
                     JSONObject response = new JSONObject(readStream(connection.getInputStream()));
                     JSONObject plannerData = response.optJSONObject("planner_itinerary");
                     if (plannerData != null) {
-                        String json = plannerData.toString();
-                        mainHandler.post(() -> {
-                            progress.setVisibility(View.GONE);
-                            Intent intent = new Intent(requireContext(), ItineraryActivity.class);
-                            intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, json);
-                            intent.putExtra("IS_COMMUNITY", true);
-                            intent.putExtra("COMMUNITY_ID", id);
-                            startActivity(intent);
-                        });
-                        return;
+                        org.json.JSONObject results = plannerData.optJSONObject("results");
+                        if (results != null) {
+                            java.util.List<com.example.finalproject.domain.model.ItineraryDay> days = new java.util.ArrayList<>();
+                            java.util.Iterator<String> keys = results.keys();
+                            while (keys.hasNext()) {
+                                String key = keys.next();
+                                int dayNum = Integer.parseInt(key);
+                                org.json.JSONArray stopsArr = results.optJSONArray(key);
+                                java.util.List<com.example.finalproject.domain.model.ItineraryStop> stops = new java.util.ArrayList<>();
+                                if (stopsArr != null) {
+                                    for (int i = 0; i < stopsArr.length(); i++) {
+                                        org.json.JSONObject stopObj = stopsArr.optJSONObject(i);
+                                        if (stopObj != null) {
+                                            com.example.finalproject.domain.model.ItineraryStop.Type type = com.example.finalproject.domain.model.ItineraryStop.Type.POI;
+                                            try { type = com.example.finalproject.domain.model.ItineraryStop.Type.valueOf(stopObj.optString("type", "POI")); } catch (Exception ignored) {}
+                                            
+                                            String image = stopObj.optString("image_url", null);
+                                            if (image == null || image.isEmpty()) image = stopObj.optString("image_code", null);
+                                            if (image != null && image.isEmpty()) image = null;
+                                            
+                                            String mealSlot = stopObj.optString("meal_slot", null);
+                                            if (mealSlot != null && mealSlot.isEmpty()) mealSlot = null;
+
+                                            stops.add(new com.example.finalproject.domain.model.ItineraryStop(
+                                                stopObj.optInt("id"), type, stopObj.optString("name"), stopObj.optString("address"),
+                                                stopObj.optDouble("latitude"), stopObj.optDouble("longitude"), 0, mealSlot, image
+                                            ));
+                                        }
+                                    }
+                                }
+                                days.add(new com.example.finalproject.domain.model.ItineraryDay(dayNum, stops));
+                            }
+                            java.util.Collections.sort(days, (a, b) -> Integer.compare(a.getDayNumber(), b.getDayNumber()));
+                            
+                            long totalBudget = Math.round(response.optDouble("budget_amount", 0));
+                            long remainingBudget = Math.round(response.optDouble("budget_remaining", 0));
+                            
+                            com.example.finalproject.domain.model.Itinerary itinerary = new com.example.finalproject.domain.model.Itinerary(
+                                response.optString("title", "Itinerary"), days, totalBudget, totalBudget - remainingBudget, false
+                            );
+
+                            mainHandler.post(() -> {
+                                progress.setVisibility(View.GONE);
+                                Intent intent = new Intent(requireContext(), ItineraryActivity.class);
+                                intent.putExtra(ItineraryActivity.EXTRA_ITINERARY, itinerary);
+                                intent.putExtra("IS_COMMUNITY", true);
+                                intent.putExtra("COMMUNITY_ID", id);
+                                startActivity(intent);
+                            });
+                            return;
+                        }
                     }
                 }
                 mainHandler.post(() -> {
