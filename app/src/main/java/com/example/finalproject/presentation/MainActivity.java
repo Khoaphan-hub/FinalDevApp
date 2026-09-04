@@ -96,6 +96,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // FragmentManager restores the existing tab; do not replace it just to update its title.
+        int selected = bottomNav.getSelectedItemId();
+        if (selected == R.id.nav_community) topAppBar.setTitle(R.string.community);
+        else if (selected == R.id.nav_trips) topAppBar.setTitle(R.string.trips);
+        else if (selected == R.id.nav_profile) topAppBar.setTitle(R.string.profile);
+        else topAppBar.setTitle("Journify");
+    }
+
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);

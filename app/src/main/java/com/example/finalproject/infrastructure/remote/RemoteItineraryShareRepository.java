@@ -73,6 +73,10 @@ public final class RemoteItineraryShareRepository {
                     .put("name", stop.getName()).put("address", stop.getAddress())
                     .put("latitude", stop.getLatitude()).put("longitude", stop.getLongitude())
                     .put("travel_to_next_km", stop.getTravelToNextKm())
+                    .put("price", stop.getPriceVnd()).put("rating", stop.getRating())
+                    .put("open_hours", stop.getOpenHours()).put("tags", stop.getTags())
+                    .put("highlight", stop.getHighlight()).put("map_name", stop.getMapName())
+                    .put("map_address", stop.getMapAddress())
                     .put("meal_slot", stop.getMealSlot() == null ? JSONObject.NULL : stop.getMealSlot()));
             }
             days.put(d.put("stops", stops));

@@ -23,6 +23,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from home import views
+from home.mobile_import import mobile_import_itinerary
 from home.mobile_api import (
     mobile_catalog,
     mobile_create_itinerary_share,
@@ -65,6 +66,7 @@ urlpatterns = [
     path('api/mobile/catalog/', mobile_catalog, name='mobile-catalog'),
     path('api/mobile/search-suggestions/', mobile_search_suggestions, name='mobile-search-suggestions'),
     path('api/mobile/itineraries/share/', mobile_create_itinerary_share, name='mobile-itinerary-share'),
+    path('api/mobile/itineraries/import/<slug:token>/', mobile_import_itinerary, name='mobile-itinerary-import'),
     path('api/mobile/place-reports/', mobile_create_place_report, name='mobile-place-report'),
     path('api/mobile/itineraries/generate/', mobile_generate_itinerary, name='mobile-generate-itinerary'),
     path('api/logout/', home_views.logout_api, name='logout-api'),

@@ -1,0 +1,33 @@
+<resources>
+    <string name="qr_import_title">Import itinerary</string>
+    <string name="qr_entry_title">One little code. A whole trip.</string>
+    <string name="qr_entry_body">Got a Journify PDF from a friend? Scan its code to explore and save the trip.</string>
+    <string name="qr_hero_title">Shared journeys.\nNew inspiration.</string>
+    <string name="qr_hero_body">Bring a trip back from a Journify PDF QR code. Preview, make it yours, then save.</string>
+    <string name="qr_scan">Scan QR code</string>
+    <string name="qr_scan_hint">Point your camera at a code on another screen or a printed page.</string>
+    <string name="qr_choose_image">Choose QR image</string>
+    <string name="qr_image_hint">PDF on this phone? Take a screenshot of the QR page, then choose that image.</string>
+    <string name="qr_privacy">Images are decoded on your device, never uploaded. A backend connection is needed to retrieve the trip. Codes last 30 days.</string>
+    <string name="qr_preview_note">Preview first. Nothing is saved until you tap “Save to my trips”.</string>
+    <string name="qr_reading_image">Reading the code in your image…</string>
+    <string name="qr_loading_trip">Retrieving your itinerary…</string>
+    <string name="qr_retry">Try connecting again</string>
+    <string name="qr_invalid">This is not a valid Journify itinerary code. Choose the QR code on the last page of a Journify PDF.</string>
+    <string name="qr_no_code">No QR code found. Choose a clear image with all four corners visible, or crop closer to the code.</string>
+    <string name="qr_multiple">This image contains multiple QR codes. Crop it to the itinerary code you want to open.</string>
+    <string name="qr_image_error">Could not read this image. Try another PNG or JPG screenshot.</string>
+    <string name="qr_expired">This QR code has expired. Ask the sender to export a new PDF.</string>
+    <string name="qr_missing">Trip not found on this backend. The code may have been removed, belong to another server, or require a backend update for QR import.</string>
+    <string name="qr_network_error">Cannot reach the backend. Check your connection and start the backend, then retry. You do not need to choose the image again.</string>
+    <string name="qr_server_error">The backend cannot return the trip right now. Please try again shortly.</string>
+    <string name="qr_camera_denied">Camera access is not granted. Enable Camera in app settings or use “Choose QR image”.</string>
+    <string name="qr_no_camera">No camera is available. Please use “Choose QR image”.</string>
+    <string name="qr_cancelled">No code selected. Scan or choose an image whenever you are ready.</string>
+    <string name="qr_scan_prompt">Place the QR code inside the frame</string>
+    <string name="qr_scan_footer">Hold steady • Your code is detected automatically</string>
+    <string name="qr_close">Close camera</string>
+    <string name="qr_preview_badge">PREVIEW • NOT SAVED</string>
+    <string name="qr_save">Save to my trips</string>
+    <string name="qr_back">Go back</string>
+</resources>

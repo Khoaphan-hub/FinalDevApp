@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background" android:orientation="vertical">
+    <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="20dp" android:layout_marginTop="16dp" app:cardCornerRadius="22dp" app:cardElevation="0dp" app:cardBackgroundColor="@color/surface_variant">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/qr_entry_title" android:textSize="19sp" android:textStyle="bold" android:textColor="@color/text_primary" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/qr_entry_body" android:textSize="14sp" android:textColor="@color/text_secondary" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/importTripButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp" android:layout_marginTop="14dp" android:text="@string/qr_import_title" app:icon="@drawable/ic_qr_import" app:iconGravity="textStart" app:cornerRadius="16dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/savedTripsRecycler" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:padding="20dp" />
     <ProgressBar android:id="@+id/savedTripsProgress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" android:indeterminateTint="@color/primary" />
     <LinearLayout android:id="@+id/savedTripsEmpty" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:padding="32dp" android:visibility="gone">
@@ -10,6 +18,6 @@
         <TextView android:fontFamily="@font/journify_display" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:gravity="center" android:text="@string/saved_empty_title" android:textColor="@color/text_primary" android:textSize="21sp" android:textStyle="bold" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:text="@string/saved_empty_message" android:textColor="@color/text_secondary" android:textSize="14sp" />
     </LinearLayout>
-
     <include layout="@layout/view_signed_out" />
-</FrameLayout>
+    </FrameLayout>
+</LinearLayout>

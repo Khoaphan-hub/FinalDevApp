@@ -1,0 +1,33 @@
+<resources>
+    <string name="qr_import_title">Nhập lịch trình</string>
+    <string name="qr_entry_title">Một mã nhỏ, cả chuyến đi</string>
+    <string name="qr_entry_body">Có PDF Journify từ bạn bè? Quét mã để xem và lưu lịch trình.</string>
+    <string name="qr_hero_title">Chuyến đi được chia sẻ,\ncảm hứng được tiếp nối.</string>
+    <string name="qr_hero_body">Mở lại lịch trình từ mã QR trong PDF Journify. Xem trước, chỉnh sửa rồi lưu theo cách của bạn.</string>
+    <string name="qr_scan">Quét mã QR</string>
+    <string name="qr_scan_hint">Đưa camera vào mã QR trên một màn hình khác hoặc bản in.</string>
+    <string name="qr_choose_image">Chọn ảnh QR</string>
+    <string name="qr_image_hint">PDF ở ngay trên điện thoại? Chụp màn hình trang có QR rồi chọn ảnh đó.</string>
+    <string name="qr_privacy">Ảnh được đọc ngay trên máy, không tải lên server. Cần kết nối backend để lấy lịch trình; mã có hiệu lực 30 ngày.</string>
+    <string name="qr_preview_note">Bạn luôn được xem trước. Chuyến đi chỉ được lưu khi bạn nhấn “Lưu vào chuyến đi”.</string>
+    <string name="qr_reading_image">Đang đọc mã trong ảnh…</string>
+    <string name="qr_loading_trip">Đang lấy lịch trình của bạn…</string>
+    <string name="qr_retry">Thử kết nối lại</string>
+    <string name="qr_invalid">Mã này không chứa lịch trình Journify hợp lệ. Hãy chọn QR ở trang cuối của PDF Journify.</string>
+    <string name="qr_no_code">Chưa tìm thấy mã QR. Hãy chọn ảnh rõ nét, có đủ bốn góc của mã hoặc cắt ảnh gần vùng QR hơn.</string>
+    <string name="qr_multiple">Ảnh có nhiều mã QR. Hãy cắt ảnh để chỉ còn mã lịch trình bạn muốn mở.</string>
+    <string name="qr_image_error">Không đọc được ảnh này. Hãy thử ảnh chụp màn hình dạng PNG hoặc JPG khác.</string>
+    <string name="qr_expired">Mã QR đã hết hạn. Nhờ người chia sẻ xuất lại PDF để tạo mã mới.</string>
+    <string name="qr_missing">Không tìm thấy lịch trình trên backend hiện tại. Có thể mã đã bị xóa, thuộc server khác hoặc backend chưa cập nhật chức năng nhập QR.</string>
+    <string name="qr_network_error">Chưa kết nối được backend. Kiểm tra mạng và bật backend, rồi thử lại. Ảnh QR không cần chọn lại.</string>
+    <string name="qr_server_error">Backend chưa thể trả lịch trình. Hãy thử lại sau ít phút.</string>
+    <string name="qr_camera_denied">Chưa có quyền camera. Bạn có thể cấp quyền Camera trong cài đặt ứng dụng hoặc dùng “Chọn ảnh QR”.</string>
+    <string name="qr_no_camera">Thiết bị không có camera khả dụng. Hãy dùng “Chọn ảnh QR”.</string>
+    <string name="qr_cancelled">Chưa chọn mã nào. Bạn có thể quét hoặc chọn ảnh khi sẵn sàng.</string>
+    <string name="qr_scan_prompt">Đặt mã QR vào trong khung</string>
+    <string name="qr_scan_footer">Giữ máy ổn định • Mã sẽ được nhận tự động</string>
+    <string name="qr_close">Đóng camera</string>
+    <string name="qr_preview_badge">XEM TRƯỚC • CHƯA LƯU</string>
+    <string name="qr_save">Lưu vào chuyến đi</string>
+    <string name="qr_back">Quay lại</string>
+</resources>

@@ -43,6 +43,8 @@ public class SavedTripsFragment extends Fragment {
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        view.findViewById(R.id.importTripButton).setOnClickListener(v -> startActivity(new Intent(
+                requireContext(), com.example.finalproject.presentation.importtrip.ImportTripActivity.class)));
         RecyclerView recycler = view.findViewById(R.id.savedTripsRecycler);
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new SavedTripAdapter(new SavedTripAdapter.Listener() {

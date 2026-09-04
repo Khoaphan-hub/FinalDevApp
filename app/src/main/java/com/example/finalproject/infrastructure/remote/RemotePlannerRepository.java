@@ -105,7 +105,7 @@ public final class RemotePlannerRepository implements PlannerRepository {
         return json;
     }
 
-    private Itinerary parseItinerary(JSONObject data) throws Exception {
+    public static Itinerary parseItinerary(JSONObject data) throws Exception {
         List<ItineraryDay> days = new ArrayList<>();
         JSONArray dayArray = data.getJSONArray("days");
         for (int i = 0; i < dayArray.length(); i++) {
@@ -120,8 +120,8 @@ public final class RemotePlannerRepository implements PlannerRepository {
                 stops.add(new ItineraryStop(
                     stop.optInt("id"), type, stop.optString("name"), stop.optString("address"),
                     stop.optDouble("latitude"), stop.optDouble("longitude"),
-                    stop.optDouble("travel_to_next_km"), nullable(stop, "meal_slot"),
-                    nullable(stop, "image_url"), stop.optDouble("rating"),
+                    stop.optDouble("travel_to_next_km", 0), nullable(stop, "meal_slot"),
+                    nullable(stop, "image_url"), stop.optDouble("rating", 0),
                     Math.round(stop.optDouble("price")), nullable(stop, "open_hours"),
                     nullable(stop, "tags"), nullable(stop, "highlight"), nullable(stop, "media_url"),
                     localized(stop, "map_name", "name"), localized(stop, "map_address", "address")
@@ -134,11 +134,11 @@ public final class RemotePlannerRepository implements PlannerRepository {
             Math.round(budget.optDouble("total")), Math.round(budget.optDouble("estimated")), false);
     }
 
-    private String nullable(JSONObject object, String key) {
+    private static String nullable(JSONObject object, String key) {
         return object.isNull(key) ? null : object.optString(key, null);
     }
 
-    private String localized(JSONObject object, String preferred, String fallback) {
+    private static String localized(JSONObject object, String preferred, String fallback) {
         String value = nullable(object, preferred);
         return value == null || value.trim().isEmpty() ? object.optString(fallback) : value;
     }

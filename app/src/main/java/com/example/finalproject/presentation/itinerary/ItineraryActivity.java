@@ -60,6 +60,7 @@ import java.util.concurrent.Executors;
 
 public class ItineraryActivity extends AppCompatActivity {
     public static final String EXTRA_ITINERARY = "itinerary";
+    public static final String EXTRA_IMPORTED = "imported_qr_preview";
 
     // The itinerary is edited in place (Replace), so on a configuration change it must come back
     // from the saved state. Re-reading the intent would silently undo every replacement.
@@ -147,6 +148,7 @@ public class ItineraryActivity extends AppCompatActivity {
         findViewById(R.id.shareTripButton).setOnClickListener(v -> shareItinerary());
         boolean isCommunity = getIntent().getBooleanExtra("IS_COMMUNITY", false);
         int communityId = getIntent().getIntExtra("COMMUNITY_ID", -1);
+        boolean isImported = getIntent().getBooleanExtra(EXTRA_IMPORTED, false);
         
         if (isCommunity) {
             saveTripBtn.setText(R.string.save_to_device);
@@ -161,6 +163,17 @@ public class ItineraryActivity extends AppCompatActivity {
         } else {
             saveTripBtn.setOnClickListener(v -> saveTripLocally(v));
             publishTripBtn.setOnClickListener(v -> publishItinerary());
+        }
+        if (isImported) {
+            TextView badge = findViewById(R.id.offlineBadge);
+            badge.setText(R.string.qr_preview_badge);
+            badge.setTextColor(getColor(R.color.primary));
+            badge.setVisibility(View.VISIBLE);
+            saveTripBtn.setVisibility(View.GONE);
+            publishTripBtn.setVisibility(View.GONE);
+            View importSave = findViewById(R.id.importSaveButton);
+            importSave.setVisibility(View.VISIBLE);
+            importSave.setOnClickListener(this::saveTripLocally);
         }
 
         findViewById(R.id.openMapButton).setOnClickListener(v -> {
@@ -180,8 +193,16 @@ public class ItineraryActivity extends AppCompatActivity {
             chip.setId(android.view.View.generateViewId());
             chip.setText(getString(R.string.day_label, day.getDayNumber()));
             chip.setCheckable(true);
-            chip.setTag(day);
-            chip.setOnClickListener(v -> renderDay((ItineraryDay) v.getTag()));
+            final int dayNumber = day.getDayNumber();
+            chip.setOnClickListener(v -> {
+                // Replacements create new day objects; always render the current model.
+                for (ItineraryDay currentDay : itinerary.getDays()) {
+                    if (currentDay.getDayNumber() == dayNumber) {
+                        renderDay(currentDay);
+                        break;
+                    }
+                }
+            });
             chipGroup.addView(chip);
             if (chipToCheck == null || day.getDayNumber() == selectedDayNumber) {
                 chipToCheck = chip;

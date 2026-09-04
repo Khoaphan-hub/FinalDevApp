@@ -46,6 +46,9 @@ def build_resume_snapshot(itinerary: dict) -> dict:
                 'travel_to_next_km': float(stop.get('travel_to_next_km') or 0),
                 'slot': stop.get('meal_slot'),
             }
+            for field in ('price', 'rating', 'open_hours', 'tags', 'highlight', 'map_name', 'map_address'):
+                if stop.get(field) is not None:
+                    normalized[field] = stop[field]
             stops.append(normalized)
             if item_id > 0 and item_type == 'POI':
                 selected_poi_ids.append(item_id)

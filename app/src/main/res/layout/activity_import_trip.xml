@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/importTripRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/importToolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" app:title="@string/qr_import_title" app:titleTextColor="@color/text_primary" app:navigationIcon="@drawable/ic_qr_back" app:navigationContentDescription="@string/qr_back" />
+    <ScrollView android:id="@+id/qrImportScroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+            <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="28dp" app:cardElevation="0dp" app:cardBackgroundColor="@color/primary">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="24dp" android:orientation="vertical">
+                    <ImageView android:layout_width="48dp" android:layout_height="48dp" android:src="@drawable/ic_qr_import" android:importantForAccessibility="no" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="@string/qr_hero_title" android:textSize="27sp" android:textStyle="bold" android:textColor="@color/white" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/qr_hero_body" android:textSize="15sp" android:lineSpacingExtra="3dp" android:textColor="@color/white" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton android:id="@+id/qrCameraButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:layout_marginTop="24dp" android:text="@string/qr_scan" app:icon="@drawable/ic_qr_import" app:iconGravity="textStart" app:cornerRadius="18dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:paddingHorizontal="8dp" android:text="@string/qr_scan_hint" android:textSize="14sp" android:textColor="@color/text_secondary" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/qrImageButton" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:layout_marginTop="20dp" android:text="@string/qr_choose_image" android:textAllCaps="false" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/primary" app:icon="@drawable/ic_qr_photo" app:iconTint="@color/primary" app:iconGravity="textStart" app:strokeColor="@color/primary" app:cornerRadius="18dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:paddingHorizontal="8dp" android:text="@string/qr_image_hint" android:textSize="14sp" android:textColor="@color/text_secondary" />
+            <com.google.android.material.card.MaterialCardView android:id="@+id/qrStatusCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:visibility="gone" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:cardBackgroundColor="@color/surface_variant">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+                    <ProgressBar android:id="@+id/qrProgress" android:layout_width="32dp" android:layout_height="32dp" android:layout_gravity="center_horizontal" android:indeterminateTint="@color/primary" />
+                    <TextView android:id="@+id/qrStatusText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="15sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_primary" android:accessibilityLiveRegion="polite" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/qrRetryButton" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/qr_retry" android:textAllCaps="false" android:textColor="@color/primary" android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/qr_preview_note" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/primary" android:lineSpacingExtra="3dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/qr_privacy" android:textSize="12sp" android:textColor="@color/text_secondary" android:lineSpacingExtra="3dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
