@@ -1,0 +1,15 @@
+name: Keep Alive Server
+
+on:
+  schedule:
+    # Run every 10 minutes (UTC)
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Server
+        run: |
+          curl -f -s -S -I --max-time 30 "https://journify-backend-hiky.onrender.com/" || true
